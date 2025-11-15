@@ -141,7 +141,7 @@ const HomePage = () => {
             <Card className="border-2 border-slate-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300 bg-white">
               <CardHeader>
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/20">
-                  <Box className="w-7 h-7 text-white" />
+                  <Boxes className="w-7 h-7 text-white" />
                 </div>
                 <CardTitle className="text-2xl">Conversione 3D Automatica</CardTitle>
                 <CardDescription className="text-base">
