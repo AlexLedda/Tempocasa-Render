@@ -92,7 +92,7 @@ const Scene3D = ({ threeData }) => {
           </mesh>
         ))}
         
-        <OrbitControls enablePan enableZoom enableRotate />
+        <CameraControls />
       </>
     );
   } catch (error) {
