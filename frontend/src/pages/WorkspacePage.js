@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
