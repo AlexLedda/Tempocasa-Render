@@ -396,7 +396,7 @@ const WorkspacePage = () => {
                             disabled={loading}
                             className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                           >
-                            <Cube className="w-4 h-4 mr-1" />
+                            <Box className="w-4 h-4 mr-1" />
                             Converti 3D
                           </Button>
                         )}
