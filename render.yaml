@@ -1,0 +1,38 @@
+services:
+  # Backend Service
+  - type: web
+    name: vision3d-backend
+    env: python
+    region: frankfurt
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn server:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: MONGO_URL
+        sync: false
+      - key: DB_NAME
+        value: vision3d_production
+      - key: CORS_ORIGINS
+        sync: false
+      - key: EMERGENT_LLM_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dywaykio8
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+  # Frontend Service
+  - type: web
+    name: vision3d-frontend
+    env: node
+    region: frankfurt
+    buildCommand: "cd frontend && yarn install && yarn build"
+    startCommand: "cd frontend && npx serve -s build -p $PORT"
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.5
+      - key: REACT_APP_BACKEND_URL
+        sync: false
