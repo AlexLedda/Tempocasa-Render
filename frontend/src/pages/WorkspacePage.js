@@ -7,11 +7,11 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Box, Upload, Pencil, Home, Loader2, Eye } from 'lucide-react';
+import { Boxes, Upload, Pencil, Home, Loader2, Eye } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Box, Plane } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 const Scene3D = ({ threeData }) => {
