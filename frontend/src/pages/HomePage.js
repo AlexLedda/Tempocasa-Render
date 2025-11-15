@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Cube, MessageSquare, Sparkles, Zap, Upload, Pencil } from 'lucide-react';
+import { Box, MessageSquare, Sparkles, Zap, Upload, Pencil } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
