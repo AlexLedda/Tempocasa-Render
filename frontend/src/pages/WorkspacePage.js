@@ -10,9 +10,35 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Boxes, Upload, Pencil, Home, Loader2, Eye } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
+
+extend({ OrbitControls });
+
+const CameraControls = () => {
+  const { camera, gl } = useThree();
+  const controlsRef = React.useRef();
+  
+  React.useEffect(() => {
+    const controls = new OrbitControls(camera, gl.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controlsRef.current = controls;
+    
+    return () => {
+      controls.dispose();
+    };
+  }, [camera, gl]);
+  
+  useFrame(() => {
+    if (controlsRef.current) {
+      controlsRef.current.update();
+    }
+  });
+  
+  return null;
+};
 
 const Scene3D = ({ threeData }) => {
   if (!threeData) return null;
