@@ -6,7 +6,7 @@ import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Cube, Home, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
+import { Box, Home, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
