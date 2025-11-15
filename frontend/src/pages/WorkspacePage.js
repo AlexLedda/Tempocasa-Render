@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Cube, Upload, Pencil, Home, Loader2, Eye } from 'lucide-react';
+import { Box, Upload, Pencil, Home, Loader2, Eye } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Canvas } from '@react-three/fiber';
