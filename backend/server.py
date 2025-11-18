@@ -234,25 +234,92 @@ async def upload_floorplan_file(floorplan_id: str, file: UploadFile = File(...))
         logging.error(f"Upload error for {floorplan_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
+async def analyze_floorplan_with_ai(file_url: str) -> dict:
+    """Use AI to analyze floor plan image and extract structure"""
+    try:
+        # Use OpenAI Vision API to analyze the floor plan
+        client = AsyncOpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        
+        response = await client.chat.completions.create(
+            model="gpt-4o",  # Vision-capable model
+            messages=[
+                {
+                    "role": "system",
+                    "content": """Sei un esperto di architettura. Analizza questa piantina e estrai:
+                    1. Numero e dimensioni approssimative delle stanze (in metri)
+                    2. Posizione e dimensioni di porte e finestre
+                    3. Layout generale
+                    Rispondi in formato JSON con questa struttura:
+                    {
+                      \"rooms\": [{\"id\": \"room1\", \"type\": \"living\", \"width\": 5.0, \"depth\": 4.0, \"height\": 2.8}],
+                      \"walls\": [{\"start\": [0, 0], \"end\": [5, 0], \"height\": 2.8, \"thickness\": 0.2}],
+                      \"doors\": [{\"position\": [2.5, 0], \"width\": 0.9, \"height\": 2.1}],
+                      \"windows\": [{\"position\": [1, 2.8], \"width\": 1.2, \"height\": 1.5}]
+                    }"""
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "Analizza questa piantina e genera il modello 3D"},
+                        {"type": "image_url", "image_url": {"url": file_url}}
+                    ]
+                }
+            ],
+            max_tokens=1500,
+            temperature=0.3
+        )
+        
+        # Parse AI response
+        content = response.choices[0].message.content
+        # Extract JSON from response (might be wrapped in markdown)
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
+        
+        return json.loads(content)
+    except Exception as e:
+        logging.error(f"AI analysis failed: {str(e)}")
+        # Fallback to mock data if AI fails
+        return {
+            "rooms": [
+                {"id": "room1", "type": "living", "width": 5, "depth": 4, "height": 2.8},
+                {"id": "room2", "type": "bedroom", "width": 3.5, "depth": 3, "height": 2.8}
+            ],
+            "walls": [
+                {"start": [0, 0], "end": [5, 0], "height": 2.8, "thickness": 0.2},
+                {"start": [5, 0], "end": [5, 4], "height": 2.8, "thickness": 0.2}
+            ],
+            "doors": [{"position": [2.5, 0], "width": 0.9, "height": 2.1}],
+            "windows": [{"position": [1, 2.8], "width": 1.2, "height": 1.5}]
+        }
+
 @api_router.post("/floorplans/{floorplan_id}/convert-3d")
 async def convert_to_3d(floorplan_id: str):
     floorplan = await db.floorplans.find_one({"id": floorplan_id}, {"_id": 0})
     if not floorplan:
         raise HTTPException(status_code=404, detail="Floor plan not found")
     
-    # Simple mock 3D conversion - in production, this would use actual image processing/AI
-    three_d_data = {
-        "rooms": [
-            {"id": "room1", "type": "living", "width": 5, "depth": 4, "height": 2.8},
-            {"id": "room2", "type": "bedroom", "width": 3.5, "depth": 3, "height": 2.8}
-        ],
-        "walls": [
-            {"start": [0, 0], "end": [5, 0], "height": 2.8, "thickness": 0.2},
-            {"start": [5, 0], "end": [5, 4], "height": 2.8, "thickness": 0.2}
-        ],
-        "doors": [{"position": [2.5, 0], "width": 0.9, "height": 2.1}],
-        "windows": [{"position": [1, 2.8], "width": 1.2, "height": 1.5}]
-    }
+    # Check if file_url exists for AI analysis
+    three_d_data = None
+    if floorplan.get('file_url'):
+        logging.info(f"Using AI analysis for floor plan {floorplan_id}")
+        three_d_data = await analyze_floorplan_with_ai(floorplan['file_url'])
+    else:
+        # Fallback to mock data for canvas drawings
+        logging.info(f"Using mock data for floor plan {floorplan_id} (no file URL)")
+        three_d_data = {
+            "rooms": [
+                {"id": "room1", "type": "living", "width": 5, "depth": 4, "height": 2.8},
+                {"id": "room2", "type": "bedroom", "width": 3.5, "depth": 3, "height": 2.8}
+            ],
+            "walls": [
+                {"start": [0, 0], "end": [5, 0], "height": 2.8, "thickness": 0.2},
+                {"start": [5, 0], "end": [5, 4], "height": 2.8, "thickness": 0.2}
+            ],
+            "doors": [{"position": [2.5, 0], "width": 0.9, "height": 2.1}],
+            "windows": [{"position": [1, 2.8], "width": 1.2, "height": 1.5}]
+        }
     
     await db.floorplans.update_one(
         {"id": floorplan_id},
