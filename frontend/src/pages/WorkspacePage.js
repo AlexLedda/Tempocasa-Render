@@ -237,6 +237,27 @@ const WorkspacePage = () => {
     }
   };
 
+  const handleUpdate3D = async (updatedData) => {
+    if (!selectedPlan) return;
+    
+    setLoading(true);
+    try {
+      await axios.patch(`${API}/floorplans/${selectedPlan.id}`, {
+        three_d_data: JSON.stringify(updatedData)
+      });
+      
+      // Reload the plan
+      const planResponse = await axios.get(`${API}/floorplans/${selectedPlan.id}`);
+      setSelectedPlan(planResponse.data);
+      toast.success('Modello 3D aggiornato!');
+    } catch (error) {
+      console.error('Update error:', error);
+      toast.error('Errore durante l\\'aggiornamento');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const startDrawing = (e) => {
     if (!canvasContext) return;
     setIsDrawing(true);
