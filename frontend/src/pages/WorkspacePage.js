@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import * as THREE from 'three';
-import ThreeDEditor from '../components/ThreeD_Editor';
+import FloorPlanEditor2D from '../components/FloorPlanEditor2D';
 
 extend({ OrbitControls });
 
