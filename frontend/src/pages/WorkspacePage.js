@@ -436,18 +436,15 @@ const WorkspacePage = () => {
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        {!plan.three_d_data && (
-                          <Button
-                            data-testid={`convert-button-${plan.id}`}
-                            size="sm"
-                            onClick={() => handleConvert3D(plan.id)}
-                            disabled={loading}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                          >
-                            <Boxes className="w-4 h-4 mr-1" />
-                            Converti 3D
-                          </Button>
-                        )}
+                        <Button
+                          data-testid={`edit-button-${plan.id}`}
+                          size="sm"
+                          onClick={() => setSelectedPlan(plan)}
+                          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+                        >
+                          <Pencil className="w-4 h-4 mr-1" />
+                          Modifica 2D
+                        </Button>
                         {plan.three_d_data && (
                           <Button
                             data-testid={`view-button-${plan.id}`}
@@ -456,7 +453,7 @@ const WorkspacePage = () => {
                             variant="outline"
                           >
                             <Eye className="w-4 h-4 mr-1" />
-                            Visualizza
+                            Vista 3D
                           </Button>
                         )}
                       </div>
