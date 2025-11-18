@@ -470,26 +470,34 @@ const WorkspacePage = () => {
 
         {/* 3D Viewer */}
         {selectedPlan && selectedPlan.three_d_data && (
-          <Card className="mt-8 p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-slate-900">Vista 3D: {selectedPlan.name}</h2>
-              <Button
-                data-testid="close-3d-viewer-button"
-                variant="outline"
-                onClick={() => setSelectedPlan(null)}
-              >
-                Chiudi
-              </Button>
-            </div>
-            
-            <div className="h-[500px] bg-slate-100 rounded-lg overflow-hidden" data-testid="3d-canvas">
-              <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-                <Suspense fallback={null}>
-                  <Scene3D threeData={selectedPlan.three_d_data} />
-                </Suspense>
-              </Canvas>
-            </div>
-          </Card>
+          <>
+            <Card className="mt-8 p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-slate-900">Vista 3D: {selectedPlan.name}</h2>
+                <Button
+                  data-testid="close-3d-viewer-button"
+                  variant="outline"
+                  onClick={() => setSelectedPlan(null)}
+                >
+                  Chiudi
+                </Button>
+              </div>
+              
+              <div className="h-[500px] bg-slate-100 rounded-lg overflow-hidden" data-testid="3d-canvas">
+                <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
+                  <Suspense fallback={null}>
+                    <Scene3D threeData={selectedPlan.three_d_data} />
+                  </Suspense>
+                </Canvas>
+              </div>
+            </Card>
+
+            {/* 3D Editor */}
+            <ThreeDEditor
+              threeDData={selectedPlan.three_d_data}
+              onUpdate={handleUpdate3D}
+            />
+          </>
         )}
       </div>
     </div>
