@@ -465,14 +465,14 @@ const WorkspacePage = () => {
           </Card>
         </div>
 
-        {/* 3D Viewer */}
-        {selectedPlan && selectedPlan.three_d_data && (
+        {/* Editor and Viewer */}
+        {selectedPlan && (
           <>
             <Card className="mt-8 p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-slate-900">Vista 3D: {selectedPlan.name}</h2>
+                <h2 className="text-2xl font-bold text-slate-900">Piantina: {selectedPlan.name}</h2>
                 <Button
-                  data-testid="close-3d-viewer-button"
+                  data-testid="close-editor-button"
                   variant="outline"
                   onClick={() => setSelectedPlan(null)}
                 >
@@ -480,13 +480,15 @@ const WorkspacePage = () => {
                 </Button>
               </div>
               
-              <div className="h-[500px] bg-slate-100 rounded-lg overflow-hidden" data-testid="3d-canvas">
-                <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-                  <Suspense fallback={null}>
-                    <Scene3D threeData={selectedPlan.three_d_data} />
-                  </Suspense>
-                </Canvas>
-              </div>
+              {selectedPlan.file_url && (
+                <div className="mb-4">
+                  <img 
+                    src={selectedPlan.file_url} 
+                    alt={selectedPlan.name}
+                    className="w-full max-h-64 object-contain rounded-lg border border-slate-200"
+                  />
+                </div>
+              )}
             </Card>
 
             {/* 2D Editor */}
@@ -495,6 +497,20 @@ const WorkspacePage = () => {
               threeDData={selectedPlan.three_d_data}
               onSave={handleUpdate3D}
             />
+
+            {/* 3D Viewer - Only show if 3D data exists */}
+            {selectedPlan.three_d_data && (
+              <Card className="mt-4 p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Render 3D</h3>
+                <div className="h-[500px] bg-slate-100 rounded-lg overflow-hidden" data-testid="3d-canvas">
+                  <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
+                    <Suspense fallback={null}>
+                      <Scene3D threeData={selectedPlan.three_d_data} />
+                    </Suspense>
+                  </Canvas>
+                </div>
+              </Card>
+            )}
           </>
         )}
       </div>
