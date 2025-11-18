@@ -252,7 +252,7 @@ const WorkspacePage = () => {
       toast.success('Modello 3D aggiornato!');
     } catch (error) {
       console.error('Update error:', error);
-      toast.error('Errore durante l\\'aggiornamento');
+      toast.error('Errore durante l\'aggiornamento');
     } finally {
       setLoading(false);
     }
