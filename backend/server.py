@@ -202,7 +202,8 @@ async def upload_floorplan_file(floorplan_id: str, file: UploadFile = File(...))
     try:
         # Upload to Cloudinary
         contents = await file.read()
-        upload_result = cloudinary.uploader.upload(
+        upload_result = await asyncio.to_thread(
+            cloudinary.uploader.upload,
             contents,
             folder="floorplans",
             resource_type="auto"
