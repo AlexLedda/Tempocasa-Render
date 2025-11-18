@@ -12,8 +12,9 @@ import uuid
 from datetime import datetime, timezone
 import cloudinary
 import cloudinary.uploader
-from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json
+from openai import AsyncOpenAI
+from anthropic import AsyncAnthropic
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
