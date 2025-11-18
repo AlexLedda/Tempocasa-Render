@@ -251,6 +251,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     };
     
     onSave(data);
+    toast.success('Modello 3D generato! Scorri in basso per vederlo.')
   };
 
   const generateWalls = () => {
