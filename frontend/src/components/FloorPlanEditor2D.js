@@ -291,10 +291,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           <Button
             data-testid="save-2d-changes"
             onClick={handleSave}
-            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
           >
             <Save className="w-4 h-4 mr-2" />
-            Salva e Aggiorna 3D
+            Genera Render 3D
           </Button>
         </div>
       </div>
