@@ -200,14 +200,20 @@ async def delete_floorplan(floorplan_id: str):
 @api_router.post("/floorplans/{floorplan_id}/upload")
 async def upload_floorplan_file(floorplan_id: str, file: UploadFile = File(...)):
     try:
+        logging.info(f"Starting upload for floor plan {floorplan_id}, file: {file.filename}")
+        
         # Upload to Cloudinary
         contents = await file.read()
+        logging.info(f"File read successfully, size: {len(contents)} bytes")
+        
         upload_result = await asyncio.to_thread(
             cloudinary.uploader.upload,
             contents,
             folder="floorplans",
             resource_type="auto"
         )
+        
+        logging.info(f"Cloudinary upload successful: {upload_result.get('secure_url')}")
         
         # Update floor plan with file URL
         await db.floorplans.update_one(
@@ -225,6 +231,7 @@ async def upload_floorplan_file(floorplan_id: str, file: UploadFile = File(...))
             "thumbnail_url": upload_result.get('thumbnail_url', upload_result['secure_url'])
         }
     except Exception as e:
+        logging.error(f"Upload error for {floorplan_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 @api_router.post("/floorplans/{floorplan_id}/convert-3d")
