@@ -15,12 +15,14 @@ services:
         value: vision3d_production
       - key: CORS_ORIGINS
         sync: false
-      - key: EMERGENT_LLM_KEY
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
         sync: false
       - key: CLOUDINARY_CLOUD_NAME
         value: dywaykio8
       - key: CLOUDINARY_API_KEY
-        sync: false
+        value: 936424415516613
       - key: CLOUDINARY_API_SECRET
         sync: false
 
