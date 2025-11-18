@@ -25,7 +25,9 @@
 5. Configura le variabili d'ambiente:
    - `MONGO_URL`: la tua MongoDB Atlas connection string
    - `CORS_ORIGINS`: URL del frontend (es: https://vision3d-frontend.onrender.com)
-   - `EMERGENT_LLM_KEY`: sk-emergent-298D49dBc66B0AeEd1
+   - `OPENAI_API_KEY`: La tua chiave OpenAI (o EMERGENT_LLM_KEY)
+   - `ANTHROPIC_API_KEY`: La tua chiave Anthropic (o EMERGENT_LLM_KEY)
+   - `CLOUDINARY_CLOUD_NAME`: dywaykio8
    - `CLOUDINARY_API_KEY`: 936424415516613
    - `CLOUDINARY_API_SECRET`: 0cJj36XbwhjwSJ8fuOoYv1arQfA
 6. Clicca "Apply"
