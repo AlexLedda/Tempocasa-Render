@@ -492,10 +492,11 @@ const WorkspacePage = () => {
               </div>
             </Card>
 
-            {/* 3D Editor */}
-            <ThreeDEditor
+            {/* 2D Editor */}
+            <FloorPlanEditor2D
+              floorPlanImage={selectedPlan.file_url}
               threeDData={selectedPlan.three_d_data}
-              onUpdate={handleUpdate3D}
+              onSave={handleUpdate3D}
             />
           </>
         )}
