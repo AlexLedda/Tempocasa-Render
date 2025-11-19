@@ -26,18 +26,33 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     if (floorPlanImage) {
       console.log('Loading background image:', floorPlanImage);
       const img = new Image();
+      
+      // Try with CORS first
       img.crossOrigin = 'anonymous';
+      
       img.onload = () => {
         console.log('Background image loaded successfully');
         setBackgroundImage(img);
         toast.success('Immagine caricata!');
       };
+      
       img.onerror = (e) => {
-        console.error('Error loading background image:', e, floorPlanImage);
-        toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
-        // Set a flag to stop showing loading message
-        setBackgroundImage('error');
+        console.warn('CORS load failed, trying without CORS...');
+        // Try again without CORS
+        const img2 = new Image();
+        img2.onload = () => {
+          console.log('Background image loaded without CORS');
+          setBackgroundImage(img2);
+          toast.success('Immagine caricata (modalità compatibilità)');
+        };
+        img2.onerror = (e2) => {
+          console.error('Error loading background image:', e2, floorPlanImage);
+          toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
+          setBackgroundImage('error');
+        };
+        img2.src = floorPlanImage;
       };
+      
       img.src = floorPlanImage;
     } else {
       console.log('No floor plan image provided');
