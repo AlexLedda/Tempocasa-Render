@@ -24,16 +24,24 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   useEffect(() => {
     // Load background image
     if (floorPlanImage) {
+      console.log('Loading background image:', floorPlanImage);
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
+        console.log('Background image loaded successfully');
         setBackgroundImage(img);
+        toast.success('Immagine caricata!');
       };
       img.onerror = (e) => {
-        console.error('Error loading background image:', e);
-        toast.error('Impossibile caricare l\'immagine di sfondo');
+        console.error('Error loading background image:', e, floorPlanImage);
+        toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
+        // Set a flag to stop showing loading message
+        setBackgroundImage('error');
       };
       img.src = floorPlanImage;
+    } else {
+      console.log('No floor plan image provided');
+      setBackgroundImage(null);
     }
   }, [floorPlanImage]);
 
