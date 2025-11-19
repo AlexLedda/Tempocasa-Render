@@ -72,10 +72,14 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw background image FIRST if available
-    if (backgroundImage) {
-      ctx.globalAlpha = 0.4;
-      ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-      ctx.globalAlpha = 1.0;
+    if (backgroundImage && backgroundImage !== 'error') {
+      try {
+        ctx.globalAlpha = 0.4;
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1.0;
+      } catch (e) {
+        console.error('Error drawing background image:', e);
+      }
     }
 
     // Draw grid
