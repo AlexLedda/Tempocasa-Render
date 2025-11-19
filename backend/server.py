@@ -544,19 +544,38 @@ async def proxy_image(url: str):
     """Proxy endpoint to bypass CORS for images"""
     try:
         import httpx
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url)
+        
+        # Add Cloudinary authentication if needed
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
+            logging.info(f"Proxying image from: {url}")
+            response = await client.get(url, headers=headers)
+            
+            logging.info(f"Proxy response status: {response.status_code}")
+            
             if response.status_code != 200:
-                raise HTTPException(status_code=response.status_code, detail="Failed to fetch image")
+                logging.error(f"Failed to fetch image: {response.status_code} - {response.text}")
+                raise HTTPException(
+                    status_code=response.status_code, 
+                    detail=f"Cloudinary returned {response.status_code}"
+                )
             
             return Response(
                 content=response.content,
                 media_type=response.headers.get('content-type', 'image/jpeg'),
                 headers={
                     'Cache-Control': 'public, max-age=31536000',
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET',
+                    'Access-Control-Allow-Headers': '*'
                 }
             )
+    except httpx.HTTPError as e:
+        logging.error(f"HTTP error proxying image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"HTTP error: {str(e)}")
     except Exception as e:
         logging.error(f"Proxy image error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Proxy error: {str(e)}")
