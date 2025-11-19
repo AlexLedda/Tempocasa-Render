@@ -19,6 +19,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [startPoint, setStartPoint] = useState(null);
   const [scale, setScale] = useState(10); // pixels per meter
   const [wallHeight, setWallHeight] = useState(2.8);
+  const [backgroundImage, setBackgroundImage] = useState(null);
+
+  useEffect(() => {
+    // Load background image
+    if (floorPlanImage) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        setBackgroundImage(img);
+      };
+      img.onerror = (e) => {
+        console.error('Error loading background image:', e);
+        toast.error('Impossibile caricare l\'immagine di sfondo');
+      };
+      img.src = floorPlanImage;
+    }
+  }, [floorPlanImage]);
 
   useEffect(() => {
     // Load existing 3D data if available
@@ -37,7 +54,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
 
   useEffect(() => {
     drawCanvas();
-  }, [rooms, doors, windows, walls, selectedElement]);
+  }, [rooms, doors, windows, walls, selectedElement, backgroundImage]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
