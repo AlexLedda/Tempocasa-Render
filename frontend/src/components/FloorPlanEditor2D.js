@@ -19,49 +19,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [startPoint, setStartPoint] = useState(null);
   const [scale, setScale] = useState(10); // pixels per meter
   const [wallHeight, setWallHeight] = useState(2.8);
-  const [backgroundImage, setBackgroundImage] = useState(null);
-
-  useEffect(() => {
-    // Load background image using backend proxy to bypass CORS
-    const loadImageViaProxy = async () => {
-      if (!floorPlanImage) {
-        console.log('No floor plan image provided');
-        setBackgroundImage(null);
-        return;
-      }
-
-      console.log('Loading background image via proxy:', floorPlanImage);
-      
-      try {
-        // Use backend proxy endpoint
-        const API_URL = process.env.REACT_APP_BACKEND_URL;
-        const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(floorPlanImage)}`;
-        
-        console.log('Proxy URL:', proxyUrl);
-        
-        // Create image from proxy URL
-        const img = new Image();
-        img.onload = () => {
-          console.log('Background image loaded successfully via proxy');
-          setBackgroundImage(img);
-          toast.success('Immagine caricata!');
-        };
-        img.onerror = (e) => {
-          console.error('Error loading image from proxy:', e);
-          toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
-          setBackgroundImage('error');
-        };
-        img.src = proxyUrl;
-        
-      } catch (error) {
-        console.error('Error setting up proxy image:', error);
-        toast.error('Errore nel caricamento. Continua senza sfondo.');
-        setBackgroundImage('error');
-      }
-    };
-
-    loadImageViaProxy();
-  }, [floorPlanImage]);
 
   useEffect(() => {
     // Load existing 3D data if available
