@@ -46,19 +46,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw background image FIRST if available
-    if (backgroundImage && backgroundImage !== 'error') {
-      try {
-        ctx.globalAlpha = 0.4;
-        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1.0;
-      } catch (e) {
-        console.error('Error drawing background image:', e);
-      }
-    }
-
     // Draw grid
-    ctx.strokeStyle = '#e2e8f0';
+    ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 1;
     for (let i = 0; i < canvas.width; i += scale * 1) { // 1 meter grid
       ctx.beginPath();
