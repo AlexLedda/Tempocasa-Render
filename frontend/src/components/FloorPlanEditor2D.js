@@ -22,55 +22,45 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [backgroundImage, setBackgroundImage] = useState(null);
 
   useEffect(() => {
-    // Load background image using fetch to bypass CORS issues
-    const loadImageViaFetch = async () => {
+    // Load background image using backend proxy to bypass CORS
+    const loadImageViaProxy = async () => {
       if (!floorPlanImage) {
         console.log('No floor plan image provided');
         setBackgroundImage(null);
         return;
       }
 
-      console.log('Loading background image via fetch:', floorPlanImage);
+      console.log('Loading background image via proxy:', floorPlanImage);
       
       try {
-        // Fetch the image as blob
-        const response = await fetch(floorPlanImage, {
-          mode: 'cors',
-          credentials: 'omit'
-        });
+        // Use backend proxy endpoint
+        const API_URL = process.env.REACT_APP_BACKEND_URL;
+        const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(floorPlanImage)}`;
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        console.log('Proxy URL:', proxyUrl);
         
-        const blob = await response.blob();
-        const objectURL = URL.createObjectURL(blob);
-        
-        // Create image from blob
+        // Create image from proxy URL
         const img = new Image();
         img.onload = () => {
-          console.log('Background image loaded successfully via fetch');
+          console.log('Background image loaded successfully via proxy');
           setBackgroundImage(img);
           toast.success('Immagine caricata!');
-          // Clean up object URL after loading
-          URL.revokeObjectURL(objectURL);
         };
         img.onerror = (e) => {
-          console.error('Error creating image from blob:', e);
-          toast.error('Errore nel rendering dell\'immagine');
+          console.error('Error loading image from proxy:', e);
+          toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
           setBackgroundImage('error');
-          URL.revokeObjectURL(objectURL);
         };
-        img.src = objectURL;
+        img.src = proxyUrl;
         
       } catch (error) {
-        console.error('Error fetching background image:', error);
-        toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
+        console.error('Error setting up proxy image:', error);
+        toast.error('Errore nel caricamento. Continua senza sfondo.');
         setBackgroundImage('error');
       }
     };
 
-    loadImageViaFetch();
+    loadImageViaProxy();
   }, [floorPlanImage]);
 
   useEffect(() => {
