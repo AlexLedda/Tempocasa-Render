@@ -369,6 +369,30 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </div>
       )}
 
+      {floorPlanImage && !backgroundImage && (
+        <div className="bg-yellow-50 p-3 rounded-lg mb-4">
+          <p className="text-sm text-yellow-800">
+            ⏳ <strong>Caricamento immagine di sfondo...</strong>
+          </p>
+        </div>
+      )}
+
+      {floorPlanImage && backgroundImage && (
+        <div className="bg-green-50 p-3 rounded-lg mb-4">
+          <p className="text-sm text-green-800">
+            ✅ <strong>Immagine caricata!</strong> Puoi ora tracciare sulla piantina.
+          </p>
+        </div>
+      )}
+
+      {!floorPlanImage && (
+        <div className="bg-slate-50 p-3 rounded-lg mb-4">
+          <p className="text-sm text-slate-600">
+            ℹ️ <strong>Nessuna immagine di riferimento.</strong> Disegna liberamente sulla griglia.
+          </p>
+        </div>
+      )}
+
       <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
