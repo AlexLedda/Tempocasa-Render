@@ -22,42 +22,55 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [backgroundImage, setBackgroundImage] = useState(null);
 
   useEffect(() => {
-    // Load background image
-    if (floorPlanImage) {
-      console.log('Loading background image:', floorPlanImage);
-      const img = new Image();
+    // Load background image using fetch to bypass CORS issues
+    const loadImageViaFetch = async () => {
+      if (!floorPlanImage) {
+        console.log('No floor plan image provided');
+        setBackgroundImage(null);
+        return;
+      }
+
+      console.log('Loading background image via fetch:', floorPlanImage);
       
-      // Try with CORS first
-      img.crossOrigin = 'anonymous';
-      
-      img.onload = () => {
-        console.log('Background image loaded successfully');
-        setBackgroundImage(img);
-        toast.success('Immagine caricata!');
-      };
-      
-      img.onerror = (e) => {
-        console.warn('CORS load failed, trying without CORS...');
-        // Try again without CORS
-        const img2 = new Image();
-        img2.onload = () => {
-          console.log('Background image loaded without CORS');
-          setBackgroundImage(img2);
-          toast.success('Immagine caricata (modalità compatibilità)');
+      try {
+        // Fetch the image as blob
+        const response = await fetch(floorPlanImage, {
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const blob = await response.blob();
+        const objectURL = URL.createObjectURL(blob);
+        
+        // Create image from blob
+        const img = new Image();
+        img.onload = () => {
+          console.log('Background image loaded successfully via fetch');
+          setBackgroundImage(img);
+          toast.success('Immagine caricata!');
+          // Clean up object URL after loading
+          URL.revokeObjectURL(objectURL);
         };
-        img2.onerror = (e2) => {
-          console.error('Error loading background image:', e2, floorPlanImage);
-          toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
+        img.onerror = (e) => {
+          console.error('Error creating image from blob:', e);
+          toast.error('Errore nel rendering dell\'immagine');
           setBackgroundImage('error');
+          URL.revokeObjectURL(objectURL);
         };
-        img2.src = floorPlanImage;
-      };
-      
-      img.src = floorPlanImage;
-    } else {
-      console.log('No floor plan image provided');
-      setBackgroundImage(null);
-    }
+        img.src = objectURL;
+        
+      } catch (error) {
+        console.error('Error fetching background image:', error);
+        toast.error('Impossibile caricare l\'immagine. Continua senza sfondo.');
+        setBackgroundImage('error');
+      }
+    };
+
+    loadImageViaFetch();
   }, [floorPlanImage]);
 
   useEffect(() => {
