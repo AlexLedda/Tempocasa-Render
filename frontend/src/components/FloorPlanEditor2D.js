@@ -433,14 +433,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </div>
       )}
 
-      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white">
+      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white relative">
+        {floorPlanImage && (
+          <img 
+            src={floorPlanImage}
+            alt="Floor plan background"
+            className="absolute inset-0 w-full h-full object-contain opacity-40"
+            style={{ pointerEvents: 'none' }}
+          />
+        )}
         <canvas
           ref={canvasRef}
           width={800}
           height={600}
           onClick={handleCanvasClick}
-          className="cursor-crosshair w-full"
+          className="cursor-crosshair w-full relative z-10"
           data-testid="floor-plan-canvas"
+          style={{ background: 'transparent' }}
         />
       </div>
 
