@@ -419,8 +419,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       {floorPlanImage && backgroundImage === 'error' && (
         <div className="bg-orange-50 p-3 rounded-lg mb-4">
           <p className="text-sm text-orange-800">
-            ⚠️ <strong>Impossibile caricare l'immagine.</strong> Controlla la console (F12) per dettagli. Puoi comunque disegnare sulla griglia.
+            ⚠️ <strong>Impossibile caricare l'immagine nel canvas.</strong> Usa l'anteprima sopra come riferimento e disegna sulla griglia.
           </p>
+          <p className="text-xs text-orange-600 mt-1">Nota: L'immagine è visibile nell'anteprima in alto. Puoi comunque tracciare gli elementi guardando quella.</p>
         </div>
       )}
 
