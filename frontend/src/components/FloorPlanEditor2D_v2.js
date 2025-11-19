@@ -34,6 +34,11 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
   const [mode, setMode] = useState('view');
+  
+  // Debug: Log when component receives image
+  useEffect(() => {
+    console.log('FloorPlanEditor2D - floorPlanImage:', floorPlanImage);
+  }, [floorPlanImage]);
   const [rooms, setRooms] = useState([]);
   const [doors, setDoors] = useState([]);
   const [windows, setWindows] = useState([]);
