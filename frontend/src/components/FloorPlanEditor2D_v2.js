@@ -572,24 +572,55 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </div>
       )}
 
-      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white relative mt-4" style={{ height: '600px' }}>
-        {floorPlanImage && (
-          <img 
-            ref={imageRef}
-            src={floorPlanImage}
-            alt="Floor plan background"
-            style={{
+      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-slate-50 relative mt-4" style={{ height: '600px', position: 'relative' }}>
+        {floorPlanImage ? (
+          <>
+            <img 
+              ref={imageRef}
+              src={floorPlanImage}
+              alt="Floor plan background"
+              onLoad={() => console.log('Image loaded successfully')}
+              onError={(e) => console.error('Image load error:', e)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                opacity: 0.6,
+                pointerEvents: 'none',
+                zIndex: 1,
+                display: 'block'
+              }}
+            />
+            <div style={{
               position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              opacity: 0.5,
-              pointerEvents: 'none',
-              zIndex: 1
-            }}
-          />
+              top: 5,
+              right: 5,
+              background: 'rgba(0,0,0,0.6)',
+              color: 'white',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              fontSize: '10px',
+              zIndex: 20
+            }}>
+              Immagine: {floorPlanImage.substring(floorPlanImage.lastIndexOf('/') + 1, floorPlanImage.lastIndexOf('/') + 20)}...
+            </div>
+          </>
+        ) : (
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            color: '#64748b',
+            zIndex: 0
+          }}>
+            <p>Nessuna immagine di riferimento</p>
+            <p className="text-xs">Carica una piantina per vederla qui</p>
+          </div>
         )}
         <canvas
           ref={canvasRef}
@@ -603,7 +634,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             width: '100%',
             height: '100%',
             cursor: 'crosshair',
-            zIndex: 10
+            zIndex: 10,
+            background: 'transparent'
           }}
           data-testid="floor-plan-canvas"
         />
