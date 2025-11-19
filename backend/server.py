@@ -539,6 +539,28 @@ async def create_render(request: RenderRequest):
     
     return render_result
 
+@api_router.get("/proxy-image")
+async def proxy_image(url: str):
+    """Proxy endpoint to bypass CORS for images"""
+    try:
+        import httpx
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail="Failed to fetch image")
+            
+            return Response(
+                content=response.content,
+                media_type=response.headers.get('content-type', 'image/jpeg'),
+                headers={
+                    'Cache-Control': 'public, max-age=31536000',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            )
+    except Exception as e:
+        logging.error(f"Proxy image error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Proxy error: {str(e)}")
+
 # Include router
 app.include_router(api_router)
 
