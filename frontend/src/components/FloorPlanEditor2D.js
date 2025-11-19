@@ -63,6 +63,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw background image FIRST if available
+    if (backgroundImage) {
+      ctx.globalAlpha = 0.4;
+      ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 1.0;
+    }
+
     // Draw grid
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
@@ -77,17 +84,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.moveTo(0, i);
       ctx.lineTo(canvas.width, i);
       ctx.stroke();
-    }
-
-    // Draw background image if available
-    if (floorPlanImage) {
-      const img = new Image();
-      img.src = floorPlanImage;
-      img.onload = () => {
-        ctx.globalAlpha = 0.3;
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.globalAlpha = 1.0;
-      };
     }
 
     // Draw rooms
