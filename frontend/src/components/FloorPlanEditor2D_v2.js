@@ -144,7 +144,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.font = 'bold 14px Inter';
       ctx.fillText(`${room.type || 'Stanza'}`, (room.x || 0) + 5, (room.y || 0) + 20);
       ctx.font = '12px Inter';
-      ctx.fillText(`${room.width}x${room.depth}m`, (room.x || 0) + 5, (room.y || 0) + 35);
+      ctx.fillText(`${room.width}x${room.depth}cm`, (room.x || 0) + 5, (room.y || 0) + 35);
     });
 
     // Draw furniture
