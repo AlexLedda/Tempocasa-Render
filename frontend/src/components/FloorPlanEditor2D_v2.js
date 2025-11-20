@@ -7,26 +7,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Save, Square, Move, Trash2, DoorOpen, Maximize2, Sofa, Grid3x3 } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Libreria elementi predefiniti
+// Libreria elementi predefiniti (dimensioni in cm)
 const ELEMENT_LIBRARY = {
   doors: [
-    { id: 'door-single', name: 'Porta Singola', width: 0.9, height: 2.1, icon: '🚪' },
-    { id: 'door-double', name: 'Porta Doppia', width: 1.6, height: 2.1, icon: '🚪🚪' },
-    { id: 'door-sliding', name: 'Porta Scorrevole', width: 1.2, height: 2.1, icon: '↔️' }
+    { id: 'door-single', name: 'Porta Singola', width: 90, height: 210, icon: '🚪' },
+    { id: 'door-double', name: 'Porta Doppia', width: 160, height: 210, icon: '🚪🚪' },
+    { id: 'door-sliding', name: 'Porta Scorrevole', width: 120, height: 210, icon: '↔️' }
   ],
   windows: [
-    { id: 'window-small', name: 'Finestra Piccola', width: 0.8, height: 1.2, icon: '🪟' },
-    { id: 'window-medium', name: 'Finestra Media', width: 1.2, height: 1.5, icon: '🪟' },
-    { id: 'window-large', name: 'Finestra Grande', width: 2.0, height: 1.8, icon: '🪟' }
+    { id: 'window-small', name: 'Finestra Piccola', width: 80, height: 120, icon: '🪟' },
+    { id: 'window-medium', name: 'Finestra Media', width: 120, height: 150, icon: '🪟' },
+    { id: 'window-large', name: 'Finestra Grande', width: 200, height: 180, icon: '🪟' }
   ],
   furniture: [
-    { id: 'bed-single', name: 'Letto Singolo', width: 1.0, depth: 2.0, icon: '🛏️' },
-    { id: 'bed-double', name: 'Letto Matrimoniale', width: 1.6, depth: 2.0, icon: '🛏️' },
-    { id: 'sofa-2', name: 'Divano 2 posti', width: 1.5, depth: 0.9, icon: '🛋️' },
-    { id: 'sofa-3', name: 'Divano 3 posti', width: 2.2, depth: 0.9, icon: '🛋️' },
-    { id: 'table-dining', name: 'Tavolo Pranzo', width: 1.6, depth: 0.9, icon: '🪑' },
-    { id: 'desk', name: 'Scrivania', width: 1.4, depth: 0.7, icon: '💻' },
-    { id: 'wardrobe', name: 'Armadio', width: 2.0, depth: 0.6, icon: '👔' }
+    { id: 'bed-single', name: 'Letto Singolo', width: 100, depth: 200, icon: '🛏️' },
+    { id: 'bed-double', name: 'Letto Matrimoniale', width: 160, depth: 200, icon: '🛏️' },
+    { id: 'sofa-2', name: 'Divano 2 posti', width: 150, depth: 90, icon: '🛋️' },
+    { id: 'sofa-3', name: 'Divano 3 posti', width: 220, depth: 90, icon: '🛋️' },
+    { id: 'table-dining', name: 'Tavolo Pranzo', width: 160, depth: 90, icon: '🪑' },
+    { id: 'desk', name: 'Scrivania', width: 140, depth: 70, icon: '💻' },
+    { id: 'wardrobe', name: 'Armadio', width: 200, depth: 60, icon: '👔' }
   ]
 };
 
