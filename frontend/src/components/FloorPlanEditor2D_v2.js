@@ -606,74 +606,24 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </div>
       )}
 
-      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-slate-50 relative mt-4" style={{ height: '600px', position: 'relative' }}>
-        {floorPlanImage ? (
-          <>
-            <img 
-              ref={imageRef}
-              src={floorPlanImage}
-              alt="Floor plan background"
-              onLoad={() => console.log('Image loaded successfully')}
-              onError={(e) => console.error('Image load error:', e)}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                opacity: 0.6,
-                pointerEvents: 'none',
-                zIndex: 1,
-                display: 'block'
-              }}
-            />
-            <div style={{
-              position: 'absolute',
-              top: 5,
-              right: 5,
-              background: 'rgba(0,0,0,0.6)',
-              color: 'white',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              fontSize: '10px',
-              zIndex: 20
-            }}>
-              Immagine: {floorPlanImage.substring(floorPlanImage.lastIndexOf('/') + 1, floorPlanImage.lastIndexOf('/') + 20)}...
-            </div>
-          </>
-        ) : (
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            color: '#64748b',
-            zIndex: 0
-          }}>
-            <p>Nessuna immagine di riferimento</p>
-            <p className="text-xs">Carica una piantina per vederla qui</p>
-          </div>
-        )}
+      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white mt-4">
         <canvas
           ref={canvasRef}
           width={800}
           height={600}
           onClick={handleCanvasClick}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            cursor: 'crosshair',
-            zIndex: 10,
-            background: 'transparent'
-          }}
+          className="w-full cursor-crosshair"
           data-testid="floor-plan-canvas"
         />
       </div>
+      
+      {floorPlanImage && (
+        <div className="mt-2 text-xs text-slate-500">
+          URL immagine: {floorPlanImage.substring(0, 80)}...
+          {backgroundImg && <span className="text-green-600 ml-2">✓ Caricata</span>}
+          {!backgroundImg && <span className="text-orange-600 ml-2">⏳ Caricamento...</span>}
+        </div>
+      )}
 
       <div className="mt-4 grid grid-cols-4 gap-4">
         <div>
