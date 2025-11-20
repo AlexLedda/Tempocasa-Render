@@ -47,8 +47,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [selectedElement, setSelectedElement] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
-  const [scale, setScale] = useState(10);
-  const [wallHeight, setWallHeight] = useState(2.8);
+  const [scale, setScale] = useState(0.1); // 0.1 pixels per cm = 10 pixels per metro
+  const [wallHeight, setWallHeight] = useState(280); // 280 cm = 2.8m
+  const [wallThickness, setWallThickness] = useState(20); // 20 cm
   const [selectedLibraryItem, setSelectedLibraryItem] = useState(null);
 
   useEffect(() => {
