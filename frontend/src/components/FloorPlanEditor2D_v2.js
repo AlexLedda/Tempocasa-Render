@@ -492,7 +492,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </TabsList>
 
         <TabsContent value="tools" className="space-y-4">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-5 gap-2">
             <Button
               onClick={() => { setMode('view'); setSelectedLibraryItem(null); }}
               variant={mode === 'view' ? 'default' : 'outline'}
@@ -502,7 +502,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               Seleziona
             </Button>
             <Button
-              onClick={() => { setMode('room'); setSelectedLibraryItem(null); }}
+              onClick={() => { setMode('wall'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); }}
+              variant={mode === 'wall' ? 'default' : 'outline'}
+              className="w-full"
+            >
+              <Grid3x3 className="w-4 h-4 mr-1" />
+              Muro
+            </Button>
+            <Button
+              onClick={() => { setMode('room'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); }}
               variant={mode === 'room' ? 'default' : 'outline'}
               className="w-full"
             >
@@ -527,10 +535,17 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             </Button>
           </div>
 
+          {mode === 'wall' && (
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <p className="text-sm text-slate-800">
+                🧱 <strong>Muro:</strong> Clicca punto iniziale, poi clicca punto finale per tracciare un muro.
+              </p>
+            </div>
+          )}
           {mode === 'room' && (
             <div className="bg-blue-50 p-3 rounded-lg">
               <p className="text-sm text-blue-800">
-                📐 <strong>Stanza:</strong> Clicca per iniziare, poi clicca di nuovo per finire.
+                📐 <strong>Stanza:</strong> Clicca per iniziare, poi clicca di nuovo per finire il rettangolo.
               </p>
             </div>
           )}
