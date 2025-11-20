@@ -66,9 +66,30 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     }
   }, [threeDData]);
 
+  const [backgroundImg, setBackgroundImg] = useState(null);
+
+  useEffect(() => {
+    // Load background image into memory
+    if (floorPlanImage) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        console.log('Background image loaded for canvas');
+        setBackgroundImg(img);
+      };
+      img.onerror = () => {
+        console.error('Failed to load background image');
+        setBackgroundImg(null);
+      };
+      img.src = floorPlanImage;
+    } else {
+      setBackgroundImg(null);
+    }
+  }, [floorPlanImage]);
+
   useEffect(() => {
     drawCanvas();
-  }, [rooms, doors, windows, walls, selectedElement, furniture, floorPlanImage]);
+  }, [rooms, doors, windows, walls, selectedElement, furniture, backgroundImg]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
