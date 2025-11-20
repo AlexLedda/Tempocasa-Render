@@ -109,17 +109,17 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.globalAlpha = 1.0;
     }
 
-    // Draw grid
-    ctx.strokeStyle = '#94a3b8';
+    // Draw grid (every 100cm = 1m)
+    ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 2]);
-    for (let i = 0; i < canvas.width; i += scale * 1) {
+    for (let i = 0; i < canvas.width; i += scale * 100) { // 100 cm grid
       ctx.beginPath();
       ctx.moveTo(i, 0);
       ctx.lineTo(i, canvas.height);
       ctx.stroke();
     }
-    for (let i = 0; i < canvas.height; i += scale * 1) {
+    for (let i = 0; i < canvas.height; i += scale * 100) {
       ctx.beginPath();
       ctx.moveTo(0, i);
       ctx.lineTo(canvas.width, i);
