@@ -713,20 +713,20 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 {selectedElement.type === 'room' && (
                   <>
                     <p>ID: {selectedElement.data.id}</p>
-                    <p>Dimensioni: {selectedElement.data.width}m x {selectedElement.data.depth}m x {selectedElement.data.height}m</p>
+                    <p>Dimensioni: {selectedElement.data.width}cm x {selectedElement.data.depth}cm x {selectedElement.data.height}cm</p>
                   </>
                 )}
                 {selectedElement.type === 'door' && (
-                  <p>Porta: {selectedElement.data.name} ({selectedElement.data.width}m)</p>
+                  <p>Porta: {selectedElement.data.name} ({selectedElement.data.width}cm)</p>
                 )}
                 {selectedElement.type === 'window' && (
-                  <p>Finestra: {selectedElement.data.name} ({selectedElement.data.width}m)</p>
+                  <p>Finestra: {selectedElement.data.name} ({selectedElement.data.width}cm)</p>
                 )}
                 {selectedElement.type === 'furniture' && (
-                  <p>Arredo: {selectedElement.data.name} ({selectedElement.data.width}x{selectedElement.data.depth}m)</p>
+                  <p>Arredo: {selectedElement.data.name} ({selectedElement.data.width}x{selectedElement.data.depth}cm)</p>
                 )}
                 {selectedElement.type === 'wall' && (
-                  <p>Muro: da [{selectedElement.start[0].toFixed(1)}, {selectedElement.start[1].toFixed(1)}] a [{selectedElement.end[0].toFixed(1)}, {selectedElement.end[1].toFixed(1)}]</p>
+                  <p>Muro: lunghezza {Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)).toFixed(0)}cm, spessore {wallThickness}cm</p>
                 )}
               </div>
             </div>
