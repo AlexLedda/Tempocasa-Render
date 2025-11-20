@@ -51,6 +51,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [wallHeight, setWallHeight] = useState(280); // 280 cm = 2.8m
   const [wallThickness, setWallThickness] = useState(20); // 20 cm
   const [selectedLibraryItem, setSelectedLibraryItem] = useState(null);
+  const [mousePos, setMousePos] = useState(null);
 
   useEffect(() => {
     if (threeDData) {
