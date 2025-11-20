@@ -210,7 +210,10 @@ async def upload_floorplan_file(floorplan_id: str, file: UploadFile = File(...))
             cloudinary.uploader.upload,
             contents,
             folder="floorplans",
-            resource_type="auto"
+            resource_type="auto",
+            type="upload",  # Ensure it's uploaded as public
+            access_mode="public",  # Make publicly accessible
+            invalidate=True  # Invalidate CDN cache
         )
         
         logging.info(f"Cloudinary upload successful: {upload_result.get('secure_url')}")
