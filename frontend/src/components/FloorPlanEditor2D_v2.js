@@ -204,8 +204,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     });
 
     // Draw walls
-    ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 3;
     walls.forEach((wall) => {
       const isSelected = selectedElement?.type === 'wall' && 
                         selectedElement?.start[0] === wall.start[0] && 
@@ -213,17 +211,43 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       
       if (isSelected) {
         ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 8;
       } else {
-        ctx.strokeStyle = '#1e293b';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 6;
       }
       
       ctx.beginPath();
       ctx.moveTo(wall.start[0] * scale, wall.start[1] * scale);
       ctx.lineTo(wall.end[0] * scale, wall.end[1] * scale);
       ctx.stroke();
+      
+      // Draw small circles at endpoints for visibility
+      ctx.fillStyle = isSelected ? '#ef4444' : '#0f172a';
+      ctx.beginPath();
+      ctx.arc(wall.start[0] * scale, wall.start[1] * scale, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(wall.end[0] * scale, wall.end[1] * scale, 4, 0, Math.PI * 2);
+      ctx.fill();
     });
+    
+    // Draw temporary wall while drawing
+    if (mode === 'wall' && isDrawing && startPoint) {
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 6;
+      ctx.setLineDash([10, 5]);
+      ctx.beginPath();
+      ctx.moveTo(startPoint.x, startPoint.y);
+      
+      // Use mouse position if available, otherwise use a placeholder
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        // This will be updated on mouse move
+      }
+      ctx.setLineDash([]);
+    }
   };
 
   const handleCanvasClick = (e) => {
