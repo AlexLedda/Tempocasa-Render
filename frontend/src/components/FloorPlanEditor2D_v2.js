@@ -657,30 +657,43 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </div>
       )}
 
-      <div className="mt-4 grid grid-cols-4 gap-4">
+      <div className="mt-4 grid grid-cols-5 gap-3">
         <div>
-          <Label>Altezza Muri (m)</Label>
+          <Label>Altezza Muri (cm)</Label>
           <Input
             type="number"
-            step="0.1"
+            step="10"
             value={wallHeight}
-            onChange={(e) => setWallHeight(parseFloat(e.target.value))}
+            onChange={(e) => setWallHeight(parseInt(e.target.value))}
             className="mt-1"
           />
         </div>
         <div>
-          <Label>Scala (px/m)</Label>
+          <Label>Spessore Muri (cm)</Label>
           <Input
             type="number"
+            step="5"
+            value={wallThickness}
+            onChange={(e) => setWallThickness(parseInt(e.target.value))}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label>Scala (px/cm)</Label>
+          <Input
+            type="number"
+            step="0.01"
             value={scale}
-            onChange={(e) => setScale(parseInt(e.target.value))}
+            onChange={(e) => setScale(parseFloat(e.target.value))}
             className="mt-1"
           />
         </div>
         <div>
           <Label className="text-sm">Elementi</Label>
           <p className="text-sm mt-1 text-slate-600">
-            {rooms.length} stanze, {doors.length} porte, {windows.length} finestre, {furniture.length} mobili
+            {rooms.length} stanze<br/>
+            {doors.length} porte, {windows.length} finestre<br/>
+            {furniture.length} mobili
           </p>
         </div>
         <div>
