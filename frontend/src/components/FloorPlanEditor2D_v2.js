@@ -97,8 +97,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
 
     const ctx = canvas.getContext('2d');
     
-    // Clear with transparent background
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Clear with white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background image if available
+    if (backgroundImg) {
+      ctx.globalAlpha = 0.5;
+      ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+      ctx.globalAlpha = 1.0;
+    }
 
     // Draw grid
     ctx.strokeStyle = '#94a3b8';
