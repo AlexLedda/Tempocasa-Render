@@ -234,20 +234,21 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     });
     
     // Draw temporary wall while drawing
-    if (mode === 'wall' && isDrawing && startPoint) {
+    if (mode === 'wall' && isDrawing && startPoint && mousePos) {
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 6;
       ctx.setLineDash([10, 5]);
       ctx.beginPath();
       ctx.moveTo(startPoint.x, startPoint.y);
-      
-      // Use mouse position if available, otherwise use a placeholder
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const rect = canvas.getBoundingClientRect();
-        // This will be updated on mouse move
-      }
+      ctx.lineTo(mousePos.x, mousePos.y);
+      ctx.stroke();
       ctx.setLineDash([]);
+      
+      // Draw start point
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.arc(startPoint.x, startPoint.y, 5, 0, Math.PI * 2);
+      ctx.fill();
     }
   };
 
