@@ -232,7 +232,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    if (mode === 'room') {
+    if (mode === 'wall') {
+      if (!isDrawing) {
+        setStartPoint({ x, y });
+        setIsDrawing(true);
+      } else {
+        const newWall = {
+          start: [startPoint.x / scale, startPoint.y / scale],
+          end: [x / scale, y / scale],
+          height: wallHeight,
+          thickness: wallThickness
+        };
+        setWalls([...walls, newWall]);
+        setIsDrawing(false);
+        setStartPoint(null);
+        toast.success('Muro aggiunto!');
+      }
+    } else if (mode === 'room') {
       if (!isDrawing) {
         setStartPoint({ x, y });
         setIsDrawing(true);
@@ -244,8 +260,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           type: 'custom',
           x: Math.min(startPoint.x, x),
           y: Math.min(startPoint.y, y),
-          width: Math.max(width, 1),
-          depth: Math.max(depth, 1),
+          width: Math.max(width, 10), // min 10cm
+          depth: Math.max(depth, 10),
           height: wallHeight
         };
         setRooms([...rooms, newRoom]);
