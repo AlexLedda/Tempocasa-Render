@@ -621,7 +621,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   >
                     <span className="text-2xl mb-1">{item.icon}</span>
                     <span className="text-xs text-center">{item.name}</span>
-                    <span className="text-xs text-slate-500">{item.width}x{item.depth}m</span>
+                    <span className="text-xs text-slate-500">{item.width}x{item.depth}cm</span>
                   </Button>
                 ))}
               </div>
