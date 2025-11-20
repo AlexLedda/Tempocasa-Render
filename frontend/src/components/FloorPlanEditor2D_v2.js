@@ -91,7 +91,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
 
   useEffect(() => {
     drawCanvas();
-  }, [rooms, doors, windows, walls, selectedElement, furniture, backgroundImg]);
+  }, [rooms, doors, windows, walls, selectedElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
