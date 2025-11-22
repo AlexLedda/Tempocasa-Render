@@ -1218,10 +1218,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       </div>
 
       {selectedElement && (
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-400">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-semibold">Selezionato: {selectedElement.type}</h4>
+              <h4 className="font-semibold text-blue-900">✓ Selezionato: {selectedElement.type === 'wall' ? 'Muro' : selectedElement.type === 'room' ? 'Stanza' : selectedElement.type === 'door' ? 'Porta' : selectedElement.type === 'window' ? 'Finestra' : 'Arredamento'}</h4>
               <div className="text-sm space-y-1 mt-2">
                 {selectedElement.type === 'room' && (
                   <>
@@ -1239,12 +1239,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   <p>Arredo: {selectedElement.data.name} ({selectedElement.data.width}x{selectedElement.data.depth}cm)</p>
                 )}
                 {selectedElement.type === 'wall' && (
-                  <p>Muro: lunghezza {(Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)) / scale).toFixed(0)}cm, spessore {wallThickness}cm</p>
+                  <p>Lunghezza: {(Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)) / scale).toFixed(0)}cm, spessore {wallThickness}cm</p>
                 )}
               </div>
+              <p className="text-xs text-blue-600 mt-2">
+                💡 Premi <kbd className="px-2 py-1 bg-white rounded border">Canc</kbd> o clicca sul pulsante per eliminare
+              </p>
             </div>
-            <Button onClick={deleteSelected} variant="destructive" size="sm">
-              <Trash2 className="w-4 h-4" />
+            <Button onClick={deleteSelected} variant="destructive" size="lg">
+              <Trash2 className="w-5 h-5 mr-2" />
+              Elimina
             </Button>
           </div>
         </div>
