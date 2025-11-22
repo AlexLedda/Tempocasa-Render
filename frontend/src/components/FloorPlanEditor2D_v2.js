@@ -1238,7 +1238,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             <p className="text-xs font-semibold text-slate-700 mb-1">⌨️ Scorciatoie da Tastiera:</p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-600">
               <span><kbd className="bg-white px-1 rounded">V</kbd> Seleziona</span>
-              <span><kbd className="bg-white px-1 rounded">M</kbd> Sposta</span>
+              <span><kbd className="bg-white px-1 rounded">S</kbd> 🖐️ Sposta</span>
               <span><kbd className="bg-white px-1 rounded">W</kbd> Muro</span>
               <span><kbd className="bg-white px-1 rounded">F</kbd> Pavimento</span>
               <span><kbd className="bg-white px-1 rounded">R</kbd> Stanza</span>
