@@ -500,8 +500,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const handleCanvasClick = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    let x = (e.clientX - rect.left - panOffset.x) / zoom;
+    let y = (e.clientY - rect.top - panOffset.y) / zoom;
+    
+    // Apply snap to grid
+    const snapped = snapToGridCoords(x, y);
+    x = snapped.x;
+    y = snapped.y;
 
     if (mode === 'wall') {
       if (!isDrawing) {
