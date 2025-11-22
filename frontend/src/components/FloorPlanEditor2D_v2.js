@@ -199,18 +199,64 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     drawCanvas();
   }, [rooms, doors, windows, walls, floors, selectedElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode, imageScale, imagePosition, imageOpacity, isResizing, wallColor, zoom, panOffset]);
 
-  // Handle keyboard shortcuts for deletion
+  // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e) => {
+      // Delete/Backspace - Delete selected element
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
         e.preventDefault();
         deleteSelected();
+        saveToHistory();
+      }
+      
+      // Ctrl+Z - Undo
+      if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        undo();
+      }
+      
+      // Ctrl+Y or Ctrl+Shift+Z - Redo
+      if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+        e.preventDefault();
+        redo();
+      }
+      
+      // Keyboard shortcuts for tools (only if not typing in an input)
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        if (e.key === 'v' || e.key === 'V') {
+          setMode('view');
+          setSelectedLibraryItem(null);
+          setIsDragging(false);
+        } else if (e.key === 'm' || e.key === 'M') {
+          if (selectedElement) setMode('move');
+        } else if (e.key === 'w' || e.key === 'W') {
+          setMode('wall');
+          setSelectedLibraryItem(null);
+          setIsDrawing(false);
+          setStartPoint(null);
+        } else if (e.key === 'f' || e.key === 'F') {
+          setMode('floor');
+          setSelectedLibraryItem(null);
+        } else if (e.key === 'r' || e.key === 'R') {
+          setMode('room');
+          setSelectedLibraryItem(null);
+        } else if (e.key === 'd' || e.key === 'D') {
+          setMode('door');
+        } else if (e.key === 'g' || e.key === 'G') {
+          setSnapToGrid(!snapToGrid);
+          toast.info(`Snap to Grid: ${!snapToGrid ? 'ON' : 'OFF'}`);
+        } else if (e.key === 'Escape') {
+          setMode('view');
+          setSelectedElement(null);
+          setIsDrawing(false);
+          setStartPoint(null);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedElement, rooms, doors, windows, walls, furniture, floors]);
+  }, [selectedElement, rooms, doors, windows, walls, furniture, floors, history, historyIndex, snapToGrid]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
