@@ -171,6 +171,55 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     }
     ctx.setLineDash([]);
 
+    // Draw floors FIRST (bottom layer)
+    floors.forEach((floor, idx) => {
+      const isSelected = selectedElement?.type === 'floor' && selectedElement?.idx === idx;
+      
+      const width = (floor.width || 4) * scale;
+      const depth = (floor.depth || 3) * scale;
+      
+      // Draw floor with color
+      ctx.fillStyle = floor.color || '#E8E8E8';
+      ctx.fillRect(floor.x || 0, floor.y || 0, width, depth);
+      
+      // Draw pattern overlay
+      if (floor.pattern === 'tile') {
+        ctx.strokeStyle = '#CCCCCC';
+        ctx.lineWidth = 1;
+        const tileSize = scale * 50; // 50cm tiles
+        for (let x = floor.x; x < floor.x + width; x += tileSize) {
+          for (let y = floor.y; y < floor.y + depth; y += tileSize) {
+            ctx.strokeRect(x, y, tileSize, tileSize);
+          }
+        }
+      } else if (floor.pattern === 'wood') {
+        ctx.strokeStyle = '#654321';
+        ctx.lineWidth = 1;
+        const plankHeight = scale * 15; // 15cm planks
+        for (let y = floor.y; y < floor.y + depth; y += plankHeight) {
+          ctx.beginPath();
+          ctx.moveTo(floor.x, y);
+          ctx.lineTo(floor.x + width, y);
+          ctx.stroke();
+        }
+      }
+      
+      // Draw border
+      ctx.strokeStyle = isSelected ? '#3b82f6' : '#94a3b8';
+      ctx.lineWidth = isSelected ? 3 : 1;
+      ctx.strokeRect(floor.x || 0, floor.y || 0, width, depth);
+      
+      // Draw resize handles for selected floor
+      if (isSelected && mode === 'view') {
+        drawResizeHandles(ctx, floor.x, floor.y, width, depth);
+      }
+      
+      // Draw label
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 12px Inter';
+      ctx.fillText(`${floor.name || 'Pavimento'}`, (floor.x || 0) + 5, (floor.y || 0) + 15);
+    });
+
     // Draw rooms
     rooms.forEach((room) => {
       const isSelected = selectedElement?.type === 'room' && selectedElement?.id === room.id;
