@@ -879,6 +879,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           width={800}
           height={600}
           onClick={handleCanvasClick}
+          onKeyDown={(e) => {
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
+              e.preventDefault();
+              deleteSelected();
+            }
+          }}
+          tabIndex={0}
           onMouseDown={(e) => {
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
