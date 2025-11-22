@@ -195,7 +195,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
 
   useEffect(() => {
     drawCanvas();
-  }, [rooms, doors, windows, walls, floors, selectedElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode, imageScale, imagePosition, imageOpacity, isResizing, wallColor]);
+  }, [rooms, doors, windows, walls, floors, selectedElement, hoveredElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode, imageScale, imagePosition, imageOpacity, isResizing, wallColor]);
 
   // Handle keyboard shortcuts
   useEffect(() => {
