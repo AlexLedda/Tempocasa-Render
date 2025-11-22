@@ -52,6 +52,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [wallThickness, setWallThickness] = useState(20); // 20 cm
   const [selectedLibraryItem, setSelectedLibraryItem] = useState(null);
   const [mousePos, setMousePos] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (threeDData) {
