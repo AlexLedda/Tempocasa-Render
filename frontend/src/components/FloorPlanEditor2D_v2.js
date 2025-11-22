@@ -1287,6 +1287,18 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   setRooms(newRooms);
                   setSelectedElement({ ...draggedElement, data: newRooms[idx] });
                 }
+              } else if (draggedElement.type === 'floor') {
+                const idx = draggedElement.idx;
+                if (idx !== undefined) {
+                  const newFloors = [...floors];
+                  newFloors[idx] = {
+                    ...newFloors[idx],
+                    x: x - dragOffset.x,
+                    y: y - dragOffset.y
+                  };
+                  setFloors(newFloors);
+                  setSelectedElement({ ...draggedElement, data: newFloors[idx] });
+                }
               } else if (draggedElement.type === 'door') {
                 const idx = draggedElement.idx;
                 const newDoors = [...doors];
