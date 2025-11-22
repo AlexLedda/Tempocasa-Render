@@ -705,12 +705,66 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </TabsContent>
       </Tabs>
 
-      {floorPlanImage && (
-        <div className="bg-green-50 p-3 rounded-lg mb-4 mt-4">
-          <p className="text-sm text-green-800">
-            ✅ <strong>Immagine di sfondo attiva!</strong> Traccia direttamente sopra la piantina.
-          </p>
-        </div>
+      {floorPlanImage && backgroundImg && (
+        <Card className="p-4 bg-blue-50 border-blue-200 mb-4 mt-4">
+          <h4 className="font-semibold text-blue-900 mb-3">🖼️ Controlli Immagine di Sfondo</h4>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label className="text-sm">Scala Immagine: {(imageScale * 100).toFixed(0)}%</Label>
+              <Input
+                type="range"
+                min="0.1"
+                max="3"
+                step="0.1"
+                value={imageScale}
+                onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Opacità: {(imageOpacity * 100).toFixed(0)}%</Label>
+              <Input
+                type="range"
+                min="0.1"
+                max="1"
+                step="0.1"
+                value={imageOpacity}
+                onChange={(e) => setImageOpacity(parseFloat(e.target.value))}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Posizione</Label>
+              <div className="flex gap-2 mt-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setImagePosition({ x: imagePosition.x - 10, y: imagePosition.y })}
+                >←</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setImagePosition({ x: imagePosition.x + 10, y: imagePosition.y })}
+                >→</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setImagePosition({ x: imagePosition.x, y: imagePosition.y - 10 })}
+                >↑</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setImagePosition({ x: imagePosition.x, y: imagePosition.y + 10 })}
+                >↓</Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setImagePosition({ x: 0, y: 0 })}
+                >Reset</Button>
+              </div>
+            </div>
+          </div>
+        </Card>
       )}
 
       <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white mt-4">
