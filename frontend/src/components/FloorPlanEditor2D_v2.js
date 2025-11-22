@@ -363,15 +363,34 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Draw rooms
     rooms.forEach((room) => {
       const isSelected = selectedElement?.type === 'room' && selectedElement?.id === room.id;
-      ctx.fillStyle = isSelected ? 'rgba(59, 130, 246, 0.3)' : 'rgba(148, 163, 184, 0.15)';
-      ctx.strokeStyle = isSelected ? '#3b82f6' : '#64748b';
-      ctx.lineWidth = isSelected ? 3 : 2;
+      const isHovered = hoveredElement?.type === 'room' && hoveredElement?.id === room.id;
       
       const width = (room.width || 4) * scale;
       const depth = (room.depth || 3) * scale;
+      const radius = 8; // Rounded corners
       
-      ctx.fillRect(room.x || 0, room.y || 0, width, depth);
-      ctx.strokeRect(room.x || 0, room.y || 0, width, depth);
+      // Add glow effect for selected
+      if (isSelected) {
+        ctx.shadowColor = 'rgba(59, 130, 246, 0.6)';
+        ctx.shadowBlur = 15;
+      } else if (isHovered) {
+        ctx.shadowColor = 'rgba(100, 116, 139, 0.4)';
+        ctx.shadowBlur = 10;
+      }
+      
+      ctx.fillStyle = isSelected ? 'rgba(59, 130, 246, 0.3)' : isHovered ? 'rgba(148, 163, 184, 0.25)' : 'rgba(148, 163, 184, 0.15)';
+      ctx.strokeStyle = isSelected ? '#3b82f6' : isHovered ? '#475569' : '#64748b';
+      ctx.lineWidth = isSelected ? 3 : 2;
+      
+      // Draw rounded rectangle
+      ctx.beginPath();
+      ctx.roundRect(room.x || 0, room.y || 0, width, depth, radius);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
       
       // Draw resize handles for selected room
       if (isSelected && mode === 'view') {
