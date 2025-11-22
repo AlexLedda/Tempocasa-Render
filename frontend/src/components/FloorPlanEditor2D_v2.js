@@ -263,9 +263,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         setStartPoint({ x, y });
         setIsDrawing(true);
       } else {
+        // Store wall with pixel coordinates, not converted
         const newWall = {
-          start: [startPoint.x / scale, startPoint.y / scale],
-          end: [x / scale, y / scale],
+          start: [startPoint.x, startPoint.y],
+          end: [x, y],
           height: wallHeight,
           thickness: wallThickness
         };
