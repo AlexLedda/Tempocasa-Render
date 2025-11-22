@@ -204,11 +204,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.textAlign = 'left';
     });
 
-    // Draw walls
-    walls.forEach((wall) => {
-      const isSelected = selectedElement?.type === 'wall' && 
-                        selectedElement?.start[0] === wall.start[0] && 
-                        selectedElement?.start[1] === wall.start[1];
+    // Draw walls (coordinates are already in pixels)
+    walls.forEach((wall, idx) => {
+      const isSelected = selectedElement?.type === 'wall' && selectedElement?.idx === idx;
       
       if (isSelected) {
         ctx.strokeStyle = '#ef4444';
@@ -219,17 +217,17 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       }
       
       ctx.beginPath();
-      ctx.moveTo(wall.start[0] * scale, wall.start[1] * scale);
-      ctx.lineTo(wall.end[0] * scale, wall.end[1] * scale);
+      ctx.moveTo(wall.start[0], wall.start[1]);
+      ctx.lineTo(wall.end[0], wall.end[1]);
       ctx.stroke();
       
       // Draw small circles at endpoints for visibility
       ctx.fillStyle = isSelected ? '#ef4444' : '#0f172a';
       ctx.beginPath();
-      ctx.arc(wall.start[0] * scale, wall.start[1] * scale, 4, 0, Math.PI * 2);
+      ctx.arc(wall.start[0], wall.start[1], 4, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(wall.end[0] * scale, wall.end[1] * scale, 4, 0, Math.PI * 2);
+      ctx.arc(wall.end[0], wall.end[1], 4, 0, Math.PI * 2);
       ctx.fill();
     });
     
