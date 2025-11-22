@@ -1127,6 +1127,25 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               </p>
             </div>
           )}
+          
+          {/* Keyboard Shortcuts Help */}
+          <div className="bg-slate-50 p-3 rounded-lg">
+            <p className="text-xs font-semibold text-slate-700 mb-1">⌨️ Scorciatoie da Tastiera:</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-600">
+              <span><kbd className="bg-white px-1 rounded">V</kbd> Seleziona</span>
+              <span><kbd className="bg-white px-1 rounded">M</kbd> Sposta</span>
+              <span><kbd className="bg-white px-1 rounded">W</kbd> Muro</span>
+              <span><kbd className="bg-white px-1 rounded">F</kbd> Pavimento</span>
+              <span><kbd className="bg-white px-1 rounded">R</kbd> Stanza</span>
+              <span><kbd className="bg-white px-1 rounded">D</kbd> Porte</span>
+              <span><kbd className="bg-white px-1 rounded">G</kbd> Toggle Snap</span>
+              <span><kbd className="bg-white px-1 rounded">Esc</kbd> Annulla azione</span>
+              <span><kbd className="bg-white px-1 rounded">Ctrl+Z</kbd> Undo</span>
+              <span><kbd className="bg-white px-1 rounded">Ctrl+Y</kbd> Redo</span>
+              <span><kbd className="bg-white px-1 rounded">Canc</kbd> Elimina</span>
+              <span><kbd className="bg-white px-1 rounded">Shift+Drag</kbd> Pan</span>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="library" className="space-y-4">
