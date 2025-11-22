@@ -578,6 +578,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         icon: selectedLibraryItem.icon
       };
       setDoors([...doors, newDoor]);
+      saveToHistory();
       toast.success(`${selectedLibraryItem.name} aggiunta!`);
     } else if (mode === 'window' && selectedLibraryItem) {
       const newWindow = {
@@ -587,6 +588,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         icon: selectedLibraryItem.icon
       };
       setWindows([...windows, newWindow]);
+      saveToHistory();
       toast.success(`${selectedLibraryItem.name} aggiunta!`);
     } else if (mode === 'furniture' && selectedLibraryItem) {
       const newFurniture = {
@@ -596,6 +598,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         icon: selectedLibraryItem.icon
       };
       setFurniture([...furniture, newFurniture]);
+      saveToHistory();
       toast.success(`${selectedLibraryItem.name} aggiunto!`);
     } else if (mode === 'move') {
       // Start dragging selected element
