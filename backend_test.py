@@ -275,6 +275,7 @@ class Vision3DAPITester:
         
         # Basic API tests
         self.test_api_root()
+        self.test_health_check()
         
         # FloorPlan tests
         self.test_create_floorplan()
