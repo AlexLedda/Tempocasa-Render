@@ -1085,6 +1085,11 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const width = (room.width || 4) * scale;
                 const depth = (room.depth || 3) * scale;
                 handle = getResizeHandle(x, y, room.x, room.y, width, depth);
+              } else if (selectedElement.type === 'floor') {
+                const floor = selectedElement.data;
+                const width = (floor.width || 4) * scale;
+                const depth = (floor.depth || 3) * scale;
+                handle = getResizeHandle(x, y, floor.x, floor.y, width, depth);
               } else if (selectedElement.type === 'furniture') {
                 const item = selectedElement.data;
                 const width = (item.width || 1) * scale;
