@@ -379,17 +379,38 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         setStartPoint({ x, y });
         setIsDrawing(true);
       } else {
-        // Store wall with pixel coordinates, not converted
+        // Store wall with pixel coordinates and color
         const newWall = {
           start: [startPoint.x, startPoint.y],
           end: [x, y],
           height: wallHeight,
-          thickness: wallThickness
+          thickness: wallThickness,
+          color: wallColor
         };
         setWalls([...walls, newWall]);
         setIsDrawing(false);
         setStartPoint(null);
         toast.success('Muro aggiunto!');
+      }
+    } else if (mode === 'floor') {
+      if (!isDrawing) {
+        setStartPoint({ x, y });
+        setIsDrawing(true);
+      } else {
+        const width = Math.abs(x - startPoint.x) / scale;
+        const depth = Math.abs(y - startPoint.y) / scale;
+        const newFloor = {
+          id: `floor${floors.length + 1}`,
+          x: Math.min(startPoint.x, x),
+          y: Math.min(startPoint.y, y),
+          width: Math.max(width, 10),
+          depth: Math.max(depth, 10),
+          ...selectedLibraryItem
+        };
+        setFloors([...floors, newFloor]);
+        setIsDrawing(false);
+        setStartPoint(null);
+        toast.success('Pavimento aggiunto!');
       }
     } else if (mode === 'room') {
       if (!isDrawing) {
