@@ -1449,20 +1449,24 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               }
             }
             
-            // Handle dragging in move mode
-            if (mode === 'move' && selectedElement) {
-              setIsDragging(true);
-              setDraggedElement(selectedElement);
-              setHasInteracted(false);
-              
-              if (selectedElement.type === 'wall') {
-                const midX = (selectedElement.start[0] + selectedElement.end[0]) / 2;
-                const midY = (selectedElement.start[1] + selectedElement.end[1]) / 2;
-                setDragOffset({ x: x - midX, y: y - midY });
-              } else if (selectedElement.type === 'room' || selectedElement.type === 'floor') {
-                setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
-              } else if (selectedElement.type === 'door' || selectedElement.type === 'window' || selectedElement.type === 'furniture') {
-                setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
+            // Handle dragging in move mode - allow direct drag on hover
+            if (mode === 'move') {
+              // If hovering over element, start dragging it directly
+              if (hoveredElement) {
+                setIsDragging(true);
+                setDraggedElement(hoveredElement);
+                setSelectedElement(hoveredElement);
+                setHasInteracted(false);
+                
+                if (hoveredElement.type === 'wall') {
+                  const midX = (hoveredElement.data.start[0] + hoveredElement.data.end[0]) / 2;
+                  const midY = (hoveredElement.data.start[1] + hoveredElement.data.end[1]) / 2;
+                  setDragOffset({ x: x - midX, y: y - midY });
+                } else if (hoveredElement.type === 'room' || hoveredElement.type === 'floor') {
+                  setDragOffset({ x: x - hoveredElement.data.x, y: y - hoveredElement.data.y });
+                } else if (hoveredElement.type === 'door' || hoveredElement.type === 'window' || hoveredElement.type === 'furniture') {
+                  setDragOffset({ x: x - hoveredElement.data.x, y: y - hoveredElement.data.y });
+                }
               }
             }
           }}
