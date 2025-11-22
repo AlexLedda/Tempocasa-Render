@@ -532,14 +532,22 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </TabsList>
 
         <TabsContent value="tools" className="space-y-4">
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-6 gap-2">
             <Button
-              onClick={() => { setMode('view'); setSelectedLibraryItem(null); }}
+              onClick={() => { setMode('view'); setSelectedLibraryItem(null); setIsDragging(false); }}
               variant={mode === 'view' ? 'default' : 'outline'}
-              className="w-full"
+              className="w-full text-xs px-1"
             >
-              <Move className="w-4 h-4 mr-1" />
+              <Move className="w-3 h-3 mr-1" />
               Seleziona
+            </Button>
+            <Button
+              onClick={() => { setMode('move'); setSelectedLibraryItem(null); }}
+              variant={mode === 'move' ? 'default' : 'outline'}
+              className="w-full text-xs px-1"
+              disabled={!selectedElement}
+            >
+              ✋ Sposta
             </Button>
             <Button
               onClick={() => { setMode('wall'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); }}
