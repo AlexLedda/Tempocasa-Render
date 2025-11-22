@@ -70,6 +70,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [resizeHandle, setResizeHandle] = useState(null);
   const [resizeStart, setResizeStart] = useState(null);
+  const [hasInteracted, setHasInteracted] = useState(false);
   
   // Image controls
   const [imageScale, setImageScale] = useState(1);
