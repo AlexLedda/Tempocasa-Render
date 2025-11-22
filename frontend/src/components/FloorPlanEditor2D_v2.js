@@ -510,6 +510,24 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     return null;
   };
 
+  const getWallEndpointHandle = (mouseX, mouseY, wall) => {
+    const threshold = 10;
+    
+    // Check start point
+    const distStart = Math.sqrt(Math.pow(mouseX - wall.start[0], 2) + Math.pow(mouseY - wall.start[1], 2));
+    if (distStart < threshold) {
+      return 'start';
+    }
+    
+    // Check end point
+    const distEnd = Math.sqrt(Math.pow(mouseX - wall.end[0], 2) + Math.pow(mouseY - wall.end[1], 2));
+    if (distEnd < threshold) {
+      return 'end';
+    }
+    
+    return null;
+  };
+
   const deleteSelected = () => {
     if (!selectedElement) return;
     
