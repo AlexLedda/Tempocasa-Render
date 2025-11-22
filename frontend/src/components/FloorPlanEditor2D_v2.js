@@ -1118,7 +1118,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const midX = (selectedElement.start[0] + selectedElement.end[0]) / 2;
                 const midY = (selectedElement.start[1] + selectedElement.end[1]) / 2;
                 setDragOffset({ x: x - midX, y: y - midY });
-              } else if (selectedElement.type === 'room') {
+              } else if (selectedElement.type === 'room' || selectedElement.type === 'floor') {
                 setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
               } else if (selectedElement.type === 'door' || selectedElement.type === 'window' || selectedElement.type === 'furniture') {
                 setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
