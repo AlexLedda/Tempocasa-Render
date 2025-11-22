@@ -156,6 +156,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implementato sistema di ridimensionamento con 8 maniglie (4 angoli + 4 lati) per rooms e furniture. Funzioni: drawResizeHandles(), getResizeHandle(). Logica in onMouseDown/Move/Up. Cursore 'nwse-resize'. Da testare resize proporzionale e corretto."
+      - working: "NA"
+        agent: "main"
+        comment: "BUGFIX: Aggiunto ridimensionamento per WALLS. Prima mancava! Ora i muri hanno maniglie agli estremi (start/end) che permettono di modificare lunghezza e angolazione. Nuova funzione: getWallEndpointHandle(). Aggiornato messaggio UI per walls."
 
 metadata:
   created_by: "main_agent"
