@@ -468,19 +468,34 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Draw walls (coordinates are already in pixels)
     walls.forEach((wall, idx) => {
       const isSelected = selectedElement?.type === 'wall' && selectedElement?.idx === idx;
+      const isHovered = hoveredElement?.type === 'wall' && hoveredElement?.idx === idx;
       
+      // Add glow effect for selected/hovered
       if (isSelected) {
+        ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
+        ctx.shadowBlur = 12;
         ctx.strokeStyle = '#ef4444';
         ctx.lineWidth = 8;
+      } else if (isHovered) {
+        ctx.shadowColor = 'rgba(100, 116, 139, 0.5)';
+        ctx.shadowBlur = 8;
+        ctx.strokeStyle = wall.color || '#475569';
+        ctx.lineWidth = 7;
       } else {
-        ctx.strokeStyle = wall.color || '#0f172a'; // Use wall's custom color
+        ctx.strokeStyle = wall.color || '#0f172a';
         ctx.lineWidth = 6;
       }
+      
+      ctx.lineCap = 'round'; // Rounded endpoints
       
       ctx.beginPath();
       ctx.moveTo(wall.start[0], wall.start[1]);
       ctx.lineTo(wall.end[0], wall.end[1]);
       ctx.stroke();
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
       
       // Draw small circles at endpoints for visibility
       ctx.fillStyle = isSelected ? '#ef4444' : (wall.color || '#0f172a');
