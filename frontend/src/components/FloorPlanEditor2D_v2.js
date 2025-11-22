@@ -1331,18 +1331,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               }
             }
           }}
-          onMouseUp={() => {
+          onMouseUp={(e) => {
             if (isResizing) {
               setIsResizing(false);
               setResizeHandle(null);
               setResizeStart(null);
               toast.success('Elemento ridimensionato!');
+              return;
             }
             if (isDragging) {
               setIsDragging(false);
               setDraggedElement(null);
               toast.success('Elemento spostato!');
+              return;
             }
+            
+            // If not resizing or dragging, handle as click
+            handleCanvasClick(e);
           }}
           onMouseLeave={() => {
             setMousePos(null);
