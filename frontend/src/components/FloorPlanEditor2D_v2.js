@@ -261,11 +261,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Clear with white background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Apply zoom and pan transformations
-    ctx.save();
-    ctx.translate(panOffset.x, panOffset.y);
-    ctx.scale(zoom, zoom);
 
     // Draw background image if available with controls
     if (backgroundImg) {
