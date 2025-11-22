@@ -895,6 +895,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const width = (item.width || 1) * scale;
                 const depth = (item.depth || 1) * scale;
                 handle = getResizeHandle(x, y, item.x - width/2, item.y - depth/2, width, depth);
+              } else if (selectedElement.type === 'wall') {
+                const wall = selectedElement.data;
+                handle = getWallEndpointHandle(x, y, wall);
               }
               
               if (handle) {
