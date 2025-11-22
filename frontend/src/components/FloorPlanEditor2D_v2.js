@@ -127,7 +127,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedElement, rooms, doors, windows, walls, furniture]);
+  }, [selectedElement, rooms, doors, windows, walls, furniture, floors]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
