@@ -1651,8 +1651,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           className="w-full"
           style={{
             cursor: isResizing ? 'nwse-resize' : 
-                    isDragging ? 'move' : 
-                    mode === 'move' ? 'move' : 
+                    isDragging ? 'grabbing' : 
+                    mode === 'move' && selectedElement ? 'grab' :
+                    mode === 'view' && hoveredElement ? 'pointer' :
+                    mode === 'view' ? 'default' : 
                     'crosshair'
           }}
           data-testid="floor-plan-canvas"
