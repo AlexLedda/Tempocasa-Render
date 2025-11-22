@@ -1416,9 +1416,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           </p>
         </div>
         <div>
-          <Label className="text-sm">Muri</Label>
+          <Label className="text-sm">Struttura</Label>
           <p className="text-sm mt-1 text-slate-600">
-            {walls.length} muri
+            {walls.length} muri<br/>
+            {floors.length} pavimenti
           </p>
         </div>
       </div>
