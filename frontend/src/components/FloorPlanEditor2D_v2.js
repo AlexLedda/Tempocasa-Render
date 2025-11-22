@@ -54,6 +54,12 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [mousePos, setMousePos] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [draggedElement, setDraggedElement] = useState(null);
+  
+  // Image controls
+  const [imageScale, setImageScale] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const [imageOpacity, setImageOpacity] = useState(0.5);
 
   useEffect(() => {
     if (threeDData) {
