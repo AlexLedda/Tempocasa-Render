@@ -126,9 +126,78 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     }
   }, [floorPlanImage]);
 
+  // Save current state to history
+  const saveToHistory = () => {
+    const currentState = {
+      rooms: JSON.parse(JSON.stringify(rooms)),
+      doors: JSON.parse(JSON.stringify(doors)),
+      windows: JSON.parse(JSON.stringify(windows)),
+      walls: JSON.parse(JSON.stringify(walls)),
+      floors: JSON.parse(JSON.stringify(floors)),
+      furniture: JSON.parse(JSON.stringify(furniture))
+    };
+    
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(currentState);
+    
+    // Limit history to 50 states
+    if (newHistory.length > 50) {
+      newHistory.shift();
+    } else {
+      setHistoryIndex(historyIndex + 1);
+    }
+    
+    setHistory(newHistory);
+  };
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      const state = history[newIndex];
+      
+      setRooms(JSON.parse(JSON.stringify(state.rooms)));
+      setDoors(JSON.parse(JSON.stringify(state.doors)));
+      setWindows(JSON.parse(JSON.stringify(state.windows)));
+      setWalls(JSON.parse(JSON.stringify(state.walls)));
+      setFloors(JSON.parse(JSON.stringify(state.floors)));
+      setFurniture(JSON.parse(JSON.stringify(state.furniture)));
+      
+      setHistoryIndex(newIndex);
+      toast.success('Annullato');
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      const state = history[newIndex];
+      
+      setRooms(JSON.parse(JSON.stringify(state.rooms)));
+      setDoors(JSON.parse(JSON.stringify(state.doors)));
+      setWindows(JSON.parse(JSON.stringify(state.windows)));
+      setWalls(JSON.parse(JSON.stringify(state.walls)));
+      setFloors(JSON.parse(JSON.stringify(state.floors)));
+      setFurniture(JSON.parse(JSON.stringify(state.furniture)));
+      
+      setHistoryIndex(newIndex);
+      toast.success('Ripristinato');
+    }
+  };
+
+  // Snap coordinates to grid
+  const snapToGridCoords = (x, y) => {
+    if (!snapToGrid) return { x, y };
+    
+    const gridSize = scale * 10; // 10cm grid
+    return {
+      x: Math.round(x / gridSize) * gridSize,
+      y: Math.round(y / gridSize) * gridSize
+    };
+  };
+
   useEffect(() => {
     drawCanvas();
-  }, [rooms, doors, windows, walls, floors, selectedElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode, imageScale, imagePosition, imageOpacity, isResizing, wallColor]);
+  }, [rooms, doors, windows, walls, floors, selectedElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode, imageScale, imagePosition, imageOpacity, isResizing, wallColor, zoom, panOffset]);
 
   // Handle keyboard shortcuts for deletion
   useEffect(() => {
