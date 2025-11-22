@@ -1551,10 +1551,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               return;
             }
             
-            // If not resizing or dragging, handle as click
-            if (!hasInteracted) {
-              handleCanvasClick(e);
-            }
+            // If not resizing or dragging, handle as click (ALWAYS call it)
+            handleCanvasClick(e);
             setHasInteracted(false);
           }}
           onMouseLeave={() => {
