@@ -623,7 +623,14 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   return (
     <Card className="p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200 mt-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-slate-900">Editor 2D Pianta</h3>
+        <div>
+          <h3 className="text-xl font-bold text-slate-900">Editor 2D Pianta</h3>
+          {selectedElement && (
+            <p className="text-sm text-blue-600 mt-1">
+              ✓ Elemento selezionato: <strong>{selectedElement.type === 'wall' ? 'Muro' : selectedElement.type}</strong>
+            </p>
+          )}
+        </div>
         <div className="flex gap-2">
           {selectedElement && (
             <Button
@@ -632,7 +639,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               size="sm"
             >
               <Trash2 className="w-4 h-4 mr-1" />
-              Elimina {selectedElement.type}
+              Elimina {selectedElement.type === 'wall' ? 'Muro' : selectedElement.type}
             </Button>
           )}
           <Button
