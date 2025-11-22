@@ -1253,6 +1253,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             
             // Handle dragging
             if (isDragging && draggedElement && mode === 'move') {
+              setHasInteracted(true);
               if (draggedElement.type === 'wall') {
                 const idx = draggedElement.idx;
                 const newWalls = [...walls];
