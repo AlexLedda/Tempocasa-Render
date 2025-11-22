@@ -491,6 +491,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         }
       });
       
+      // Check floors
+      floors.forEach((floor, idx) => {
+        const width = (floor.width || 4) * scale;
+        const depth = (floor.depth || 3) * scale;
+        if (x >= floor.x && x <= floor.x + width && y >= floor.y && y <= floor.y + depth) {
+          selected = { type: 'floor', idx, data: floor };
+        }
+      });
+      
       // Check rooms
       rooms.forEach(room => {
         const width = (room.width || 4) * scale;
