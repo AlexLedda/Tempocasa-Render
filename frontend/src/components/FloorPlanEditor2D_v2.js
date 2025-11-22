@@ -835,12 +835,38 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           height={600}
           onClick={handleCanvasClick}
           onMouseDown={(e) => {
-            if (mode === 'move' && selectedElement) {
-              const canvas = canvasRef.current;
-              const rect = canvas.getBoundingClientRect();
-              const x = e.clientX - rect.left;
-              const y = e.clientY - rect.top;
+            const canvas = canvasRef.current;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicking on a resize handle
+            if (mode === 'view' && selectedElement) {
+              let handle = null;
               
+              if (selectedElement.type === 'room') {
+                const room = selectedElement.data;
+                const width = (room.width || 4) * scale;
+                const depth = (room.depth || 3) * scale;
+                handle = getResizeHandle(x, y, room.x, room.y, width, depth);
+              } else if (selectedElement.type === 'furniture') {
+                const item = selectedElement.data;
+                const width = (item.width || 1) * scale;
+                const depth = (item.depth || 1) * scale;
+                handle = getResizeHandle(x, y, item.x - width/2, item.y - depth/2, width, depth);
+              }
+              
+              if (handle) {
+                setIsResizing(true);
+                setResizeHandle(handle);
+                setResizeStart({ x, y });
+                e.stopPropagation();
+                return;
+              }
+            }
+            
+            // Handle dragging in move mode
+            if (mode === 'move' && selectedElement) {
               setIsDragging(true);
               setDraggedElement(selectedElement);
               
@@ -848,6 +874,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const midX = (selectedElement.start[0] + selectedElement.end[0]) / 2;
                 const midY = (selectedElement.start[1] + selectedElement.end[1]) / 2;
                 setDragOffset({ x: x - midX, y: y - midY });
+              } else if (selectedElement.type === 'room') {
+                setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
+              } else if (selectedElement.type === 'door' || selectedElement.type === 'window' || selectedElement.type === 'furniture') {
+                setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
               }
             }
           }}
