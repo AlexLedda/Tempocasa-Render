@@ -691,10 +691,14 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             </Button>
           </div>
 
-          {mode === 'view' && selectedElement && (selectedElement.type === 'room' || selectedElement.type === 'furniture') && (
+          {mode === 'view' && selectedElement && (selectedElement.type === 'room' || selectedElement.type === 'furniture' || selectedElement.type === 'wall') && (
             <div className="bg-green-50 p-3 rounded-lg">
               <p className="text-sm text-green-800">
-                🎯 <strong>Ridimensiona:</strong> Trascina i quadratini blu agli angoli/lati dell'elemento per ridimensionare.
+                {selectedElement.type === 'wall' ? (
+                  <>🎯 <strong>Ridimensiona Muro:</strong> Trascina i quadratini blu agli estremi del muro per modificarne lunghezza e angolazione.</>
+                ) : (
+                  <>🎯 <strong>Ridimensiona:</strong> Trascina i quadratini blu agli angoli/lati dell'elemento per ridimensionare.</>
+                )}
               </p>
             </div>
           )}
