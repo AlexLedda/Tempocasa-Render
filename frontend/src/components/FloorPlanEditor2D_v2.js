@@ -524,6 +524,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         setWalls([...walls, newWall]);
         setIsDrawing(false);
         setStartPoint(null);
+        saveToHistory();
         toast.success('Muro aggiunto!');
       }
     } else if (mode === 'floor') {
