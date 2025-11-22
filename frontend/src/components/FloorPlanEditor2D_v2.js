@@ -468,9 +468,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Draw doors
     doors.forEach((door, idx) => {
       const isSelected = selectedElement?.type === 'door' && selectedElement?.idx === idx;
-      ctx.fillStyle = isSelected ? '#f59e0b' : '#fbbf24';
-      ctx.strokeStyle = '#d97706';
-      ctx.lineWidth = 2;
+      const isHovered = hoveredElement?.type === 'door' && hoveredElement?.idx === idx;
+      
+      if (isSelected) {
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.5)';
+        ctx.shadowBlur = 10;
+      }
+      
+      ctx.fillStyle = isSelected ? 'rgba(245, 158, 11, 0.8)' : isHovered ? 'rgba(251, 191, 36, 0.7)' : '#fbbf24';
+      ctx.strokeStyle = isSelected ? '#f59e0b' : '#d97706';
+      ctx.lineWidth = isSelected ? 3 : 2;
       
       const doorWidth = (door.width || 0.9) * scale;
       ctx.fillRect(door.x - doorWidth / 2, door.y - 5, doorWidth, 10);
