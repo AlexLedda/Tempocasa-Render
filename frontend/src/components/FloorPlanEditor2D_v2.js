@@ -73,12 +73,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   // Snap to grid
   const [snapToGrid, setSnapToGrid] = useState(true);
   
-  // Zoom & Pan
-  const [zoom, setZoom] = useState(1);
-  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [panStart, setPanStart] = useState(null);
-  
   // Resize controls
   const [isResizing, setIsResizing] = useState(false);
   const [resizeHandle, setResizeHandle] = useState(null);
