@@ -828,6 +828,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               <p className="text-sm text-slate-800 mb-2">
                 🧱 <strong>Muro:</strong> Clicca punto iniziale, poi clicca punto finale per tracciare un muro.
               </p>
+              <div className="flex items-center gap-2 mb-2">
+                <Label className="text-sm">Colore Muro:</Label>
+                <input
+                  type="color"
+                  value={wallColor}
+                  onChange={(e) => setWallColor(e.target.value)}
+                  className="w-12 h-8 rounded border-2 cursor-pointer"
+                />
+                <span className="text-xs text-slate-600">{wallColor}</span>
+              </div>
               {walls.length > 0 && (
                 <Button
                   size="sm"
@@ -850,6 +860,20 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   {isDrawing ? 'Annulla disegno' : 'Rimuovi ultimo muro'}
                 </Button>
               )}
+            </div>
+          )}
+          {mode === 'floor' && !selectedLibraryItem && (
+            <div className="bg-amber-50 p-3 rounded-lg">
+              <p className="text-sm text-amber-800">
+                👉 Vai alla tab <strong>Libreria Elementi</strong> e seleziona un tipo di pavimento.
+              </p>
+            </div>
+          )}
+          {mode === 'floor' && selectedLibraryItem && (
+            <div className="bg-green-50 p-3 rounded-lg">
+              <p className="text-sm text-green-800">
+                ✅ <strong>{selectedLibraryItem.name}</strong> selezionato. Clicca sul canvas per disegnare il pavimento (rettangolo).
+              </p>
             </div>
           )}
           {mode === 'room' && (
