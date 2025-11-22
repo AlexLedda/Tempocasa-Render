@@ -1114,6 +1114,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             if (mode === 'move' && selectedElement) {
               setIsDragging(true);
               setDraggedElement(selectedElement);
+              setHasInteracted(false);
               
               if (selectedElement.type === 'wall') {
                 const midX = (selectedElement.start[0] + selectedElement.end[0]) / 2;
