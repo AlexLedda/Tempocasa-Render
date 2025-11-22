@@ -719,14 +719,65 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           width={800}
           height={600}
           onClick={handleCanvasClick}
+          onMouseDown={(e) => {
+            if (mode === 'move' && selectedElement) {
+              const canvas = canvasRef.current;
+              const rect = canvas.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              
+              setIsDragging(true);
+              setDraggedElement(selectedElement);
+              
+              if (selectedElement.type === 'wall') {
+                const midX = (selectedElement.start[0] + selectedElement.end[0]) / 2;
+                const midY = (selectedElement.start[1] + selectedElement.end[1]) / 2;
+                setDragOffset({ x: x - midX, y: y - midY });
+              }
+            }
+          }}
           onMouseMove={(e) => {
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             setMousePos({ x, y });
+            
+            // Handle dragging
+            if (isDragging && draggedElement && mode === 'move') {
+              if (draggedElement.type === 'wall') {
+                const idx = draggedElement.idx;
+                const newWalls = [...walls];
+                const wall = newWalls[idx];
+                
+                const deltaX = x - dragOffset.x - (wall.start[0] + wall.end[0]) / 2;
+                const deltaY = y - dragOffset.y - (wall.start[1] + wall.end[1]) / 2;
+                
+                newWalls[idx] = {
+                  ...wall,
+                  start: [wall.start[0] + deltaX, wall.start[1] + deltaY],
+                  end: [wall.end[0] + deltaX, wall.end[1] + deltaY]
+                };
+                
+                setWalls(newWalls);
+                setSelectedElement({ ...draggedElement, start: newWalls[idx].start, end: newWalls[idx].end });
+              }
+            }
           }}
-          onMouseLeave={() => setMousePos(null)}
+          onMouseUp={() => {
+            if (isDragging) {
+              setIsDragging(false);
+              setDraggedElement(null);
+              toast.success('Elemento spostato!');
+            }
+          }}
+          onMouseLeave={() => {
+            setMousePos(null);
+            if (isDragging) {
+              setIsDragging(false);
+              setDraggedElement(null);
+            }
+          }}
           className="w-full cursor-crosshair"
           data-testid="floor-plan-canvas"
         />
