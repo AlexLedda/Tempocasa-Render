@@ -323,6 +323,21 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       };
       setFurniture([...furniture, newFurniture]);
       toast.success(`${selectedLibraryItem.name} aggiunto!`);
+    } else if (mode === 'move') {
+      // Start dragging selected element
+      if (selectedElement) {
+        setIsDragging(true);
+        
+        if (selectedElement.type === 'room') {
+          setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
+        } else if (selectedElement.type === 'door' || selectedElement.type === 'window') {
+          setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
+        } else if (selectedElement.type === 'furniture') {
+          setDragOffset({ x: x - selectedElement.data.x, y: y - selectedElement.data.y });
+        } else if (selectedElement.type === 'wall') {
+          setDragOffset({ x: x - selectedElement.start[0], y: y - selectedElement.start[1] });
+        }
+      }
     } else if (mode === 'view') {
       let selected = null;
       
