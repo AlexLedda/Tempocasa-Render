@@ -998,6 +998,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   setFurniture(newFurniture);
                   setSelectedElement({ ...selectedElement, data: newItem });
                 }
+              } else if (selectedElement.type === 'wall') {
+                const idx = selectedElement.idx;
+                if (idx !== undefined) {
+                  const newWalls = [...walls];
+                  const wall = newWalls[idx];
+                  let newWall = { ...wall };
+                  
+                  if (resizeHandle === 'start') {
+                    newWall.start = [newX, newY];
+                  } else if (resizeHandle === 'end') {
+                    newWall.end = [newX, newY];
+                  }
+                  
+                  newWalls[idx] = newWall;
+                  setWalls(newWalls);
+                  setSelectedElement({ ...selectedElement, data: newWall, start: newWall.start, end: newWall.end });
+                }
               }
             }
             
