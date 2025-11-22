@@ -567,6 +567,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         setRooms([...rooms, newRoom]);
         setIsDrawing(false);
         setStartPoint(null);
+        saveToHistory();
         toast.success('Stanza aggiunta!');
       }
     } else if (mode === 'door' && selectedLibraryItem) {
