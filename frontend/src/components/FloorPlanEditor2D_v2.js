@@ -1279,10 +1279,19 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             }
           }}
           onMouseMove={(e) => {
+            // Handle panning
+            if (isPanning && panStart) {
+              setPanOffset({
+                x: e.clientX - panStart.x,
+                y: e.clientY - panStart.y
+              });
+              return;
+            }
+            
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const x = (e.clientX - rect.left - panOffset.x) / zoom;
+            const y = (e.clientY - rect.top - panOffset.y) / zoom;
             setMousePos({ x, y });
             
             // Handle resizing
