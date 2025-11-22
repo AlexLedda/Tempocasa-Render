@@ -1035,6 +1035,11 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           }}
           onMouseLeave={() => {
             setMousePos(null);
+            if (isResizing) {
+              setIsResizing(false);
+              setResizeHandle(null);
+              setResizeStart(null);
+            }
             if (isDragging) {
               setIsDragging(false);
               setDraggedElement(null);
