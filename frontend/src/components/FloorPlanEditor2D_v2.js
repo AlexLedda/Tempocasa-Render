@@ -78,11 +78,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [resizeHandle, setResizeHandle] = useState(null);
   const [resizeStart, setResizeStart] = useState(null);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [hoveredElement, setHoveredElement] = useState(null);
   
   // Image controls
   const [imageScale, setImageScale] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [imageOpacity, setImageOpacity] = useState(0.5);
+  
+  // Throttle counter for performance
+  const mouseMoveCounterRef = useRef(0);
 
   useEffect(() => {
     if (threeDData) {
