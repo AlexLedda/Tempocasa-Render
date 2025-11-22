@@ -301,13 +301,26 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Draw floors FIRST (bottom layer)
     floors.forEach((floor, idx) => {
       const isSelected = selectedElement?.type === 'floor' && selectedElement?.idx === idx;
+      const isHovered = hoveredElement?.type === 'floor' && hoveredElement?.idx === idx;
       
       const width = (floor.width || 4) * scale;
       const depth = (floor.depth || 3) * scale;
       
+      // Add shadow for depth
+      if (isSelected || isHovered) {
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+      }
+      
       // Draw floor with color
       ctx.fillStyle = floor.color || '#E8E8E8';
       ctx.fillRect(floor.x || 0, floor.y || 0, width, depth);
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
       
       // Draw pattern overlay
       if (floor.pattern === 'tile') {
