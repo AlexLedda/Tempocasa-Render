@@ -489,9 +489,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.arc(startPoint.x, startPoint.y, 5, 0, Math.PI * 2);
       ctx.fill();
     }
-    
-    // Restore canvas state (undo zoom/pan transforms)
-    ctx.restore();
   };
 
   const handleCanvasClick = (e) => {
