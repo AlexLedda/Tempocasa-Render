@@ -512,6 +512,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.fillRect(window.x - windowWidth / 2, window.y - 3, windowWidth, 6);
       ctx.strokeRect(window.x - windowWidth / 2, window.y - 3, windowWidth, 6);
       
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      
       ctx.fillStyle = '#164e63';
       ctx.font = 'bold 12px Inter';
       ctx.textAlign = 'center';
