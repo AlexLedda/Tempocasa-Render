@@ -186,6 +186,11 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.fillRect(item.x - width/2, item.y - depth/2, width, depth);
       ctx.strokeRect(item.x - width/2, item.y - depth/2, width, depth);
       
+      // Draw resize handles for selected furniture
+      if (isSelected && mode === 'view') {
+        drawResizeHandles(ctx, item.x - width/2, item.y - depth/2, width, depth);
+      }
+      
       ctx.fillStyle = '#581c87';
       ctx.font = '16px Arial';
       ctx.textAlign = 'center';
