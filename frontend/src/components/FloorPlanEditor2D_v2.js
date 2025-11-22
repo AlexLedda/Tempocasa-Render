@@ -1167,6 +1167,36 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   setRooms(newRooms);
                   setSelectedElement({ ...selectedElement, data: newRoom });
                 }
+              } else if (selectedElement.type === 'floor') {
+                const idx = selectedElement.idx;
+                if (idx !== undefined) {
+                  const newFloors = [...floors];
+                  const floor = newFloors[idx];
+                  let newFloor = { ...floor };
+                  
+                  if (resizeHandle.includes('e')) {
+                    const newWidth = Math.max(10, (newX - floor.x) / scale);
+                    newFloor.width = newWidth;
+                  }
+                  if (resizeHandle.includes('w')) {
+                    const oldRight = floor.x + floor.width * scale;
+                    newFloor.x = newX;
+                    newFloor.width = Math.max(10, (oldRight - newX) / scale);
+                  }
+                  if (resizeHandle.includes('s')) {
+                    const newDepth = Math.max(10, (newY - floor.y) / scale);
+                    newFloor.depth = newDepth;
+                  }
+                  if (resizeHandle.includes('n')) {
+                    const oldBottom = floor.y + floor.depth * scale;
+                    newFloor.y = newY;
+                    newFloor.depth = Math.max(10, (oldBottom - newY) / scale);
+                  }
+                  
+                  newFloors[idx] = newFloor;
+                  setFloors(newFloors);
+                  setSelectedElement({ ...selectedElement, data: newFloor });
+                }
               } else if (selectedElement.type === 'furniture') {
                 const idx = selectedElement.idx;
                 if (idx !== undefined) {
