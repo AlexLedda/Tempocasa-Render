@@ -225,8 +225,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           setMode('view');
           setSelectedLibraryItem(null);
           setIsDragging(false);
-        } else if (e.key === 'm' || e.key === 'M') {
-          if (selectedElement) setMode('move');
+        } else if (e.key === 's' || e.key === 'S') {
+          setMode('move');
+          setSelectedLibraryItem(null);
         } else if (e.key === 'w' || e.key === 'W') {
           setMode('wall');
           setSelectedLibraryItem(null);
