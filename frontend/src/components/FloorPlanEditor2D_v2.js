@@ -1021,6 +1021,12 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             }
           }}
           onMouseUp={() => {
+            if (isResizing) {
+              setIsResizing(false);
+              setResizeHandle(null);
+              setResizeStart(null);
+              toast.success('Elemento ridimensionato!');
+            }
             if (isDragging) {
               setIsDragging(false);
               setDraggedElement(null);
