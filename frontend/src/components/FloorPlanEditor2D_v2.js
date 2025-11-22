@@ -448,6 +448,52 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     return Math.sqrt(dx * dx + dy * dy);
   };
 
+  const drawResizeHandles = (ctx, x, y, width, height) => {
+    const handleSize = 8;
+    const handles = [
+      { x: x, y: y, pos: 'nw' }, // top-left
+      { x: x + width, y: y, pos: 'ne' }, // top-right
+      { x: x + width, y: y + height, pos: 'se' }, // bottom-right
+      { x: x, y: y + height, pos: 'sw' }, // bottom-left
+      { x: x + width/2, y: y, pos: 'n' }, // top-middle
+      { x: x + width/2, y: y + height, pos: 's' }, // bottom-middle
+      { x: x, y: y + height/2, pos: 'w' }, // left-middle
+      { x: x + width, y: y + height/2, pos: 'e' }, // right-middle
+    ];
+
+    ctx.fillStyle = '#3b82f6';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    
+    handles.forEach(handle => {
+      ctx.fillRect(handle.x - handleSize/2, handle.y - handleSize/2, handleSize, handleSize);
+      ctx.strokeRect(handle.x - handleSize/2, handle.y - handleSize/2, handleSize, handleSize);
+    });
+  };
+
+  const getResizeHandle = (mouseX, mouseY, x, y, width, height) => {
+    const handleSize = 8;
+    const threshold = 10;
+    const handles = [
+      { x: x, y: y, pos: 'nw' },
+      { x: x + width, y: y, pos: 'ne' },
+      { x: x + width, y: y + height, pos: 'se' },
+      { x: x, y: y + height, pos: 'sw' },
+      { x: x + width/2, y: y, pos: 'n' },
+      { x: x + width/2, y: y + height, pos: 's' },
+      { x: x, y: y + height/2, pos: 'w' },
+      { x: x + width, y: y + height/2, pos: 'e' },
+    ];
+
+    for (const handle of handles) {
+      const dist = Math.sqrt(Math.pow(mouseX - handle.x, 2) + Math.pow(mouseY - handle.y, 2));
+      if (dist < threshold) {
+        return handle.pos;
+      }
+    }
+    return null;
+  };
+
   const deleteSelected = () => {
     if (!selectedElement) return;
     
