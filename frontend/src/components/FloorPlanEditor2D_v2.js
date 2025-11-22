@@ -1451,6 +1451,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 }
               });
               
+              // Check doors
+              doors.forEach((door, idx) => {
+                const doorWidth = (door.width || 0.9) * scale;
+                if (x >= door.x - doorWidth / 2 && x <= door.x + doorWidth / 2 && 
+                    y >= door.y - 5 && y <= door.y + 5) {
+                  hovered = { type: 'door', idx };
+                }
+              });
+              
               setHoveredElement(hovered);
             }
             
