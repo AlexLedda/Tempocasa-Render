@@ -657,6 +657,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             </Button>
           </div>
 
+          {mode === 'view' && selectedElement && (selectedElement.type === 'room' || selectedElement.type === 'furniture') && (
+            <div className="bg-green-50 p-3 rounded-lg">
+              <p className="text-sm text-green-800">
+                🎯 <strong>Ridimensiona:</strong> Trascina i quadratini blu agli angoli/lati dell'elemento per ridimensionare.
+              </p>
+            </div>
+          )}
           {mode === 'move' && selectedElement && (
             <div className="bg-purple-50 p-3 rounded-lg">
               <p className="text-sm text-purple-800">
