@@ -1292,19 +1292,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           ref={canvasRef}
           width={800}
           height={600}
-          onWheel={(e) => {
-            e.preventDefault();
-            const delta = e.deltaY > 0 ? 0.9 : 1.1;
-            const newZoom = Math.min(Math.max(zoom * delta, 0.1), 5);
-            setZoom(newZoom);
-          }}
           onMouseDown={(e) => {
-            // Pan with space key or middle mouse button
-            if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
-              setIsPanning(true);
-              setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
-              return;
-            }
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
