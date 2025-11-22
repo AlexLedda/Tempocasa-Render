@@ -56,6 +56,11 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [draggedElement, setDraggedElement] = useState(null);
   
+  // Resize controls
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeHandle, setResizeHandle] = useState(null);
+  const [resizeStart, setResizeStart] = useState(null);
+  
   // Image controls
   const [imageScale, setImageScale] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
