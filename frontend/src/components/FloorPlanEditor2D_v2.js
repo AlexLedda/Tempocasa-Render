@@ -1324,11 +1324,41 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             }
           }}
           onMouseMove={(e) => {
+            // Throttle to ~60fps for performance
+            mouseMoveCounterRef.current++;
+            if (mouseMoveCounterRef.current % 2 !== 0 && !isResizing && !isDragging) {
+              return; // Skip every other frame when not interacting
+            }
+            
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             setMousePos({ x, y });
+            
+            // Detect hover on elements for cursor change
+            if (mode === 'view' && !isResizing && !isDragging) {
+              let hovered = null;
+              
+              // Check walls
+              walls.forEach((wall, idx) => {
+                const dist = pointToLineDistance(x, y, wall.start[0], wall.start[1], wall.end[0], wall.end[1]);
+                if (dist < 15) {
+                  hovered = { type: 'wall', idx };
+                }
+              });
+              
+              // Check rooms
+              rooms.forEach((room, idx) => {
+                const width = (room.width || 4) * scale;
+                const depth = (room.depth || 3) * scale;
+                if (x >= room.x && x <= room.x + width && y >= room.y && y <= room.y + depth) {
+                  hovered = { type: 'room', idx };
+                }
+              });
+              
+              setHoveredElement(hovered);
+            }
             
             // Handle resizing
             if (isResizing && resizeHandle && selectedElement) {
