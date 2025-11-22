@@ -1480,6 +1480,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 }
               });
               
+              // Check furniture
+              furniture.forEach((item, idx) => {
+                const width = (item.width || 1) * scale;
+                const depth = (item.depth || 1) * scale;
+                if (x >= item.x - width/2 && x <= item.x + width/2 && 
+                    y >= item.y - depth/2 && y <= item.y + depth/2) {
+                  hovered = { type: 'furniture', idx };
+                }
+              });
+              
               setHoveredElement(hovered);
             }
             
