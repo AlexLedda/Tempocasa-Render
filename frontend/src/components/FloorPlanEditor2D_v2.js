@@ -921,38 +921,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               >
                 🧲 Snap: {snapToGrid ? 'ON' : 'OFF'}
               </Button>
-              
-              <div className="flex items-center gap-1 px-2 py-1 bg-white rounded border text-xs">
-                <span>Zoom:</span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0"
-                  onClick={() => setZoom(Math.max(zoom - 0.1, 0.1))}
-                >
-                  -
-                </Button>
-                <span className="w-12 text-center">{(zoom * 100).toFixed(0)}%</span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0"
-                  onClick={() => setZoom(Math.min(zoom + 0.1, 5))}
-                >
-                  +
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 px-2"
-                  onClick={() => {
-                    setZoom(1);
-                    setPanOffset({ x: 0, y: 0 });
-                  }}
-                >
-                  Reset
-                </Button>
-              </div>
             </div>
           </div>
           
