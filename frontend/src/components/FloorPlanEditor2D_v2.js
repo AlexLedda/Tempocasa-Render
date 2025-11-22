@@ -280,23 +280,59 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.restore();
     }
 
-    // Draw grid (every 100cm = 1m)
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([2, 2]);
-    for (let i = 0; i < canvas.width; i += scale * 100) { // 100 cm grid
+    // Draw improved grid with labels
+    const gridSpacing = scale * 100; // 100cm = 1m
+    const subGridSpacing = scale * 50; // 50cm
+    
+    // Draw sub-grid (50cm - very light)
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 0.5;
+    ctx.setLineDash([1, 3]);
+    for (let i = subGridSpacing; i < canvas.width; i += subGridSpacing) {
+      if (Math.round(i) % Math.round(gridSpacing) === 0) continue; // Skip main grid lines
       ctx.beginPath();
       ctx.moveTo(i, 0);
       ctx.lineTo(i, canvas.height);
       ctx.stroke();
     }
-    for (let i = 0; i < canvas.height; i += scale * 100) {
+    for (let i = subGridSpacing; i < canvas.height; i += subGridSpacing) {
+      if (Math.round(i) % Math.round(gridSpacing) === 0) continue;
       ctx.beginPath();
       ctx.moveTo(0, i);
       ctx.lineTo(canvas.width, i);
       ctx.stroke();
     }
+    
+    // Draw main grid (1m - darker and solid)
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1;
     ctx.setLineDash([]);
+    for (let i = 0; i < canvas.width; i += gridSpacing) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, canvas.height);
+      ctx.stroke();
+      
+      // Add labels
+      if (i > 0) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(`${Math.round(i / (scale * 100))}m`, i + 3, 12);
+      }
+    }
+    for (let i = 0; i < canvas.height; i += gridSpacing) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(canvas.width, i);
+      ctx.stroke();
+      
+      // Add labels
+      if (i > 0) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(`${Math.round(i / (scale * 100))}m`, 3, i - 3);
+      }
+    }
 
     // Draw floors FIRST (bottom layer)
     floors.forEach((floor, idx) => {
