@@ -161,6 +161,11 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.fillRect(room.x || 0, room.y || 0, width, depth);
       ctx.strokeRect(room.x || 0, room.y || 0, width, depth);
       
+      // Draw resize handles for selected room
+      if (isSelected && mode === 'view') {
+        drawResizeHandles(ctx, room.x, room.y, width, depth);
+      }
+      
       ctx.fillStyle = '#1e293b';
       ctx.font = 'bold 14px Inter';
       ctx.fillText(`${room.type || 'Stanza'}`, (room.x || 0) + 5, (room.y || 0) + 20);
