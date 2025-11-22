@@ -259,6 +259,22 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.beginPath();
       ctx.arc(wall.end[0], wall.end[1], 4, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Draw resize handles for selected wall endpoints
+      if (isSelected && mode === 'view') {
+        const handleSize = 10;
+        ctx.fillStyle = '#3b82f6';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        
+        // Start point handle
+        ctx.fillRect(wall.start[0] - handleSize/2, wall.start[1] - handleSize/2, handleSize, handleSize);
+        ctx.strokeRect(wall.start[0] - handleSize/2, wall.start[1] - handleSize/2, handleSize, handleSize);
+        
+        // End point handle
+        ctx.fillRect(wall.end[0] - handleSize/2, wall.end[1] - handleSize/2, handleSize, handleSize);
+        ctx.strokeRect(wall.end[0] - handleSize/2, wall.end[1] - handleSize/2, handleSize, handleSize);
+      }
     });
     
     // Draw temporary wall while drawing
