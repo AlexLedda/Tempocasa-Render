@@ -810,7 +810,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             </Button>
           </div>
 
-          {mode === 'view' && selectedElement && (selectedElement.type === 'room' || selectedElement.type === 'furniture' || selectedElement.type === 'wall') && (
+          {mode === 'view' && selectedElement && (selectedElement.type === 'room' || selectedElement.type === 'furniture' || selectedElement.type === 'wall' || selectedElement.type === 'floor') && (
             <div className="bg-green-50 p-3 rounded-lg">
               <p className="text-sm text-green-800">
                 {selectedElement.type === 'wall' ? (
