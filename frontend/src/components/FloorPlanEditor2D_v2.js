@@ -1427,12 +1427,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         <div className="mt-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-400">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="font-semibold text-blue-900">✓ Selezionato: {selectedElement.type === 'wall' ? 'Muro' : selectedElement.type === 'room' ? 'Stanza' : selectedElement.type === 'door' ? 'Porta' : selectedElement.type === 'window' ? 'Finestra' : 'Arredamento'}</h4>
+              <h4 className="font-semibold text-blue-900">✓ Selezionato: {selectedElement.type === 'wall' ? 'Muro' : selectedElement.type === 'room' ? 'Stanza' : selectedElement.type === 'floor' ? 'Pavimento' : selectedElement.type === 'door' ? 'Porta' : selectedElement.type === 'window' ? 'Finestra' : 'Arredamento'}</h4>
               <div className="text-sm space-y-1 mt-2">
                 {selectedElement.type === 'room' && (
                   <>
                     <p>ID: {selectedElement.data.id}</p>
                     <p>Dimensioni: {selectedElement.data.width}cm x {selectedElement.data.depth}cm x {selectedElement.data.height}cm</p>
+                  </>
+                )}
+                {selectedElement.type === 'floor' && (
+                  <>
+                    <p>Tipo: {selectedElement.data.name}</p>
+                    <p>Dimensioni: {selectedElement.data.width}cm x {selectedElement.data.depth}cm</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span>Colore:</span>
+                      <div className="w-6 h-6 rounded border-2" style={{ backgroundColor: selectedElement.data.color }}></div>
+                      <span className="text-xs">{selectedElement.data.color}</span>
+                    </div>
                   </>
                 )}
                 {selectedElement.type === 'door' && (
@@ -1445,7 +1456,14 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   <p>Arredo: {selectedElement.data.name} ({selectedElement.data.width}x{selectedElement.data.depth}cm)</p>
                 )}
                 {selectedElement.type === 'wall' && (
-                  <p>Lunghezza: {(Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)) / scale).toFixed(0)}cm, spessore {wallThickness}cm</p>
+                  <>
+                    <p>Lunghezza: {(Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)) / scale).toFixed(0)}cm, spessore {wallThickness}cm</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span>Colore:</span>
+                      <div className="w-6 h-6 rounded border-2" style={{ backgroundColor: selectedElement.data.color || wallColor }}></div>
+                      <span className="text-xs">{selectedElement.data.color || wallColor}</span>
+                    </div>
+                  </>
                 )}
               </div>
               <p className="text-xs text-blue-600 mt-2">
