@@ -325,15 +325,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       let selected = null;
       
       // Check walls first
-      walls.forEach((wall) => {
-        const x1 = wall.start[0] * scale;
-        const y1 = wall.start[1] * scale;
-        const x2 = wall.end[0] * scale;
-        const y2 = wall.end[1] * scale;
+      walls.forEach((wall, idx) => {
+        const x1 = wall.start[0];
+        const y1 = wall.start[1];
+        const x2 = wall.end[0];
+        const y2 = wall.end[1];
         
         const dist = pointToLineDistance(x, y, x1, y1, x2, y2);
         if (dist < 10) {
-          selected = { type: 'wall', start: wall.start, end: wall.end, data: wall };
+          selected = { type: 'wall', idx, start: wall.start, end: wall.end, data: wall };
         }
       });
       
