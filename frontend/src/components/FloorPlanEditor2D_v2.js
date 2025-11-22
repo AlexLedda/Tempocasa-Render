@@ -1136,6 +1136,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             
             // Handle resizing
             if (isResizing && resizeHandle && selectedElement) {
+              setHasInteracted(true);
               const newX = x;
               const newY = y;
               
