@@ -44,12 +44,14 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const [windows, setWindows] = useState([]);
   const [furniture, setFurniture] = useState([]);
   const [walls, setWalls] = useState([]);
+  const [floors, setFloors] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPoint, setStartPoint] = useState(null);
   const [scale, setScale] = useState(0.1); // 0.1 pixels per cm = 10 pixels per metro
   const [wallHeight, setWallHeight] = useState(280); // 280 cm = 2.8m
   const [wallThickness, setWallThickness] = useState(20); // 20 cm
+  const [wallColor, setWallColor] = useState('#0f172a'); // Default: dark slate
   const [selectedLibraryItem, setSelectedLibraryItem] = useState(null);
   const [mousePos, setMousePos] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
