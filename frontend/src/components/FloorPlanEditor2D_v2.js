@@ -900,6 +900,76 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </TabsList>
 
         <TabsContent value="tools" className="space-y-4">
+          {/* Quick Actions Bar */}
+          <div className="flex items-center justify-between p-2 bg-slate-100 rounded-lg">
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={undo}
+                disabled={historyIndex <= 0}
+                title="Annulla (Ctrl+Z)"
+              >
+                ↶ Undo
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={redo}
+                disabled={historyIndex >= history.length - 1}
+                title="Ripristina (Ctrl+Y)"
+              >
+                ↷ Redo
+              </Button>
+            </div>
+            
+            <div className="flex gap-2 items-center">
+              <Button
+                size="sm"
+                variant={snapToGrid ? 'default' : 'outline'}
+                onClick={() => {
+                  setSnapToGrid(!snapToGrid);
+                  toast.info(`Snap to Grid: ${!snapToGrid ? 'ON' : 'OFF'}`);
+                }}
+                title="Snap alla griglia (G)"
+              >
+                🧲 Snap: {snapToGrid ? 'ON' : 'OFF'}
+              </Button>
+              
+              <div className="flex items-center gap-1 px-2 py-1 bg-white rounded border text-xs">
+                <span>Zoom:</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setZoom(Math.max(zoom - 0.1, 0.1))}
+                >
+                  -
+                </Button>
+                <span className="w-12 text-center">{(zoom * 100).toFixed(0)}%</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setZoom(Math.min(zoom + 0.1, 5))}
+                >
+                  +
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2"
+                  onClick={() => {
+                    setZoom(1);
+                    setPanOffset({ x: 0, y: 0 });
+                  }}
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+          
           <div className="grid grid-cols-7 gap-2">
             <Button
               onClick={() => { setMode('view'); setSelectedLibraryItem(null); setIsDragging(false); }}
