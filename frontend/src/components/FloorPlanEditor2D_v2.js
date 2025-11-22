@@ -1104,6 +1104,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 setIsResizing(true);
                 setResizeHandle(handle);
                 setResizeStart({ x, y });
+                setHasInteracted(false);
                 e.stopPropagation();
                 return;
               }
