@@ -74,6 +74,10 @@ class Vision3DAPITester:
     def test_api_root(self):
         """Test API root endpoint"""
         return self.run_test("API Root", "GET", "", 200)
+    
+    def test_health_check(self):
+        """Test health check endpoint"""
+        return self.run_test("Health Check", "GET", "health", 200)
 
     def test_create_floorplan(self):
         """Test creating a floor plan"""
