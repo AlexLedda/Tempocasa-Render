@@ -1605,6 +1605,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               setResizeHandle(null);
               setResizeStart(null);
               if (hasInteracted) {
+                saveToHistory();
                 toast.success('Elemento ridimensionato!');
               }
               setHasInteracted(false);
@@ -1614,6 +1615,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               setIsDragging(false);
               setDraggedElement(null);
               if (hasInteracted) {
+                saveToHistory();
                 toast.success('Elemento spostato!');
               }
               setHasInteracted(false);
