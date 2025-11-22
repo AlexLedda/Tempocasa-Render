@@ -604,10 +604,37 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.setLineDash([]);
       
       // Draw start point
-      ctx.fillStyle = '#3b82f6';
+      ctx.fillStyle = '#ef4444';
       ctx.beginPath();
       ctx.arc(startPoint.x, startPoint.y, 5, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Show distance measurement while drawing
+      if (mode === 'wall') {
+        const distance = Math.sqrt(
+          Math.pow(mousePos.x - startPoint.x, 2) + 
+          Math.pow(mousePos.y - startPoint.y, 2)
+        );
+        const distanceInCm = Math.round(distance / scale);
+        
+        const midX = (startPoint.x + mousePos.x) / 2;
+        const midY = (startPoint.y + mousePos.y) / 2;
+        
+        // Draw measurement label
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        const text = `${distanceInCm}cm`;
+        const textWidth = ctx.measureText(text).width;
+        ctx.fillRect(midX - textWidth/2 - 8, midY - 20, textWidth + 16, 24);
+        ctx.strokeRect(midX - textWidth/2 - 8, midY - 20, textWidth + 16, 24);
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText(text, midX, midY - 4);
+        ctx.textAlign = 'left';
+      }
     }
   };
 
