@@ -1069,7 +1069,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           ref={canvasRef}
           width={800}
           height={600}
-          onClick={handleCanvasClick}
           onMouseDown={(e) => {
             const canvas = canvasRef.current;
             const rect = canvas.getBoundingClientRect();
