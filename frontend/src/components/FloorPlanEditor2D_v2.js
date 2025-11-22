@@ -858,6 +858,75 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             const y = e.clientY - rect.top;
             setMousePos({ x, y });
             
+            // Handle resizing
+            if (isResizing && resizeHandle && selectedElement) {
+              const newX = x;
+              const newY = y;
+              
+              if (selectedElement.type === 'room') {
+                const idx = rooms.findIndex(r => r.id === selectedElement.id);
+                if (idx !== -1) {
+                  const newRooms = [...rooms];
+                  const room = newRooms[idx];
+                  let newRoom = { ...room };
+                  
+                  if (resizeHandle.includes('e')) {
+                    const newWidth = Math.max(10, (newX - room.x) / scale);
+                    newRoom.width = newWidth;
+                  }
+                  if (resizeHandle.includes('w')) {
+                    const oldRight = room.x + room.width * scale;
+                    newRoom.x = newX;
+                    newRoom.width = Math.max(10, (oldRight - newX) / scale);
+                  }
+                  if (resizeHandle.includes('s')) {
+                    const newDepth = Math.max(10, (newY - room.y) / scale);
+                    newRoom.depth = newDepth;
+                  }
+                  if (resizeHandle.includes('n')) {
+                    const oldBottom = room.y + room.depth * scale;
+                    newRoom.y = newY;
+                    newRoom.depth = Math.max(10, (oldBottom - newY) / scale);
+                  }
+                  
+                  newRooms[idx] = newRoom;
+                  setRooms(newRooms);
+                  setSelectedElement({ ...selectedElement, data: newRoom });
+                }
+              } else if (selectedElement.type === 'furniture') {
+                const idx = selectedElement.idx;
+                if (idx !== undefined) {
+                  const newFurniture = [...furniture];
+                  const item = newFurniture[idx];
+                  let newItem = { ...item };
+                  
+                  const centerX = item.x;
+                  const centerY = item.y;
+                  
+                  if (resizeHandle.includes('e')) {
+                    const distFromCenter = Math.abs(newX - centerX);
+                    newItem.width = Math.max(10, distFromCenter * 2 / scale);
+                  }
+                  if (resizeHandle.includes('w')) {
+                    const distFromCenter = Math.abs(centerX - newX);
+                    newItem.width = Math.max(10, distFromCenter * 2 / scale);
+                  }
+                  if (resizeHandle.includes('s')) {
+                    const distFromCenter = Math.abs(newY - centerY);
+                    newItem.depth = Math.max(10, distFromCenter * 2 / scale);
+                  }
+                  if (resizeHandle.includes('n')) {
+                    const distFromCenter = Math.abs(centerY - newY);
+                    newItem.depth = Math.max(10, distFromCenter * 2 / scale);
+                  }
+                  
+                  newFurniture[idx] = newItem;
+                  setFurniture(newFurniture);
+                  setSelectedElement({ ...selectedElement, data: newItem });
+                }
+              }
+            }
+            
             // Handle dragging
             if (isDragging && draggedElement && mode === 'move') {
               if (draggedElement.type === 'wall') {
@@ -876,6 +945,48 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 
                 setWalls(newWalls);
                 setSelectedElement({ ...draggedElement, start: newWalls[idx].start, end: newWalls[idx].end });
+              } else if (draggedElement.type === 'room') {
+                const idx = rooms.findIndex(r => r.id === draggedElement.id);
+                if (idx !== -1) {
+                  const newRooms = [...rooms];
+                  newRooms[idx] = {
+                    ...newRooms[idx],
+                    x: x - dragOffset.x,
+                    y: y - dragOffset.y
+                  };
+                  setRooms(newRooms);
+                  setSelectedElement({ ...draggedElement, data: newRooms[idx] });
+                }
+              } else if (draggedElement.type === 'door') {
+                const idx = draggedElement.idx;
+                const newDoors = [...doors];
+                newDoors[idx] = {
+                  ...newDoors[idx],
+                  x: x - dragOffset.x,
+                  y: y - dragOffset.y
+                };
+                setDoors(newDoors);
+                setSelectedElement({ ...draggedElement, data: newDoors[idx] });
+              } else if (draggedElement.type === 'window') {
+                const idx = draggedElement.idx;
+                const newWindows = [...windows];
+                newWindows[idx] = {
+                  ...newWindows[idx],
+                  x: x - dragOffset.x,
+                  y: y - dragOffset.y
+                };
+                setWindows(newWindows);
+                setSelectedElement({ ...draggedElement, data: newWindows[idx] });
+              } else if (draggedElement.type === 'furniture') {
+                const idx = draggedElement.idx;
+                const newFurniture = [...furniture];
+                newFurniture[idx] = {
+                  ...newFurniture[idx],
+                  x: x - dragOffset.x,
+                  y: y - dragOffset.y
+                };
+                setFurniture(newFurniture);
+                setSelectedElement({ ...draggedElement, data: newFurniture[idx] });
               }
             }
           }}
