@@ -550,35 +550,35 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               ✋ Sposta
             </Button>
             <Button
-              onClick={() => { setMode('wall'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); }}
+              onClick={() => { setMode('wall'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); setIsDragging(false); }}
               variant={mode === 'wall' ? 'default' : 'outline'}
-              className="w-full"
+              className="w-full text-xs px-1"
             >
-              <Grid3x3 className="w-4 h-4 mr-1" />
+              <Grid3x3 className="w-3 h-3 mr-1" />
               Muro
             </Button>
             <Button
-              onClick={() => { setMode('room'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); }}
+              onClick={() => { setMode('room'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); setIsDragging(false); }}
               variant={mode === 'room' ? 'default' : 'outline'}
-              className="w-full"
+              className="w-full text-xs px-1"
             >
-              <Square className="w-4 h-4 mr-1" />
+              <Square className="w-3 h-3 mr-1" />
               Stanza
             </Button>
             <Button
-              onClick={() => setMode('door')}
+              onClick={() => { setMode('door'); setIsDragging(false); }}
               variant={mode === 'door' ? 'default' : 'outline'}
-              className="w-full"
+              className="w-full text-xs px-1"
             >
-              <DoorOpen className="w-4 h-4 mr-1" />
+              <DoorOpen className="w-3 h-3 mr-1" />
               Porte
             </Button>
             <Button
-              onClick={() => setMode('window')}
+              onClick={() => { setMode('window'); setIsDragging(false); }}
               variant={mode === 'window' ? 'default' : 'outline'}
-              className="w-full"
+              className="w-full text-xs px-1"
             >
-              <Maximize2 className="w-4 h-4 mr-1" />
+              <Maximize2 className="w-3 h-3 mr-1" />
               Finestre
             </Button>
           </div>
