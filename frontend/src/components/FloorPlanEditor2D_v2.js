@@ -1029,8 +1029,17 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const newWalls = [...walls];
                 const wall = newWalls[idx];
                 
-                const deltaX = x - dragOffset.x - (wall.start[0] + wall.end[0]) / 2;
-                const deltaY = y - dragOffset.y - (wall.start[1] + wall.end[1]) / 2;
+                // Calculate the new center position
+                const newCenterX = x - dragOffset.x;
+                const newCenterY = y - dragOffset.y;
+                
+                // Calculate the current center
+                const oldCenterX = (wall.start[0] + wall.end[0]) / 2;
+                const oldCenterY = (wall.start[1] + wall.end[1]) / 2;
+                
+                // Calculate the delta
+                const deltaX = newCenterX - oldCenterX;
+                const deltaY = newCenterY - oldCenterY;
                 
                 newWalls[idx] = {
                   ...wall,
@@ -1039,7 +1048,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 };
                 
                 setWalls(newWalls);
-                setSelectedElement({ ...draggedElement, start: newWalls[idx].start, end: newWalls[idx].end });
+                setSelectedElement({ ...draggedElement, start: newWalls[idx].start, end: newWalls[idx].end, data: newWalls[idx] });
               } else if (draggedElement.type === 'room') {
                 const idx = rooms.findIndex(r => r.id === draggedElement.id);
                 if (idx !== -1) {
