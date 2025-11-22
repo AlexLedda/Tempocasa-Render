@@ -1776,7 +1776,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           style={{
             cursor: isResizing ? 'nwse-resize' : 
                     isDragging ? 'grabbing' : 
-                    mode === 'move' && selectedElement ? 'grab' :
+                    mode === 'move' && hoveredElement ? 'grab' :
+                    mode === 'move' ? 'grab' :
                     mode === 'view' && hoveredElement ? 'pointer' :
                     mode === 'view' ? 'default' : 
                     'crosshair'
