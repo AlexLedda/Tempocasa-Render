@@ -740,7 +740,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         </TabsList>
 
         <TabsContent value="tools" className="space-y-4">
-          <div className="grid grid-cols-6 gap-2">
+          <div className="grid grid-cols-7 gap-2">
             <Button
               onClick={() => { setMode('view'); setSelectedLibraryItem(null); setIsDragging(false); }}
               variant={mode === 'view' ? 'default' : 'outline'}
@@ -764,6 +764,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             >
               <Grid3x3 className="w-3 h-3 mr-1" />
               Muro
+            </Button>
+            <Button
+              onClick={() => { setMode('floor'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); setIsDragging(false); }}
+              variant={mode === 'floor' ? 'default' : 'outline'}
+              className="w-full text-xs px-1"
+            >
+              🟫 Pavimento
             </Button>
             <Button
               onClick={() => { setMode('room'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); setIsDragging(false); }}
