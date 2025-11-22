@@ -107,15 +107,18 @@ user_problem_statement: "Implementare funzionalità di drag & drop e ridimension
 backend:
   - task: "API esistenti per floor plans"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Nessuna modifica al backend, ma verifica che le API esistenti funzionino correttamente"
+      - working: true
+        agent: "testing"
+        comment: "✅ BACKEND API TEST COMPLETATO - Tutte le API core funzionano correttamente: 1) Floor Plans CRUD (POST/GET/PATCH/DELETE) - 100% successo, 2) Upload immagini Cloudinary - funziona e ritorna URL pubblico, 3) Conversione 3D con dati mock - operativa, 4) API Root disponibile. PROBLEMI MINORI: Chat AI (GPT-5/Claude) fallisce per chiavi API non valide - non critico per funzionalità core. Database MongoDB e Cloudinary integrati correttamente. Scenario test completo eseguito con successo (7/7 test passati)."
 
 frontend:
   - task: "Controlli immagine di sfondo (scala, posizione, opacità)"
