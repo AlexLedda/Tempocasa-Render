@@ -767,6 +767,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const deleteSelected = () => {
     if (!selectedElement) return;
     
+    // Save current state before deletion
+    saveToHistory();
+    
     if (selectedElement.type === 'room') {
       setRooms(rooms.filter(r => r.id !== selectedElement.id));
       toast.success('Stanza rimossa!');
