@@ -583,6 +583,20 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             </Button>
           </div>
 
+          {mode === 'move' && selectedElement && (
+            <div className="bg-purple-50 p-3 rounded-lg">
+              <p className="text-sm text-purple-800">
+                ✋ <strong>Sposta:</strong> Clicca sull'elemento selezionato ({selectedElement.type}) e trascinalo nella nuova posizione.
+              </p>
+            </div>
+          )}
+          {mode === 'move' && !selectedElement && (
+            <div className="bg-yellow-50 p-3 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                ⚠️ Prima seleziona un elemento (modalità "Seleziona"), poi attiva "Sposta".
+              </p>
+            </div>
+          )}
           {mode === 'wall' && (
             <div className="bg-slate-50 p-3 rounded-lg">
               <p className="text-sm text-slate-800">
