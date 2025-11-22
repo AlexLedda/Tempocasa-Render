@@ -178,5 +178,7 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Ho implementato le 3 fasi richieste: 1) Drag & Drop completo per walls, rooms, doors, windows, furniture; 2) Ridimensionamento con 8 maniglie per rooms e furniture; 3) I controlli per l'immagine di sfondo erano già presenti. Servono test E2E per verificare: selezione elementi, drag & drop, resize con maniglie, controlli immagine di sfondo. Focus su WorkspacePage con upload planimetria e uso dell'editor 2D."
+  - agent: "main"
+    message: "SESSIONE 1 - Opzione C Sviluppo Incrementale: Implementate 5 nuove funzionalità professionali: 1) Undo/Redo con Ctrl+Z/Y e storico 50 stati, 2) Snap to Grid con toggle G, 3) Zoom con mouse wheel (10%-500%) e Pan con Shift+Drag, 4) Keyboard Shortcuts completi (V,M,W,F,R,D,G,Esc), 5) Sistema pronto per Input Numerico Dimensioni. Tutte le azioni salvano automaticamente nello storico. UI migliorata con barra azioni rapide e pannello shortcuts. Prossima sessione: Input numerico dimensioni + funzionalità Opzione B."
   - agent: "testing"
     message: "BACKEND TESTING COMPLETATO ✅ - Tutte le API esistenti per Vision3D Floor Plan funzionano perfettamente. Test scenario completo eseguito: Health check, CRUD floor plans, upload immagini Cloudinary, aggiornamento con dati 3D. Risultato: 7/7 test passati (100% successo). Upload immagini ritorna correttamente URL pubblico Cloudinary. Database MongoDB operativo. NOTA: Chat AI non funziona per chiavi API non valide ma non è critico per le funzionalità core dell'app. Backend pronto per uso in produzione."
