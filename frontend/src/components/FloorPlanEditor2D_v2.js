@@ -1341,18 +1341,27 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               setIsResizing(false);
               setResizeHandle(null);
               setResizeStart(null);
-              toast.success('Elemento ridimensionato!');
+              if (hasInteracted) {
+                toast.success('Elemento ridimensionato!');
+              }
+              setHasInteracted(false);
               return;
             }
             if (isDragging) {
               setIsDragging(false);
               setDraggedElement(null);
-              toast.success('Elemento spostato!');
+              if (hasInteracted) {
+                toast.success('Elemento spostato!');
+              }
+              setHasInteracted(false);
               return;
             }
             
             // If not resizing or dragging, handle as click
-            handleCanvasClick(e);
+            if (!hasInteracted) {
+              handleCanvasClick(e);
+            }
+            setHasInteracted(false);
           }}
           onMouseLeave={() => {
             setMousePos(null);
