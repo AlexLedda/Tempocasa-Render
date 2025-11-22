@@ -277,6 +277,7 @@ class Vision3DAPITester:
         self.test_get_floorplans()
         self.test_get_floorplan_by_id()
         self.test_update_floorplan()
+        self.test_upload_image()
         self.test_convert_3d()
         
         # Chat tests
