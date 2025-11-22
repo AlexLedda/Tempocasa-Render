@@ -545,6 +545,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         setFloors([...floors, newFloor]);
         setIsDrawing(false);
         setStartPoint(null);
+        saveToHistory();
         toast.success('Pavimento aggiunto!');
       }
     } else if (mode === 'room') {
