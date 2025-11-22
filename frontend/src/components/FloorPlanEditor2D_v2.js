@@ -1480,14 +1480,23 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             setMousePos({ x, y });
             
             // Detect hover on elements for cursor change
-            if (mode === 'view' && !isResizing && !isDragging) {
+            if ((mode === 'view' || mode === 'move') && !isResizing && !isDragging) {
               let hovered = null;
               
               // Check walls
               walls.forEach((wall, idx) => {
                 const dist = pointToLineDistance(x, y, wall.start[0], wall.start[1], wall.end[0], wall.end[1]);
                 if (dist < 15) {
-                  hovered = { type: 'wall', idx };
+                  hovered = { type: 'wall', idx, data: wall };
+                }
+              });
+              
+              // Check floors
+              floors.forEach((floor, idx) => {
+                const width = (floor.width || 4) * scale;
+                const depth = (floor.depth || 3) * scale;
+                if (x >= floor.x && x <= floor.x + width && y >= floor.y && y <= floor.y + depth) {
+                  hovered = { type: 'floor', idx, data: floor };
                 }
               });
               
@@ -1496,7 +1505,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const width = (room.width || 4) * scale;
                 const depth = (room.depth || 3) * scale;
                 if (x >= room.x && x <= room.x + width && y >= room.y && y <= room.y + depth) {
-                  hovered = { type: 'room', idx };
+                  hovered = { type: 'room', idx, data: room, id: room.id };
                 }
               });
               
@@ -1505,7 +1514,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const doorWidth = (door.width || 0.9) * scale;
                 if (x >= door.x - doorWidth / 2 && x <= door.x + doorWidth / 2 && 
                     y >= door.y - 5 && y <= door.y + 5) {
-                  hovered = { type: 'door', idx };
+                  hovered = { type: 'door', idx, data: door };
                 }
               });
               
@@ -1514,7 +1523,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const windowWidth = (window.width || 1.2) * scale;
                 if (x >= window.x - windowWidth / 2 && x <= window.x + windowWidth / 2 && 
                     y >= window.y - 3 && y <= window.y + 3) {
-                  hovered = { type: 'window', idx };
+                  hovered = { type: 'window', idx, data: window };
                 }
               });
               
@@ -1524,7 +1533,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const depth = (item.depth || 1) * scale;
                 if (x >= item.x - width/2 && x <= item.x + width/2 && 
                     y >= item.y - depth/2 && y <= item.y + depth/2) {
-                  hovered = { type: 'furniture', idx };
+                  hovered = { type: 'furniture', idx, data: item };
                 }
               });
               
