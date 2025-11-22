@@ -107,6 +107,53 @@ class Vision3DAPITester:
         data = {"name": "Updated Test Floor Plan"}
         return self.run_test("Update FloorPlan", "PATCH", f"floorplans/{self.floor_plan_id}", 200, data)
 
+    def test_upload_image(self):
+        """Test image upload to Cloudinary"""
+        if not self.floor_plan_id:
+            self.log_test("Upload Image", False, "No floor plan ID available")
+            return False
+        
+        # Create a simple test image file
+        import io
+        from PIL import Image
+        
+        # Create a simple test image
+        img = Image.new('RGB', (100, 100), color='red')
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format='PNG')
+        img_bytes.seek(0)
+        
+        files = {'file': ('test_image.png', img_bytes, 'image/png')}
+        
+        url = f"{self.api_url}/floorplans/{self.floor_plan_id}/upload"
+        print(f"\n🔍 Testing Upload Image...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.post(url, files=files)
+            success = response.status_code == 200
+            
+            try:
+                response_data = response.json()
+            except:
+                response_data = response.text
+            
+            if success:
+                # Check if response contains file_url
+                if isinstance(response_data, dict) and 'file_url' in response_data:
+                    self.log_test("Upload Image", True, f"Status: {response.status_code}, URL returned: {response_data.get('file_url', 'N/A')}", response_data)
+                else:
+                    self.log_test("Upload Image", False, f"No file_url in response: {response_data}")
+                    success = False
+            else:
+                self.log_test("Upload Image", False, f"Expected 200, got {response.status_code}. Response: {response_data}")
+            
+            return success
+            
+        except Exception as e:
+            self.log_test("Upload Image", False, f"Exception: {str(e)}")
+            return False
+
     def test_convert_3d(self):
         """Test 3D conversion"""
         if not self.floor_plan_id:
