@@ -835,7 +835,10 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
 
       {floorPlanImage && backgroundImg && (
         <Card className="p-4 bg-blue-50 border-blue-200 mb-4 mt-4">
-          <h4 className="font-semibold text-blue-900 mb-3">🖼️ Controlli Immagine di Sfondo</h4>
+          <h4 className="font-semibold text-blue-900 mb-2">🖼️ Controlli Immagine di Sfondo</h4>
+          <p className="text-xs text-blue-700 mb-3">
+            💡 <strong>Suggerimento:</strong> Usa questi controlli per allineare la planimetria con la griglia prima di disegnare i muri!
+          </p>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label className="text-sm">Scala Immagine: {(imageScale * 100).toFixed(0)}%</Label>
