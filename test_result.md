@@ -101,3 +101,74 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Implementare funzionalità di drag & drop e ridimensionamento per tutti gli elementi dell'editor 2D (muri, stanze, porte, finestre, mobili). Aggiungere controlli slider per posizione e scala dell'immagine di sfondo per allineamento preciso con la griglia."
+
+backend:
+  - task: "API esistenti per floor plans"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Nessuna modifica al backend, ma verifica che le API esistenti funzionino correttamente"
+
+frontend:
+  - task: "Controlli immagine di sfondo (scala, posizione, opacità)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/FloorPlanEditor2D_v2.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Controlli slider già presenti nel codice (linee 708-768). Permette scala 0.1-3x, opacità 0.1-1, e posizione con pulsanti freccia. Da testare funzionalità."
+  
+  - task: "Drag & Drop per tutti gli elementi canvas"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/FloorPlanEditor2D_v2.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementato drag & drop completo per: walls, rooms, doors, windows, furniture. Logica in onMouseDown, onMouseMove, onMouseUp. Cursore cambia in 'move' durante il drag. Da testare su tutti i tipi di elementi."
+  
+  - task: "Ridimensionamento elementi con maniglie"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/FloorPlanEditor2D_v2.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementato sistema di ridimensionamento con 8 maniglie (4 angoli + 4 lati) per rooms e furniture. Funzioni: drawResizeHandles(), getResizeHandle(). Logica in onMouseDown/Move/Up. Cursore 'nwse-resize'. Da testare resize proporzionale e corretto."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Drag & Drop per tutti gli elementi canvas"
+    - "Ridimensionamento elementi con maniglie"
+    - "Controlli immagine di sfondo (scala, posizione, opacità)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Ho implementato le 3 fasi richieste: 1) Drag & Drop completo per walls, rooms, doors, windows, furniture; 2) Ridimensionamento con 8 maniglie per rooms e furniture; 3) I controlli per l'immagine di sfondo erano già presenti. Servono test E2E per verificare: selezione elementi, drag & drop, resize con maniglie, controlli immagine di sfondo. Focus su WorkspacePage con upload planimetria e uso dell'editor 2D."
