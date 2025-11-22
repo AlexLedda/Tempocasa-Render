@@ -111,11 +111,18 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw background image if available
+    // Draw background image if available with controls
     if (backgroundImg) {
-      ctx.globalAlpha = 0.5;
-      ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
-      ctx.globalAlpha = 1.0;
+      ctx.save();
+      ctx.globalAlpha = imageOpacity;
+      
+      const imgWidth = canvas.width * imageScale;
+      const imgHeight = canvas.height * imageScale;
+      const imgX = imagePosition.x + (canvas.width - imgWidth) / 2;
+      const imgY = imagePosition.y + (canvas.height - imgHeight) / 2;
+      
+      ctx.drawImage(backgroundImg, imgX, imgY, imgWidth, imgHeight);
+      ctx.restore();
     }
 
     // Draw grid (every 100cm = 1m)
