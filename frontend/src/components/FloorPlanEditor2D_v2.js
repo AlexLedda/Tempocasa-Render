@@ -494,8 +494,8 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
   const handleCanvasClick = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    let x = (e.clientX - rect.left - panOffset.x) / zoom;
-    let y = (e.clientY - rect.top - panOffset.y) / zoom;
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
     
     // Apply snap to grid
     const snapped = snapToGridCoords(x, y);
