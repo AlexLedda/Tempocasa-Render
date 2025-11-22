@@ -648,6 +648,9 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     } else if (selectedElement.type === 'wall') {
       setWalls(walls.filter((_, idx) => idx !== selectedElement.idx));
       toast.success('Muro rimosso!');
+    } else if (selectedElement.type === 'floor') {
+      setFloors(floors.filter((_, idx) => idx !== selectedElement.idx));
+      toast.success('Pavimento rimosso!');
     }
     
     setSelectedElement(null);
