@@ -1045,7 +1045,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               setDraggedElement(null);
             }
           }}
-          className="w-full cursor-crosshair"
+          className="w-full"
+          style={{
+            cursor: isResizing ? 'nwse-resize' : 
+                    isDragging ? 'move' : 
+                    mode === 'move' ? 'move' : 
+                    'crosshair'
+          }}
           data-testid="floor-plan-canvas"
         />
       </div>
