@@ -1084,12 +1084,12 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               Seleziona
             </Button>
             <Button
-              onClick={() => { setMode('move'); setSelectedLibraryItem(null); }}
+              onClick={() => { setMode('move'); setSelectedLibraryItem(null); setSelectedElement(null); }}
               variant={mode === 'move' ? 'default' : 'outline'}
               className="w-full text-xs px-1"
-              disabled={!selectedElement}
+              title="Sposta elementi liberamente (S)"
             >
-              ✋ Sposta
+              🖐️ Sposta
             </Button>
             <Button
               onClick={() => { setMode('wall'); setSelectedLibraryItem(null); setIsDrawing(false); setStartPoint(null); setIsDragging(false); }}
