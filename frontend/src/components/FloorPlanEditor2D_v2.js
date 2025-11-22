@@ -419,9 +419,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       setFurniture(furniture.filter((_, idx) => idx !== selectedElement.idx));
       toast.success('Arredamento rimosso!');
     } else if (selectedElement.type === 'wall') {
-      setWalls(walls.filter(w => 
-        !(w.start[0] === selectedElement.start[0] && w.start[1] === selectedElement.start[1])
-      ));
+      setWalls(walls.filter((_, idx) => idx !== selectedElement.idx));
       toast.success('Muro rimosso!');
     }
     
