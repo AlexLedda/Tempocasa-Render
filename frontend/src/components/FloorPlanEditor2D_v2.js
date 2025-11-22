@@ -314,7 +314,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
         ctx.strokeStyle = '#ef4444';
         ctx.lineWidth = 8;
       } else {
-        ctx.strokeStyle = '#0f172a';
+        ctx.strokeStyle = wall.color || '#0f172a'; // Use wall's custom color
         ctx.lineWidth = 6;
       }
       
@@ -324,7 +324,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
       ctx.stroke();
       
       // Draw small circles at endpoints for visibility
-      ctx.fillStyle = isSelected ? '#ef4444' : '#0f172a';
+      ctx.fillStyle = isSelected ? '#ef4444' : (wall.color || '#0f172a');
       ctx.beginPath();
       ctx.arc(wall.start[0], wall.start[1], 4, 0, Math.PI * 2);
       ctx.fill();
