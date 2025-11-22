@@ -1460,6 +1460,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 }
               });
               
+              // Check windows
+              windows.forEach((window, idx) => {
+                const windowWidth = (window.width || 1.2) * scale;
+                if (x >= window.x - windowWidth / 2 && x <= window.x + windowWidth / 2 && 
+                    y >= window.y - 3 && y <= window.y + 3) {
+                  hovered = { type: 'window', idx };
+                }
+              });
+              
               setHoveredElement(hovered);
             }
             
