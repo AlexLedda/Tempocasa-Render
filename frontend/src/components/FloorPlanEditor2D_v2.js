@@ -718,9 +718,31 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           )}
           {mode === 'wall' && (
             <div className="bg-slate-50 p-3 rounded-lg">
-              <p className="text-sm text-slate-800">
+              <p className="text-sm text-slate-800 mb-2">
                 🧱 <strong>Muro:</strong> Clicca punto iniziale, poi clicca punto finale per tracciare un muro.
               </p>
+              {walls.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    if (isDrawing) {
+                      setIsDrawing(false);
+                      setStartPoint(null);
+                      toast.info('Disegno annullato');
+                    } else {
+                      const newWalls = [...walls];
+                      newWalls.pop();
+                      setWalls(newWalls);
+                      toast.success('Ultimo muro rimosso!');
+                    }
+                  }}
+                  className="text-red-600 border-red-600 hover:bg-red-50"
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  {isDrawing ? 'Annulla disegno' : 'Rimuovi ultimo muro'}
+                </Button>
+              )}
             </div>
           )}
           {mode === 'room' && (
