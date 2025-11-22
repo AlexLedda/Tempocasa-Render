@@ -497,9 +497,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Draw windows
     windows.forEach((window, idx) => {
       const isSelected = selectedElement?.type === 'window' && selectedElement?.idx === idx;
-      ctx.fillStyle = isSelected ? '#06b6d4' : '#22d3ee';
-      ctx.strokeStyle = '#0891b2';
-      ctx.lineWidth = 2;
+      const isHovered = hoveredElement?.type === 'window' && hoveredElement?.idx === idx;
+      
+      if (isSelected) {
+        ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
+        ctx.shadowBlur = 10;
+      }
+      
+      ctx.fillStyle = isSelected ? 'rgba(6, 182, 212, 0.8)' : isHovered ? 'rgba(34, 211, 238, 0.7)' : '#22d3ee';
+      ctx.strokeStyle = isSelected ? '#0891b2' : '#0891b2';
+      ctx.lineWidth = isSelected ? 3 : 2;
       
       const windowWidth = (window.width || 1.2) * scale;
       ctx.fillRect(window.x - windowWidth / 2, window.y - 3, windowWidth, 6);
