@@ -1097,7 +1097,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               <span><kbd className="bg-white px-1 rounded">Ctrl+Z</kbd> Undo</span>
               <span><kbd className="bg-white px-1 rounded">Ctrl+Y</kbd> Redo</span>
               <span><kbd className="bg-white px-1 rounded">Canc</kbd> Elimina</span>
-              <span><kbd className="bg-white px-1 rounded">Shift+Drag</kbd> Pan</span>
             </div>
           </div>
         </TabsContent>
