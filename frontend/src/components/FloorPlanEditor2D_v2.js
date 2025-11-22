@@ -443,9 +443,16 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     // Draw furniture
     furniture.forEach((item, idx) => {
       const isSelected = selectedElement?.type === 'furniture' && selectedElement?.idx === idx;
-      ctx.fillStyle = isSelected ? 'rgba(168, 85, 247, 0.4)' : 'rgba(168, 85, 247, 0.25)';
+      const isHovered = hoveredElement?.type === 'furniture' && hoveredElement?.idx === idx;
+      
+      if (isSelected) {
+        ctx.shadowColor = 'rgba(168, 85, 247, 0.5)';
+        ctx.shadowBlur = 10;
+      }
+      
+      ctx.fillStyle = isSelected ? 'rgba(168, 85, 247, 0.5)' : isHovered ? 'rgba(168, 85, 247, 0.35)' : 'rgba(168, 85, 247, 0.25)';
       ctx.strokeStyle = isSelected ? '#a855f7' : '#9333ea';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = isSelected ? 3 : 2;
       
       const width = (item.width || 1) * scale;
       const depth = (item.depth || 1) * scale;
