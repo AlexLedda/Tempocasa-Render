@@ -903,6 +903,29 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
           <div className="space-y-4">
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
+                🟫 Pavimenti
+              </h4>
+              <div className="grid grid-cols-3 gap-2">
+                {ELEMENT_LIBRARY.floors.map(item => (
+                  <Button
+                    key={item.id}
+                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                    onClick={() => { setSelectedLibraryItem(item); setMode('floor'); }}
+                    className="h-auto flex-col py-3"
+                    style={{
+                      backgroundColor: selectedLibraryItem?.id === item.id ? undefined : item.color + '20',
+                      borderColor: item.color
+                    }}
+                  >
+                    <span className="text-2xl mb-1">{item.icon}</span>
+                    <span className="text-xs text-center">{item.name}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
                 <DoorOpen className="w-4 h-4" /> Porte
               </h4>
               <div className="grid grid-cols-3 gap-2">
