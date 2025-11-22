@@ -106,6 +106,19 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
     drawCanvas();
   }, [rooms, doors, windows, walls, selectedElement, furniture, backgroundImg, mousePos, isDrawing, startPoint, mode, imageScale, imagePosition, imageOpacity, isResizing]);
 
+  // Handle keyboard shortcuts for deletion
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
+        e.preventDefault();
+        deleteSelected();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [selectedElement, rooms, doors, windows, walls, furniture]);
+
   const drawCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
