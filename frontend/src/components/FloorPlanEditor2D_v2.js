@@ -1497,6 +1497,12 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             }
           }}
           onMouseUp={(e) => {
+            if (isPanning) {
+              setIsPanning(false);
+              setPanStart(null);
+              return;
+            }
+            
             if (isResizing) {
               setIsResizing(false);
               setResizeHandle(null);
