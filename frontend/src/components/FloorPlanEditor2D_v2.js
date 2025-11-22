@@ -757,7 +757,7 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                   <p>Arredo: {selectedElement.data.name} ({selectedElement.data.width}x{selectedElement.data.depth}cm)</p>
                 )}
                 {selectedElement.type === 'wall' && (
-                  <p>Muro: lunghezza {Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)).toFixed(0)}cm, spessore {wallThickness}cm</p>
+                  <p>Muro: lunghezza {(Math.sqrt(Math.pow((selectedElement.end[0] - selectedElement.start[0]), 2) + Math.pow((selectedElement.end[1] - selectedElement.start[1]), 2)) / scale).toFixed(0)}cm, spessore {wallThickness}cm</p>
                 )}
               </div>
             </div>
