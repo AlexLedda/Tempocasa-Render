@@ -487,8 +487,116 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           </div>
         </TabsContent>
         
-        <TabsContent value="library">
-          <p className="text-sm text-slate-600">Libreria elementi in arrivo...</p>
+        <TabsContent value="library" className="space-y-4">
+          <div className="space-y-4">
+            {/* Pavimenti */}
+            <div>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                🟫 Pavimenti
+              </h4>
+              <div className="grid grid-cols-3 gap-2">
+                {ELEMENT_LIBRARY.floors.map(item => (
+                  <Button
+                    key={item.id}
+                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                    onClick={() => { 
+                      setSelectedLibraryItem(item); 
+                      setMode('floor'); 
+                    }}
+                    className="h-auto flex-col py-3"
+                    style={{
+                      backgroundColor: selectedLibraryItem?.id === item.id ? undefined : item.color + '20',
+                      borderColor: item.color
+                    }}
+                  >
+                    <span className="text-2xl mb-1">{item.icon}</span>
+                    <span className="text-xs text-center">{item.name}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Porte */}
+            <div>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <DoorOpen className="w-4 h-4" /> Porte
+              </h4>
+              <div className="grid grid-cols-3 gap-2">
+                {ELEMENT_LIBRARY.doors.map(item => (
+                  <Button
+                    key={item.id}
+                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                    onClick={() => { 
+                      setSelectedLibraryItem(item); 
+                      setMode('door'); 
+                    }}
+                    className="h-auto flex-col py-3"
+                  >
+                    <span className="text-2xl mb-1">{item.icon}</span>
+                    <span className="text-xs text-center">{item.name}</span>
+                    <span className="text-xs text-slate-500">{item.width}cm</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Finestre */}
+            <div>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <Maximize2 className="w-4 h-4" /> Finestre
+              </h4>
+              <div className="grid grid-cols-3 gap-2">
+                {ELEMENT_LIBRARY.windows.map(item => (
+                  <Button
+                    key={item.id}
+                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                    onClick={() => { 
+                      setSelectedLibraryItem(item); 
+                      setMode('window'); 
+                    }}
+                    className="h-auto flex-col py-3"
+                  >
+                    <span className="text-2xl mb-1">{item.icon}</span>
+                    <span className="text-xs text-center">{item.name}</span>
+                    <span className="text-xs text-slate-500">{item.width}cm</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobili */}
+            <div>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                🛋️ Arredamento
+              </h4>
+              <div className="grid grid-cols-3 gap-2">
+                {ELEMENT_LIBRARY.furniture.map(item => (
+                  <Button
+                    key={item.id}
+                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                    onClick={() => { 
+                      setSelectedLibraryItem(item); 
+                      setMode('furniture'); 
+                    }}
+                    className="h-auto flex-col py-3"
+                  >
+                    <span className="text-2xl mb-1">{item.icon}</span>
+                    <span className="text-xs text-center">{item.name}</span>
+                    <span className="text-xs text-slate-500">{item.width}x{item.depth}cm</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          {/* Info quando elemento selezionato */}
+          {selectedLibraryItem && (
+            <div className="bg-green-50 p-3 rounded-lg mt-4">
+              <p className="text-sm text-green-800">
+                ✅ <strong>{selectedLibraryItem.name}</strong> selezionato. Clicca sul canvas per posizionare.
+              </p>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
       
