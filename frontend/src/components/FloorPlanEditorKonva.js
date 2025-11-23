@@ -5,9 +5,10 @@ import { Card } from '../components/ui/card';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { toast } from 'sonner';
-import { Grid3x3, Square, DoorOpen, Maximize2, Move, Save, Trash2 } from 'lucide-react';
+import { Grid3x3, Square, DoorOpen, Maximize2, Move, Save, Trash2, Search, Upload, Plus } from 'lucide-react';
+import { EXTENDED_LIBRARY, getAllItems, searchItems } from '../data/extendedLibrary';
 
-// Libreria elementi predefiniti (dimensioni in cm)
+// Mantieni compatibilità per ora
 const ELEMENT_LIBRARY = {
   doors: [
     { id: 'door-single', name: 'Porta Singola', width: 90, height: 210, icon: '🚪' },
