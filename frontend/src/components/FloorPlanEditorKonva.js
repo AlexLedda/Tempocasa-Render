@@ -68,6 +68,8 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   // Background image
   const [backgroundImg, setBackgroundImg] = useState(null);
   const [imageOpacity, setImageOpacity] = useState(0.5);
+  const [imageScale, setImageScale] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   
   // Load background image
   useEffect(() => {
