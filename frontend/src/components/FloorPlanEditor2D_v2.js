@@ -1447,7 +1447,6 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             if (mode === 'move') {
               // If hovering over element, start dragging it directly
               if (hoveredElement) {
-                console.log('Starting drag:', hoveredElement);
                 setIsDragging(true);
                 setDraggedElement(hoveredElement);
                 setSelectedElement(hoveredElement);
