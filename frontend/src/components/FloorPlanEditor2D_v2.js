@@ -1659,44 +1659,50 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             if (isDragging && draggedElement && mode === 'move') {
               setHasInteracted(true);
               if (draggedElement.type === 'wall') {
-                const idx = draggedElement.idx;
-                
                 // Use the wall data from draggedElement directly
                 const wall = draggedElement.data;
                 
-                // Safety check
-                if (!wall || !wall.start || !wall.end) {
-                  console.error('Wall data invalid:', wall);
+                // Safety check - molto importante!
+                if (!wall || !wall.start || !wall.end || !Array.isArray(wall.start) || !Array.isArray(wall.end)) {
+                  console.error('Wall data invalid or missing:', draggedElement);
+                  setIsDragging(false);
                   return;
                 }
                 
-                // Calculate the new center position
+                // Calculate the new position directly
+                const currentCenterX = (wall.start[0] + wall.end[0]) / 2;
+                const currentCenterY = (wall.start[1] + wall.end[1]) / 2;
+                
                 const newCenterX = x - dragOffset.x;
                 const newCenterY = y - dragOffset.y;
                 
-                // Calculate the current center
-                const oldCenterX = (wall.start[0] + wall.end[0]) / 2;
-                const oldCenterY = (wall.start[1] + wall.end[1]) / 2;
+                const deltaX = newCenterX - currentCenterX;
+                const deltaY = newCenterY - currentCenterY;
                 
-                // Calculate the delta
-                const deltaX = newCenterX - oldCenterX;
-                const deltaY = newCenterY - oldCenterY;
-                
-                // Update the wall with new position
+                // Create updated wall
                 const updatedWall = {
                   ...wall,
                   start: [wall.start[0] + deltaX, wall.start[1] + deltaY],
                   end: [wall.end[0] + deltaX, wall.end[1] + deltaY]
                 };
                 
-                // Update the walls array
-                const newWalls = [...walls];
-                newWalls[idx] = updatedWall;
+                // Find and update the wall in the array
+                const newWalls = walls.map((w, i) => {
+                  if (i === draggedElement.idx) {
+                    return updatedWall;
+                  }
+                  return w;
+                });
+                
                 setWalls(newWalls);
                 
-                // Update draggedElement with new positions so next frame uses updated data
-                setDraggedElement({ ...draggedElement, data: updatedWall });
-                setSelectedElement({ ...draggedElement, start: updatedWall.start, end: updatedWall.end, data: updatedWall });
+                // Update draggedElement so next frame uses the new position
+                setDraggedElement({ 
+                  ...draggedElement, 
+                  data: updatedWall,
+                  start: updatedWall.start,
+                  end: updatedWall.end
+                });
               } else if (draggedElement.type === 'room') {
                 const idx = rooms.findIndex(r => r.id === draggedElement.id);
                 if (idx !== -1) {
