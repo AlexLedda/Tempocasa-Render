@@ -1660,12 +1660,13 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
               setHasInteracted(true);
               if (draggedElement.type === 'wall') {
                 const idx = draggedElement.idx;
-                const newWalls = [...walls];
-                const wall = newWalls[idx];
                 
-                // Safety check - wall must exist
+                // Use the wall data from draggedElement directly
+                const wall = draggedElement.data;
+                
+                // Safety check
                 if (!wall || !wall.start || !wall.end) {
-                  console.error('Wall not found or invalid structure:', idx, wall);
+                  console.error('Wall data invalid:', wall);
                   return;
                 }
                 
@@ -1681,14 +1682,21 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
                 const deltaX = newCenterX - oldCenterX;
                 const deltaY = newCenterY - oldCenterY;
                 
-                newWalls[idx] = {
+                // Update the wall with new position
+                const updatedWall = {
                   ...wall,
                   start: [wall.start[0] + deltaX, wall.start[1] + deltaY],
                   end: [wall.end[0] + deltaX, wall.end[1] + deltaY]
                 };
                 
+                // Update the walls array
+                const newWalls = [...walls];
+                newWalls[idx] = updatedWall;
                 setWalls(newWalls);
-                setSelectedElement({ ...draggedElement, start: newWalls[idx].start, end: newWalls[idx].end, data: newWalls[idx] });
+                
+                // Update draggedElement with new positions so next frame uses updated data
+                setDraggedElement({ ...draggedElement, data: updatedWall });
+                setSelectedElement({ ...draggedElement, start: updatedWall.start, end: updatedWall.end, data: updatedWall });
               } else if (draggedElement.type === 'room') {
                 const idx = rooms.findIndex(r => r.id === draggedElement.id);
                 if (idx !== -1) {
