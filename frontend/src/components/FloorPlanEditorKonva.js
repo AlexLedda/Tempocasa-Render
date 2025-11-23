@@ -450,18 +450,41 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           </div>
           
           {mode === 'wall' && (
-            <div className="bg-slate-50 p-3 rounded-lg">
-              <p className="text-sm text-slate-800 mb-2">
+            <div className="bg-slate-50 p-3 rounded-lg space-y-3">
+              <p className="text-sm text-slate-800">
                 🧱 <strong>Muro:</strong> Clicca punto iniziale, poi clicca punto finale.
               </p>
-              <div className="flex items-center gap-2">
-                <Label className="text-sm">Colore Muro:</Label>
-                <input
-                  type="color"
-                  value={wallColor}
-                  onChange={(e) => setWallColor(e.target.value)}
-                  className="w-12 h-8 rounded border-2 cursor-pointer"
-                />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm">Colore Muro:</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <input
+                      type="color"
+                      value={wallColor}
+                      onChange={(e) => setWallColor(e.target.value)}
+                      className="w-12 h-8 rounded border-2 cursor-pointer"
+                    />
+                    <span className="text-xs text-slate-600">{wallColor}</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm">Spessore Muro: {wallThickness}cm</Label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="50"
+                    step="5"
+                    value={wallThickness}
+                    onChange={(e) => setWallThickness(parseInt(e.target.value))}
+                    className="w-full mt-1"
+                  />
+                  <div className="flex justify-between text-xs text-slate-500 mt-1">
+                    <span>10cm</span>
+                    <span>50cm</span>
+                  </div>
+                </div>
               </div>
             </div>
           )}
