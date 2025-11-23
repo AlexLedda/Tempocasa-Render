@@ -255,6 +255,17 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   
   // Handle stage mouse down for drawing
   const handleStageMouseDown = (e) => {
+    // Calibration mode
+    if (isCalibrating) {
+      const pos = e.target.getStage().getPointerPosition();
+      if (!calibrationStart) {
+        setCalibrationStart(pos);
+      } else if (!calibrationEnd) {
+        setCalibrationEnd(pos);
+      }
+      return;
+    }
+    
     if (mode === 'wall' && !isDrawing) {
       const pos = e.target.getStage().getPointerPosition();
       const snapped = snapToGridCoords(pos.x, pos.y);
