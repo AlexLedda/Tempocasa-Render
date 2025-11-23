@@ -449,12 +449,22 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        setImagePosition({ x: 0, y: 0 });
-                        setImageScale(1);
-                        setImageOpacity(0.5);
+                        if (backgroundImg) {
+                          // Auto-fit
+                          const scaleX = canvasWidth / backgroundImg.width;
+                          const scaleY = canvasHeight / backgroundImg.height;
+                          const autoScale = Math.min(scaleX, scaleY, 1);
+                          setImageScale(autoScale);
+                          
+                          const centeredX = (canvasWidth - backgroundImg.width * autoScale) / 2;
+                          const centeredY = (canvasHeight - backgroundImg.height * autoScale) / 2;
+                          setImagePosition({ x: centeredX, y: centeredY });
+                          setImageOpacity(0.5);
+                        }
                       }}
+                      title="Adatta immagine al canvas"
                     >
-                      Reset
+                      Fit
                     </Button>
                   </div>
                 </div>
