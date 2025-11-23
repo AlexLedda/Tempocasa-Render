@@ -171,8 +171,68 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   
   // Handle canvas click
   const handleStageClick = (e) => {
-    // Deselect when clicked on empty area
+    // Check if clicking on empty area
     if (e.target === e.target.getStage()) {
+      // Place element from library if selected
+      if (selectedLibraryItem && (mode === 'door' || mode === 'window' || mode === 'furniture' || mode === 'floor')) {
+        const pos = e.target.getStage().getPointerPosition();
+        const snapped = snapToGridCoords(pos.x, pos.y);
+        
+        if (mode === 'door') {
+          const newDoor = {
+            id: `door-${Date.now()}`,
+            x: snapped.x,
+            y: snapped.y,
+            width: (selectedLibraryItem.width || 90) * scale,
+            height: 10,
+            fill: 'rgba(34, 197, 94, 0.5)',
+            ...selectedLibraryItem
+          };
+          setDoors([...doors, newDoor]);
+          saveToHistory();
+          toast.success(`${selectedLibraryItem.name} aggiunta!`);
+        } else if (mode === 'window') {
+          const newWindow = {
+            id: `window-${Date.now()}`,
+            x: snapped.x,
+            y: snapped.y,
+            width: (selectedLibraryItem.width || 80) * scale,
+            height: 10,
+            fill: 'rgba(59, 130, 246, 0.5)',
+            ...selectedLibraryItem
+          };
+          setWindows([...windows, newWindow]);
+          saveToHistory();
+          toast.success(`${selectedLibraryItem.name} aggiunta!`);
+        } else if (mode === 'furniture') {
+          const newFurniture = {
+            id: `furniture-${Date.now()}`,
+            x: snapped.x,
+            y: snapped.y,
+            width: (selectedLibraryItem.width || 100) * scale,
+            height: (selectedLibraryItem.depth || 100) * scale,
+            fill: 'rgba(168, 85, 247, 0.4)',
+            ...selectedLibraryItem
+          };
+          setFurniture([...furniture, newFurniture]);
+          saveToHistory();
+          toast.success(`${selectedLibraryItem.name} aggiunto!`);
+        } else if (mode === 'floor') {
+          const newFloor = {
+            id: `floor-${Date.now()}`,
+            x: snapped.x,
+            y: snapped.y,
+            width: 400, // Default 4m
+            height: 300, // Default 3m
+            ...selectedLibraryItem
+          };
+          setFloors([...floors, newFloor]);
+          saveToHistory();
+          toast.success(`${selectedLibraryItem.name} aggiunto!`);
+        }
+        return;
+      }
+      
       setSelectedId(null);
       return;
     }
