@@ -66,6 +66,12 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   // Custom elements
   const [customElements, setCustomElements] = useState([]);
   
+  // Scale calibration
+  const [isCalibrating, setIsCalibrating] = useState(false);
+  const [calibrationStart, setCalibrationStart] = useState(null);
+  const [calibrationEnd, setCalibrationEnd] = useState(null);
+  const [calibrationRealLength, setCalibrationRealLength] = useState(500); // cm
+  
   // Drawing state
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState(null);
