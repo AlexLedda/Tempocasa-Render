@@ -71,7 +71,11 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [imageScale, setImageScale] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   
-  // Load background image
+  // Canvas dimensions
+  const canvasWidth = 1400;
+  const canvasHeight = 900;
+  
+  // Load background image and auto-fit
   useEffect(() => {
     if (floorPlanImage) {
       const img = new window.Image();
@@ -79,7 +83,20 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       img.src = floorPlanImage;
       img.onload = () => {
         setBackgroundImg(img);
-        console.log('Background image loaded for Konva');
+        
+        // Auto-fit image to canvas
+        const scaleX = canvasWidth / img.width;
+        const scaleY = canvasHeight / img.height;
+        const autoScale = Math.min(scaleX, scaleY, 1); // Don't scale up
+        
+        setImageScale(autoScale);
+        
+        // Center the image
+        const centeredX = (canvasWidth - img.width * autoScale) / 2;
+        const centeredY = (canvasHeight - img.height * autoScale) / 2;
+        setImagePosition({ x: centeredX, y: centeredY });
+        
+        console.log('Background image loaded and fitted for Konva');
       };
     }
   }, [floorPlanImage]);
