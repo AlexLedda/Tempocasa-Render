@@ -643,8 +643,88 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           </div>
           
           <div className="space-y-4">
-            {/* Pavimenti */}
-            <div>
+            {/* Custom Elements */}
+            {selectedCategory === 'custom' && customElements.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  🖼️ Elementi Personalizzati
+                </h4>
+                <div className="grid grid-cols-4 gap-2">
+                  {customElements.map(item => (
+                    <Button
+                      key={item.id}
+                      variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                      onClick={() => { 
+                        setSelectedLibraryItem(item); 
+                        setMode('furniture'); 
+                      }}
+                      className="h-auto flex-col py-3 relative"
+                    >
+                      <span className="text-2xl mb-1">{item.icon}</span>
+                      <span className="text-xs text-center truncate w-full">{item.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Extended Library Categories */}
+            {(selectedCategory === 'all' || Object.keys(EXTENDED_LIBRARY).includes(selectedCategory)) && 
+              Object.keys(EXTENDED_LIBRARY)
+                .filter(catKey => selectedCategory === 'all' || selectedCategory === catKey)
+                .filter(catKey => {
+                  if (!searchQuery) return true;
+                  const category = EXTENDED_LIBRARY[catKey];
+                  return category.items.some(item => 
+                    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  );
+                })
+                .map(catKey => {
+                  const category = EXTENDED_LIBRARY[catKey];
+                  const filteredItems = category.items.filter(item => 
+                    !searchQuery || item.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  );
+                  
+                  if (filteredItems.length === 0) return null;
+                  
+                  return (
+                    <div key={catKey}>
+                      <h4 className="font-semibold mb-2 flex items-center gap-2">
+                        {category.icon} {category.name} ({filteredItems.length})
+                      </h4>
+                      <div className="grid grid-cols-4 gap-2">
+                        {filteredItems.map(item => (
+                          <Button
+                            key={item.id}
+                            variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
+                            onClick={() => { 
+                              setSelectedLibraryItem({ ...item, category: catKey }); 
+                              setMode(catKey === 'floors' ? 'floor' : catKey === 'doors_windows' ? 'door' : 'furniture'); 
+                            }}
+                            className="h-auto flex-col py-2 text-xs"
+                            style={{
+                              backgroundColor: selectedLibraryItem?.id === item.id ? undefined : 
+                                item.color ? item.color + '20' : undefined,
+                              borderColor: item.color
+                            }}
+                          >
+                            <span className="text-xl mb-1">{item.icon}</span>
+                            <span className="text-xs text-center leading-tight">{item.name}</span>
+                            {(item.width && item.depth) && (
+                              <span className="text-[10px] text-slate-500 mt-0.5">
+                                {item.width}x{item.depth}cm
+                              </span>
+                            )}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+            }
+            
+            {/* OLD LIBRARY - Mantengo per compatibilità ma nascosto */}
+            <div className="hidden">
               <h4 className="font-semibold mb-2 flex items-center gap-2">
                 🟫 Pavimenti
               </h4>
