@@ -1158,6 +1158,54 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 fill="#ef4444"
               />
             )}
+            
+            {/* Calibration line preview */}
+            {isCalibrating && calibrationStart && (
+              <Circle
+                x={calibrationStart.x}
+                y={calibrationStart.y}
+                radius={8}
+                fill="#f59e0b"
+                stroke="#ffffff"
+                strokeWidth={2}
+              />
+            )}
+            {isCalibrating && calibrationStart && calibrationEnd && (
+              <>
+                <Line
+                  points={[
+                    calibrationStart.x, 
+                    calibrationStart.y, 
+                    calibrationEnd.x, 
+                    calibrationEnd.y
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={4}
+                  dash={[10, 5]}
+                />
+                <Circle
+                  x={calibrationEnd.x}
+                  y={calibrationEnd.y}
+                  radius={8}
+                  fill="#f59e0b"
+                  stroke="#ffffff"
+                  strokeWidth={2}
+                />
+                <Text
+                  x={(calibrationStart.x + calibrationEnd.x) / 2 - 40}
+                  y={(calibrationStart.y + calibrationEnd.y) / 2 - 30}
+                  text={`${Math.sqrt(
+                    Math.pow(calibrationEnd.x - calibrationStart.x, 2) + 
+                    Math.pow(calibrationEnd.y - calibrationStart.y, 2)
+                  ).toFixed(0)} px`}
+                  fontSize={14}
+                  fontStyle="bold"
+                  fill="#ffffff"
+                  padding={8}
+                  background="#f59e0b"
+                />
+              </>
+            )}
           </Layer>
         </Stage>
       </div>
