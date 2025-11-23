@@ -493,7 +493,7 @@ const WorkspacePage = () => {
             </Card>
 
             {/* 2D Editor */}
-            <FloorPlanEditor2D
+            <FloorPlanEditorKonva
               floorPlanImage={selectedPlan.file_url}
               threeDData={selectedPlan.three_d_data}
               onSave={handleUpdate3D}
