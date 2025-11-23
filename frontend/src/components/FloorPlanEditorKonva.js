@@ -483,10 +483,10 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       </Tabs>
       
       {/* Konva Stage */}
-      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white mt-4">
+      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white mt-4 shadow-lg">
         <Stage
-          width={800}
-          height={600}
+          width={canvasWidth}
+          height={canvasHeight}
           ref={stageRef}
           onClick={handleStageClick}
           onMouseDown={handleStageMouseDown}
