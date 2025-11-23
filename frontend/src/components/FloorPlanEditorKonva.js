@@ -505,21 +505,23 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               />
             )}
             
-            {/* Grid */}
-            {Array.from({ length: 9 }, (_, i) => (
+            {/* Grid - Main lines every meter */}
+            {Array.from({ length: Math.ceil(canvasWidth / 100) + 1 }, (_, i) => (
               <Line
                 key={`v-${i}`}
-                points={[i * 100, 0, i * 100, 600]}
+                points={[i * 100, 0, i * 100, canvasHeight]}
                 stroke="#94a3b8"
-                strokeWidth={1}
+                strokeWidth={i % 5 === 0 ? 1.5 : 0.5}
+                opacity={i % 5 === 0 ? 0.6 : 0.3}
               />
             ))}
-            {Array.from({ length: 7 }, (_, i) => (
+            {Array.from({ length: Math.ceil(canvasHeight / 100) + 1 }, (_, i) => (
               <Line
                 key={`h-${i}`}
-                points={[0, i * 100, 800, i * 100]}
+                points={[0, i * 100, canvasWidth, i * 100]}
                 stroke="#94a3b8"
-                strokeWidth={1}
+                strokeWidth={i % 5 === 0 ? 1.5 : 0.5}
+                opacity={i % 5 === 0 ? 0.6 : 0.3}
               />
             ))}
             
