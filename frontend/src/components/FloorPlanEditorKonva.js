@@ -565,6 +565,83 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         </TabsContent>
         
         <TabsContent value="library" className="space-y-4">
+          {/* Search Bar */}
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Cerca elementi... (es: divano, tavolo, porta)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                      const newCustom = {
+                        id: `custom-${Date.now()}`,
+                        name: file.name.split('.')[0],
+                        imageUrl: event.target.result,
+                        width: 100,
+                        depth: 100,
+                        icon: '🖼️',
+                        isCustom: true
+                      };
+                      setCustomElements([...customElements, newCustom]);
+                      toast.success('Elemento custom aggiunto!');
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                };
+                input.click();
+              }}
+              title="Carica elemento personalizzato"
+            >
+              <Upload className="w-4 h-4 mr-1" />
+              Carica
+            </Button>
+          </div>
+          
+          {/* Category Filter */}
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              size="sm"
+              variant={selectedCategory === 'all' ? 'default' : 'outline'}
+              onClick={() => setSelectedCategory('all')}
+            >
+              Tutti
+            </Button>
+            {Object.keys(EXTENDED_LIBRARY).map(catKey => (
+              <Button
+                key={catKey}
+                size="sm"
+                variant={selectedCategory === catKey ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory(catKey)}
+              >
+                {EXTENDED_LIBRARY[catKey].icon} {EXTENDED_LIBRARY[catKey].name}
+              </Button>
+            ))}
+            {customElements.length > 0 && (
+              <Button
+                size="sm"
+                variant={selectedCategory === 'custom' ? 'default' : 'outline'}
+                onClick={() => setSelectedCategory('custom')}
+              >
+                🖼️ Custom ({customElements.length})
+              </Button>
+            )}
+          </div>
+          
           <div className="space-y-4">
             {/* Pavimenti */}
             <div>
