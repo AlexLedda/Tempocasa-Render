@@ -392,9 +392,14 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           <Layer>
             {/* Background Image */}
             {backgroundImg && (
-              <Group opacity={imageOpacity}>
-                {/* Image will be added here */}
-              </Group>
+              <KonvaImage
+                image={backgroundImg}
+                x={0}
+                y={0}
+                width={800}
+                height={600}
+                opacity={imageOpacity}
+              />
             )}
             
             {/* Grid */}
