@@ -497,6 +497,92 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
             </div>
           )}
           
+          {/* Scale Calibration */}
+          <Card className="p-4 bg-amber-50 border-amber-200">
+            <h4 className="font-semibold text-amber-900 mb-2">📏 Calibrazione Scala</h4>
+            <p className="text-xs text-amber-700 mb-3">
+              Calibra la scala per avere misure reali. Traccia una linea di riferimento sulla planimetria.
+            </p>
+            
+            {!isCalibrating ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm">Scala attuale:</Label>
+                  <span className="text-sm font-mono bg-white px-2 py-1 rounded">
+                    {(1 / scale).toFixed(1)} px = 1 cm
+                  </span>
+                </div>
+                <Button
+                  onClick={() => {
+                    setIsCalibrating(true);
+                    setCalibrationStart(null);
+                    setCalibrationEnd(null);
+                    toast.info('Clicca su due punti della planimetria per calibrare');
+                  }}
+                  className="w-full"
+                >
+                  🎯 Avvia Calibrazione
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {!calibrationStart && (
+                  <p className="text-sm text-amber-800">
+                    📍 <strong>Step 1:</strong> Clicca sul primo punto della linea di riferimento
+                  </p>
+                )}
+                {calibrationStart && !calibrationEnd && (
+                  <p className="text-sm text-amber-800">
+                    📍 <strong>Step 2:</strong> Clicca sul secondo punto
+                  </p>
+                )}
+                {calibrationStart && calibrationEnd && (
+                  <div className="space-y-2">
+                    <Label className="text-sm">Lunghezza reale (cm):</Label>
+                    <input
+                      type="number"
+                      value={calibrationRealLength}
+                      onChange={(e) => setCalibrationRealLength(parseFloat(e.target.value))}
+                      className="w-full px-3 py-2 border border-amber-300 rounded"
+                      min="1"
+                      step="10"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          const pixelLength = Math.sqrt(
+                            Math.pow(calibrationEnd.x - calibrationStart.x, 2) + 
+                            Math.pow(calibrationEnd.y - calibrationStart.y, 2)
+                          );
+                          const newScale = pixelLength / calibrationRealLength;
+                          setScale(newScale);
+                          setIsCalibrating(false);
+                          setCalibrationStart(null);
+                          setCalibrationEnd(null);
+                          toast.success(`Scala calibrata! ${(1/newScale).toFixed(2)} px = 1 cm`);
+                        }}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        ✅ Applica Scala
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setIsCalibrating(false);
+                          setCalibrationStart(null);
+                          setCalibrationEnd(null);
+                          toast.info('Calibrazione annullata');
+                        }}
+                        variant="outline"
+                      >
+                        ❌ Annulla
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+          
           {/* Image Background Controls */}
           {floorPlanImage && backgroundImg && (
             <Card className="p-4 bg-blue-50 border-blue-200">
