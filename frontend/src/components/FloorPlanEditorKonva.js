@@ -361,6 +361,90 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
             </div>
           )}
           
+          {/* Image Background Controls */}
+          {floorPlanImage && backgroundImg && (
+            <Card className="p-4 bg-blue-50 border-blue-200">
+              <h4 className="font-semibold text-blue-900 mb-2">🖼️ Controlli Immagine di Sfondo</h4>
+              <p className="text-xs text-blue-700 mb-3">
+                💡 <strong>Suggerimento:</strong> Usa questi controlli per allineare la planimetria con la griglia!
+              </p>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm">Scala Immagine</Label>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="3"
+                    step="0.1"
+                    value={imageScale}
+                    onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                    className="w-full mt-1"
+                  />
+                  <p className="text-xs text-blue-600 mt-1">{(imageScale * 100).toFixed(0)}%</p>
+                </div>
+                
+                <div>
+                  <Label className="text-sm">Opacità</Label>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="1"
+                    step="0.1"
+                    value={imageOpacity}
+                    onChange={(e) => setImageOpacity(parseFloat(e.target.value))}
+                    className="w-full mt-1"
+                  />
+                  <p className="text-xs text-blue-600 mt-1">{(imageOpacity * 100).toFixed(0)}%</p>
+                </div>
+                
+                <div>
+                  <Label className="text-sm">Posizione</Label>
+                  <div className="flex gap-1 mt-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImagePosition({ ...imagePosition, x: imagePosition.x - 10 })}
+                    >
+                      ←
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImagePosition({ ...imagePosition, x: imagePosition.x + 10 })}
+                    >
+                      →
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImagePosition({ ...imagePosition, y: imagePosition.y - 10 })}
+                    >
+                      ↑
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImagePosition({ ...imagePosition, y: imagePosition.y + 10 })}
+                    >
+                      ↓
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setImagePosition({ x: 0, y: 0 });
+                        setImageScale(1);
+                        setImageOpacity(0.5);
+                      }}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
+          
           {/* Keyboard Shortcuts Help */}
           <div className="bg-slate-50 p-3 rounded-lg">
             <p className="text-xs font-semibold text-slate-700 mb-1">⌨️ Scorciatoie:</p>
