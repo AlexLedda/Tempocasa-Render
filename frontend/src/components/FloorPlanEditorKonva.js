@@ -42,7 +42,8 @@ const ELEMENT_LIBRARY = {
 const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const stageRef = useRef(null);
   const [mode, setMode] = useState('view');
-  const [scale] = useState(0.1); // 0.1 pixels per cm
+  const [scale, setScale] = useState(0.1); // 0.1 pixels per cm (default)
+  const [wallThickness, setWallThickness] = useState(20); // cm
   
   // Elements
   const [walls, setWalls] = useState([]);
