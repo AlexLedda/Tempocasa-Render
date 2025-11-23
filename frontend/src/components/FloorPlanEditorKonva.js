@@ -396,10 +396,10 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
             {backgroundImg && (
               <KonvaImage
                 image={backgroundImg}
-                x={0}
-                y={0}
-                width={800}
-                height={600}
+                x={imagePosition.x}
+                y={imagePosition.y}
+                width={backgroundImg.width * imageScale}
+                height={backgroundImg.height * imageScale}
                 opacity={imageOpacity}
               />
             )}
