@@ -1002,7 +1002,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 key={wall.id}
                 points={wall.points}
                 stroke={wall.stroke}
-                strokeWidth={wall.strokeWidth}
+                strokeWidth={wall.thickness ? wall.thickness * scale : wall.strokeWidth}
                 lineCap="round"
                 draggable={mode === 'move'}
                 onClick={() => setSelectedId(wall.id)}
