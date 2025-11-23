@@ -1447,14 +1447,17 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             if (mode === 'move') {
               // If hovering over element, start dragging it directly
               if (hoveredElement) {
+                console.log('Starting drag:', hoveredElement);
                 setIsDragging(true);
                 setDraggedElement(hoveredElement);
                 setSelectedElement(hoveredElement);
                 setHasInteracted(false);
                 
                 if (hoveredElement.type === 'wall') {
+                  console.log('Wall data:', hoveredElement.data);
                   const midX = (hoveredElement.data.start[0] + hoveredElement.data.end[0]) / 2;
                   const midY = (hoveredElement.data.start[1] + hoveredElement.data.end[1]) / 2;
+                  console.log('Wall midpoint:', midX, midY, 'dragOffset:', { x: x - midX, y: y - midY });
                   setDragOffset({ x: x - midX, y: y - midY });
                 } else if (hoveredElement.type === 'room' || hoveredElement.type === 'floor') {
                   setDragOffset({ x: x - hoveredElement.data.x, y: y - hoveredElement.data.y });
