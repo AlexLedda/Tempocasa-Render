@@ -58,6 +58,13 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [wallColor, setWallColor] = useState('#0f172a');
   const [snapToGrid, setSnapToGrid] = useState(true);
   
+  // Search and filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  
+  // Custom elements
+  const [customElements, setCustomElements] = useState([]);
+  
   // Drawing state
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState(null);
