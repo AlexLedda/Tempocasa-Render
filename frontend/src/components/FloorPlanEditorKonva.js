@@ -284,6 +284,15 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     } else if (selectedId.startsWith('floor-')) {
       setFloors(floors.filter(f => f.id !== selectedId));
       toast.success('Pavimento rimosso!');
+    } else if (selectedId.startsWith('door-')) {
+      setDoors(doors.filter(d => d.id !== selectedId));
+      toast.success('Porta rimossa!');
+    } else if (selectedId.startsWith('window-')) {
+      setWindows(windows.filter(w => w.id !== selectedId));
+      toast.success('Finestra rimossa!');
+    } else if (selectedId.startsWith('furniture-')) {
+      setFurniture(furniture.filter(f => f.id !== selectedId));
+      toast.success('Arredamento rimosso!');
     }
     
     setSelectedId(null);
