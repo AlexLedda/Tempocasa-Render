@@ -703,6 +703,118 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               />
             ))}
             
+            {/* Floors */}
+            {floors.map((floor) => (
+              <Rect
+                key={floor.id}
+                x={floor.x}
+                y={floor.y}
+                width={floor.width}
+                height={floor.height}
+                fill={floor.color || '#E8E8E8'}
+                stroke={selectedId === floor.id ? '#3b82f6' : '#94a3b8'}
+                strokeWidth={selectedId === floor.id ? 3 : 1}
+                draggable={mode === 'move'}
+                onClick={() => setSelectedId(floor.id)}
+                onDragEnd={(e) => {
+                  const newFloors = floors.map(f => {
+                    if (f.id === floor.id) {
+                      return { ...f, x: e.target.x(), y: e.target.y() };
+                    }
+                    return f;
+                  });
+                  setFloors(newFloors);
+                  saveToHistory();
+                }}
+                shadowBlur={selectedId === floor.id ? 10 : 0}
+                shadowColor={selectedId === floor.id ? 'rgba(59, 130, 246, 0.6)' : 'transparent'}
+              />
+            ))}
+            
+            {/* Doors */}
+            {doors.map((door) => (
+              <Rect
+                key={door.id}
+                x={door.x}
+                y={door.y}
+                width={door.width}
+                height={door.height}
+                fill={door.fill}
+                stroke={selectedId === door.id ? '#22c55e' : '#16a34a'}
+                strokeWidth={selectedId === door.id ? 3 : 2}
+                draggable={mode === 'move'}
+                onClick={() => setSelectedId(door.id)}
+                onDragEnd={(e) => {
+                  const newDoors = doors.map(d => {
+                    if (d.id === door.id) {
+                      return { ...d, x: e.target.x(), y: e.target.y() };
+                    }
+                    return d;
+                  });
+                  setDoors(newDoors);
+                  saveToHistory();
+                }}
+                shadowBlur={selectedId === door.id ? 10 : 0}
+                shadowColor={selectedId === door.id ? 'rgba(34, 197, 94, 0.5)' : 'transparent'}
+              />
+            ))}
+            
+            {/* Windows */}
+            {windows.map((window) => (
+              <Rect
+                key={window.id}
+                x={window.x}
+                y={window.y}
+                width={window.width}
+                height={window.height}
+                fill={window.fill}
+                stroke={selectedId === window.id ? '#3b82f6' : '#2563eb'}
+                strokeWidth={selectedId === window.id ? 3 : 2}
+                draggable={mode === 'move'}
+                onClick={() => setSelectedId(window.id)}
+                onDragEnd={(e) => {
+                  const newWindows = windows.map(w => {
+                    if (w.id === window.id) {
+                      return { ...w, x: e.target.x(), y: e.target.y() };
+                    }
+                    return w;
+                  });
+                  setWindows(newWindows);
+                  saveToHistory();
+                }}
+                shadowBlur={selectedId === window.id ? 10 : 0}
+                shadowColor={selectedId === window.id ? 'rgba(59, 130, 246, 0.5)' : 'transparent'}
+              />
+            ))}
+            
+            {/* Furniture */}
+            {furniture.map((item) => (
+              <Rect
+                key={item.id}
+                x={item.x}
+                y={item.y}
+                width={item.width}
+                height={item.height}
+                fill={item.fill}
+                stroke={selectedId === item.id ? '#a855f7' : '#9333ea'}
+                strokeWidth={2}
+                draggable={mode === 'move'}
+                onClick={() => setSelectedId(item.id)}
+                onDragEnd={(e) => {
+                  const newFurniture = furniture.map(f => {
+                    if (f.id === item.id) {
+                      return { ...f, x: e.target.x(), y: e.target.y() };
+                    }
+                    return f;
+                  });
+                  setFurniture(newFurniture);
+                  saveToHistory();
+                }}
+                shadowBlur={selectedId === item.id ? 10 : 0}
+                shadowColor={selectedId === item.id ? 'rgba(168, 85, 247, 0.5)' : 'transparent'}
+              />
+            ))}
+            
             {/* Walls */}
             {walls.map((wall) => (
               <Line
