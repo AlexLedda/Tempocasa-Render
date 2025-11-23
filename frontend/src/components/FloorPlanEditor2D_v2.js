@@ -1662,11 +1662,15 @@ const FloorPlanEditor2D = ({ floorPlanImage, threeDData, onSave }) => {
             if (isDragging && draggedElement && mode === 'move') {
               setHasInteracted(true);
               if (draggedElement.type === 'wall') {
-                console.log('Dragging wall, draggedElement:', draggedElement);
                 const idx = draggedElement.idx;
                 const newWalls = [...walls];
                 const wall = newWalls[idx];
-                console.log('Wall from array:', wall);
+                
+                // Safety check - wall must exist
+                if (!wall || !wall.start || !wall.end) {
+                  console.error('Wall not found or invalid structure:', idx, wall);
+                  return;
+                }
                 
                 // Calculate the new center position
                 const newCenterX = x - dragOffset.x;
