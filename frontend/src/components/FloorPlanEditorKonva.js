@@ -273,7 +273,8 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         id: `wall-${Date.now()}`,
         points: [drawStart.x, drawStart.y, snapped.x, snapped.y],
         stroke: wallColor,
-        strokeWidth: 6
+        strokeWidth: wallThickness * scale,
+        thickness: wallThickness // Store in cm
       };
       
       setWalls([...walls, newWall]);
