@@ -25,6 +25,8 @@ services:
         value: 936424415516613
       - key: CLOUDINARY_API_SECRET
         sync: false
+      - key: EMERGENT_LLM_KEY
+        value: sk-emergent-298D49dBc66B0AeEd1
 
   # Frontend Service
   - type: web
