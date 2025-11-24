@@ -488,9 +488,22 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         </div>
         <div className="flex gap-2">
           {selectedId && (
-            <Button onClick={deleteSelected} variant="destructive" size="sm">
-              <Trash2 className="w-4 h-4 mr-1" />
-              Elimina
+            <>
+              <Button onClick={copySelected} variant="outline" size="sm">
+                📋 Copia
+              </Button>
+              <Button onClick={duplicateSelected} variant="outline" size="sm">
+                📑 Duplica
+              </Button>
+              <Button onClick={deleteSelected} variant="destructive" size="sm">
+                <Trash2 className="w-4 h-4 mr-1" />
+                Elimina
+              </Button>
+            </>
+          )}
+          {clipboard && !selectedId && (
+            <Button onClick={pasteElement} variant="outline" size="sm">
+              📋 Incolla
             </Button>
           )}
           <Button
