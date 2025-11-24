@@ -181,9 +181,8 @@ metadata:
 test_plan:
   current_focus:
     - "Editor Konva - Funzionalità Base Complete"
-    - "Misure in Tempo Reale e Dimension Lines"
-    - "Copy/Paste e Duplicazione Elementi"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Editor Konva - Funzionalità Base Complete"
   test_all: false
   test_priority: "high_first"
 
