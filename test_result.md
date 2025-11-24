@@ -121,44 +121,41 @@ backend:
         comment: "✅ BACKEND API TEST COMPLETATO - Tutte le API core funzionano correttamente: 1) Floor Plans CRUD (POST/GET/PATCH/DELETE) - 100% successo, 2) Upload immagini Cloudinary - funziona e ritorna URL pubblico, 3) Conversione 3D con dati mock - operativa, 4) API Root disponibile. PROBLEMI MINORI: Chat AI (GPT-5/Claude) fallisce per chiavi API non valide - non critico per funzionalità core. Database MongoDB e Cloudinary integrati correttamente. Scenario test completo eseguito con successo (7/7 test passati)."
 
 frontend:
-  - task: "Controlli immagine di sfondo (scala, posizione, opacità)"
+  - task: "Editor Konva - Funzionalità Base Complete"
     implemented: true
     working: "NA"
-    file: "/app/frontend/src/components/FloorPlanEditor2D_v2.js"
+    file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Controlli slider già presenti nel codice (linee 708-768). Permette scala 0.1-3x, opacità 0.1-1, e posizione con pulsanti freccia. Da testare funzionalità."
+        comment: "Editor Konva implementato con: drag/drop nativo, resize con Transformer, undo/redo, snap-to-grid, calibrazione scala, spessore muri, libreria estesa 70+ elementi, custom element upload, controlli immagine sfondo. Sostituisce FloorPlanEditor2D_v2."
   
-  - task: "Drag & Drop per tutti gli elementi canvas"
+  - task: "Misure in Tempo Reale e Dimension Lines"
     implemented: true
     working: "NA"
-    file: "/app/frontend/src/components/FloorPlanEditor2D_v2.js"
+    file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implementato drag & drop completo per: walls, rooms, doors, windows, furniture. Logica in onMouseDown, onMouseMove, onMouseUp. Cursore cambia in 'move' durante il drag. Da testare su tutti i tipi di elementi."
+        comment: "NUOVA FUNZIONALITÀ: Implementato sistema completo di misure real-time con: 1) Helper functions pixelsToRealUnit() e formatMeasurement(), 2) Rendering dimension lines per walls (lunghezza), rooms/floors (larghezza x altezza con linee tratteggiate), doors/windows (larghezza), furniture (dimensioni complete), 3) Toggle mostra/nascondi misure, 4) Selector unità (cm/m/auto). Misure si aggiornano automaticamente con scale calibrata. Linee 1177-1270."
   
-  - task: "Ridimensionamento elementi con maniglie"
+  - task: "Copy/Paste e Duplicazione Elementi"
     implemented: true
     working: "NA"
-    file: "/app/frontend/src/components/FloorPlanEditor2D_v2.js"
+    file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implementato sistema di ridimensionamento con 8 maniglie (4 angoli + 4 lati) per rooms e furniture. Funzioni: drawResizeHandles(), getResizeHandle(). Logica in onMouseDown/Move/Up. Cursore 'nwse-resize'. Da testare resize proporzionale e corretto."
-      - working: "NA"
-        agent: "main"
-        comment: "BUGFIX: Aggiunto ridimensionamento per WALLS. Prima mancava! Ora i muri hanno maniglie agli estremi (start/end) che permettono di modificare lunghezza e angolazione. Nuova funzione: getWallEndpointHandle(). Aggiornato messaggio UI per walls."
+        comment: "NUOVA FUNZIONALITÀ: Implementato sistema copy/paste completo con: 1) State clipboard per memorizzare elemento, 2) Funzioni copySelected(), pasteElement(), duplicateSelected() con offset automatico 30px, 3) Keyboard shortcuts Ctrl+C/Ctrl+V/Ctrl+D, 4) Pulsanti UI 'Copia', 'Incolla', 'Duplica' nella toolbar, 5) Toast notifications per feedback utente. Funziona con tutti i tipi di elementi (walls, rooms, floors, doors, windows, furniture). Linee 214-292."
 
 metadata:
   created_by: "main_agent"
