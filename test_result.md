@@ -122,6 +122,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ RETEST BACKEND STABILITÀ COMPLETATO (16/18 test passati, 88.9% successo) - CORE APIs PERFETTAMENTE FUNZIONANTI: 1) Health Check API Root ✅, 2) Floor Plans CRUD completo (Create/Read/Update/Delete) ✅, 3) Upload immagini Cloudinary con URL pubblico ✅, 4) Conversione 3D con dati mock ✅, 5) Conversations CRUD ✅, 6) User Preferences ✅, 7) Feedback system ✅, 8) Render endpoint ✅. PROBLEMI MINORI NON CRITICI: Chat AI (GPT-5/Claude) fallisce per chiavi API non valide (401 authentication error) - non impatta funzionalità core dell'editor. Backend stabile dopo modifiche frontend."
+      - working: true
+        agent: "main"
+        comment: "✅ CHAT AI FIXED! Sostituito AsyncOpenAI/AsyncAnthropic con emergentintegrations.llm.chat.LlmChat. Testato con successo: 1) GPT-5.1 risponde correttamente ✅, 2) Claude-3-7-sonnet risponde correttamente ✅. Ora usa EMERGENT_LLM_KEY tramite libreria corretta. Tutti i provider (OpenAI/Anthropic/Gemini) supportati."
 
 frontend:
   - task: "Editor Konva - Funzionalità Base Complete"
