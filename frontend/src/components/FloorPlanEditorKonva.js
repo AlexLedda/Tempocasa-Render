@@ -702,6 +702,66 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
             </Card>
           )}
           
+          {/* Measurements Controls */}
+          <Card className="p-4 bg-indigo-50 border-indigo-200">
+            <h4 className="font-semibold text-indigo-900 mb-2">📐 Controlli Misure</h4>
+            <p className="text-xs text-indigo-700 mb-3">
+              Mostra/nascondi le dimensioni degli elementi in tempo reale
+            </p>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Mostra Misure:</Label>
+                <Button
+                  size="sm"
+                  variant={showMeasurements ? 'default' : 'outline'}
+                  onClick={() => {
+                    setShowMeasurements(!showMeasurements);
+                    toast.info(`Misure: ${!showMeasurements ? 'Visibili' : 'Nascoste'}`);
+                  }}
+                  className={showMeasurements ? 'bg-indigo-600' : ''}
+                >
+                  {showMeasurements ? '✅ Attivo' : '❌ Disattivo'}
+                </Button>
+              </div>
+              
+              {showMeasurements && (
+                <div>
+                  <Label className="text-sm mb-2 block">Unità di Misura:</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={measurementUnit === 'cm' ? 'default' : 'outline'}
+                      onClick={() => setMeasurementUnit('cm')}
+                      className="flex-1"
+                    >
+                      cm
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={measurementUnit === 'm' ? 'default' : 'outline'}
+                      onClick={() => setMeasurementUnit('m')}
+                      className="flex-1"
+                    >
+                      m
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={measurementUnit === 'auto' ? 'default' : 'outline'}
+                      onClick={() => setMeasurementUnit('auto')}
+                      className="flex-1"
+                    >
+                      Auto
+                    </Button>
+                  </div>
+                  <p className="text-xs text-indigo-600 mt-2">
+                    {measurementUnit === 'auto' ? 'Auto: cm per <100cm, m altrimenti' : `Sempre in ${measurementUnit}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+          
           {/* Keyboard Shortcuts Help */}
           <div className="bg-slate-50 p-3 rounded-lg">
             <p className="text-xs font-semibold text-slate-700 mb-1">⌨️ Scorciatoie:</p>
