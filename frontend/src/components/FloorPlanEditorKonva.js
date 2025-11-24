@@ -90,6 +90,9 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [showMeasurements, setShowMeasurements] = useState(true);
   const [measurementUnit, setMeasurementUnit] = useState('auto'); // 'cm', 'm', 'auto'
   
+  // Copy/Paste clipboard
+  const [clipboard, setClipboard] = useState(null);
+  
   // Canvas dimensions
   const canvasWidth = 1400;
   const canvasHeight = 900;
