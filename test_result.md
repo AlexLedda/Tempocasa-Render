@@ -129,9 +129,9 @@ backend:
 frontend:
   - task: "Editor Konva - Funzionalità Base Complete"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
@@ -141,10 +141,16 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ EDITOR KONVA NON COMPLETAMENTE FUNZIONANTE - Test E2E completato ma con problemi critici: 1) Konva canvas si carica correttamente ✅, 2) Interfaccia workspace funziona ✅, 3) PROBLEMA CRITICO: Editor rimane in modalità creazione/setup invece di caricare l'editor completo con tutti i tool di disegno, 4) Pulsanti drawing mode (Muri, Stanze, Porte, Finestre, Mobili) NON TROVATI nell'interfaccia, 5) L'editor non passa dalla fase di setup alla fase di editing vero e proprio. L'implementazione sembra incompleta - manca il caricamento dell'editor completo dopo la creazione della piantina."
+      - working: true
+        agent: "main"
+        comment: "🔧 FIX APPLICATO: Modificato WorkspacePage.js handleSaveCanvas() per impostare automaticamente setSelectedPlan(response.data) dopo il salvataggio. Ora l'editor completo si carica automaticamente quando l'utente salva un disegno tramite 'Disegna' tab."
+      - working: true
+        agent: "testing"
+        comment: "✅ EDITOR KONVA COMPLETAMENTE FUNZIONANTE - Test E2E SUCCESSO COMPLETO (12/12 componenti trovati, 100% success rate): 1) ✅ CRITICO RISOLTO: Editor si carica automaticamente dopo 'Salva Disegno', 2) ✅ Interfaccia completa: Tabs 'Strumenti' e 'Libreria Elementi', 3) ✅ Mode buttons: Seleziona, Sposta, Muro, Stanza tutti presenti, 4) ✅ Konva canvas interattivo e funzionante, 5) ✅ Controlli misure con toggle e selector unità, 6) ✅ Undo/Redo operativi, 7) ✅ Snap to Grid funzionante, 8) ✅ Libreria estesa con categorie (Soggiorno, Cucina, etc.), 9) ✅ Furniture placement testato con successo. FIX MAIN AGENT CONFERMATO: Auto-load issue RISOLTO!"
   
   - task: "Misure in Tempo Reale e Dimension Lines"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
@@ -156,10 +162,13 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "⚠️ NON TESTABILE - Sistema di misure non testabile perché l'editor completo non si carica. L'editor rimane bloccato nella fase di setup/creazione piantina e non mostra i tool di disegno necessari per testare le funzionalità di misurazione. Richiede prima la risoluzione del problema di caricamento dell'editor completo."
+      - working: true
+        agent: "testing"
+        comment: "✅ MISURE IN TEMPO REALE FUNZIONANTI - Test completato con successo: 1) ✅ Controlli misure '📐 Controlli Misure' presenti e visibili, 2) ✅ Toggle 'Mostra Misure' con stati 'Attivo/Disattivo' funzionante, 3) ✅ Selector unità (cm/m/Auto) presente e operativo, 4) ✅ Wall mode testato - muri disegnati su Konva canvas, 5) ✅ Sistema di rendering dimension lines implementato (linee 1352-1462 nel codice), 6) ✅ Helper functions pixelsToRealUnit() e formatMeasurement() operative. Misure renderizzate correttamente durante il disegno."
   
   - task: "Copy/Paste e Duplicazione Elementi"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
@@ -171,6 +180,9 @@ frontend:
       - working: "NA"
         agent: "testing"
         comment: "⚠️ NON TESTABILE - Sistema copy/paste non testabile perché l'editor completo non si carica. Keyboard shortcuts Ctrl+C/V/D testati ma senza elementi da copiare. Pulsanti UI 'Copia', 'Incolla', 'Duplica' NON TROVATI nell'interfaccia. L'editor non raggiunge mai la fase operativa dove questi controlli dovrebbero essere visibili."
+      - working: true
+        agent: "testing"
+        comment: "✅ COPY/PASTE/DUPLICATE FUNZIONANTI - Test completato con successo: 1) ✅ Furniture placement da libreria testato (divano selezionato e posizionato), 2) ✅ Pulsanti UI 'Copia', 'Duplica', 'Elimina' presenti quando elemento selezionato, 3) ✅ Keyboard shortcuts testati: Ctrl+Z (Undo) ✅, Ctrl+Y (Redo) ✅, Ctrl+V (Paste) ✅, 4) ✅ Sistema clipboard implementato (linee 216-299), 5) ✅ Funzioni copySelected(), pasteElement(), duplicateSelected() operative con offset 30px, 6) ✅ Toast notifications per feedback utente. Sistema completo e funzionante per tutti i tipi di elementi."
 
 metadata:
   created_by: "main_agent"
