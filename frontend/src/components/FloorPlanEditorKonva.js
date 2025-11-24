@@ -883,6 +883,9 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               <span><kbd className="bg-white px-1 rounded">G</kbd> Toggle Snap</span>
               <span><kbd className="bg-white px-1 rounded">Ctrl+Z</kbd> Undo</span>
               <span><kbd className="bg-white px-1 rounded">Ctrl+Y</kbd> Redo</span>
+              <span><kbd className="bg-white px-1 rounded">Ctrl+C</kbd> Copia</span>
+              <span><kbd className="bg-white px-1 rounded">Ctrl+V</kbd> Incolla</span>
+              <span><kbd className="bg-white px-1 rounded">Ctrl+D</kbd> Duplica</span>
               <span><kbd className="bg-white px-1 rounded">Canc</kbd> Elimina</span>
             </div>
           </div>
