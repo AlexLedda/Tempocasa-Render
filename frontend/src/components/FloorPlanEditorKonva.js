@@ -130,6 +130,27 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     };
   };
   
+  // Measurement helper functions
+  const pixelsToRealUnit = (pixels) => {
+    // scale is pixels per cm, so pixels / scale = cm
+    return pixels / scale;
+  };
+  
+  const formatMeasurement = (cm) => {
+    if (measurementUnit === 'cm') {
+      return `${cm.toFixed(1)} cm`;
+    } else if (measurementUnit === 'm') {
+      return `${(cm / 100).toFixed(2)} m`;
+    } else {
+      // Auto: use m for > 100cm, cm otherwise
+      if (cm >= 100) {
+        return `${(cm / 100).toFixed(2)} m`;
+      } else {
+        return `${cm.toFixed(1)} cm`;
+      }
+    }
+  };
+  
   // Save to history
   const saveToHistory = () => {
     const currentState = {
