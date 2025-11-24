@@ -379,70 +379,45 @@ async def chat_with_ai(request: ChatRequest):
         user_doc['timestamp'] = user_doc['timestamp'].isoformat()
         await db.messages.insert_one(user_doc)
         
-        # Get conversation history
-        messages_history = await db.messages.find(
-            {"conversation_id": request.conversation_id},
-            {"_id": 0}
-        ).sort("timestamp", 1).to_list(1000)
-        
-        # Build conversation history
-        conversation = []
-        for msg in messages_history:
-            if msg['role'] in ['user', 'assistant']:
-                conversation.append({
-                    "role": msg['role'],
-                    "content": msg['content']
-                })
-        
         system_message = """Sei un assistente AI esperto in architettura e design 3D. 
         Aiuti gli utenti a convertire piantine 2D in modelli 3D, suggerisci miglioramenti 
         e rispondi a domande su design, rendering e layout degli spazi. Impari dalle 
         preferenze degli utenti e dai loro feedback per offrire suggerimenti sempre più personalizzati."""
         
-        # Determine provider and get response
-        response_text = ""
-        if request.model.startswith("gpt"):
-            # OpenAI
-            client = AsyncOpenAI(api_key=os.environ.get('EMERGENT_LLM_KEY') or os.environ.get('OPENAI_API_KEY'))
-            response = await client.chat.completions.create(
-                model=request.model,
-                messages=[
-                    {"role": "system", "content": system_message}
-                ] + conversation,
-                temperature=0.7
-            )
-            response_text = response.choices[0].message.content
+        # Initialize LlmChat with emergentintegrations
+        chat = LlmChat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            session_id=request.conversation_id,
+            system_message=system_message
+        )
+        
+        # Determine provider and model
+        provider = "openai"
+        model = request.model or "gpt-5.1"
+        
+        if request.model and request.model.startswith("gpt"):
             provider = "openai"
-        elif request.model.startswith("claude"):
-            # Anthropic
-            client = AsyncAnthropic(api_key=os.environ.get('EMERGENT_LLM_KEY') or os.environ.get('ANTHROPIC_API_KEY'))
-            response = await client.messages.create(
-                model=request.model,
-                max_tokens=2000,
-                system=system_message,
-                messages=conversation
-            )
-            response_text = response.content[0].text
+            model = request.model
+        elif request.model and request.model.startswith("claude"):
             provider = "anthropic"
-        else:
-            # Default to GPT-5
-            client = AsyncOpenAI(api_key=os.environ.get('EMERGENT_LLM_KEY') or os.environ.get('OPENAI_API_KEY'))
-            response = await client.chat.completions.create(
-                model="gpt-5",
-                messages=[
-                    {"role": "system", "content": system_message}
-                ] + conversation,
-                temperature=0.7
-            )
-            response_text = response.choices[0].message.content
-            provider = "openai"
+            model = request.model
+        elif request.model and request.model.startswith("gemini"):
+            provider = "gemini"
+            model = request.model
+        
+        # Set model
+        chat.with_model(provider, model)
+        
+        # Create user message and send
+        user_message = UserMessage(text=request.message)
+        response_text = await chat.send_message(user_message)
         
         # Store assistant message
         assistant_msg = Message(
             conversation_id=request.conversation_id,
             role="assistant",
             content=response_text,
-            model=f"{provider}/{request.model}"
+            model=f"{provider}/{model}"
         )
         assistant_doc = assistant_msg.model_dump()
         assistant_doc['timestamp'] = assistant_doc['timestamp'].isoformat()
