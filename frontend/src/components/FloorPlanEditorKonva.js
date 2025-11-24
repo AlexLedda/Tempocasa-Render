@@ -1174,6 +1174,119 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               />
             ))}
             
+            {/* Measurement Lines for Walls */}
+            {showMeasurements && walls.map((wall) => {
+              const [x1, y1, x2, y2] = wall.points;
+              const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+              const lengthCm = pixelsToRealUnit(length);
+              const midX = (x1 + x2) / 2;
+              const midY = (y1 + y2) / 2;
+              
+              // Calculate perpendicular offset for label
+              const angle = Math.atan2(y2 - y1, x2 - x1);
+              const offsetDist = 25;
+              const offsetX = Math.sin(angle) * offsetDist;
+              const offsetY = -Math.cos(angle) * offsetDist;
+              
+              return (
+                <Group key={`measure-${wall.id}`}>
+                  <Text
+                    x={midX + offsetX - 30}
+                    y={midY + offsetY - 10}
+                    text={formatMeasurement(lengthCm)}
+                    fontSize={12}
+                    fontStyle="bold"
+                    fill="#1e40af"
+                    padding={4}
+                    align="center"
+                  />
+                </Group>
+              );
+            })}
+            
+            {/* Measurement Lines for Rooms/Floors */}
+            {showMeasurements && [...rooms, ...floors].map((element) => {
+              const widthCm = pixelsToRealUnit(element.width);
+              const heightCm = pixelsToRealUnit(element.height);
+              
+              return (
+                <Group key={`measure-${element.id}`}>
+                  {/* Width measurement (top) */}
+                  <Line
+                    points={[element.x, element.y - 15, element.x + element.width, element.y - 15]}
+                    stroke="#1e40af"
+                    strokeWidth={1}
+                    dash={[4, 4]}
+                  />
+                  <Text
+                    x={element.x + element.width / 2 - 30}
+                    y={element.y - 30}
+                    text={formatMeasurement(widthCm)}
+                    fontSize={11}
+                    fontStyle="bold"
+                    fill="#1e40af"
+                    align="center"
+                  />
+                  
+                  {/* Height measurement (right) */}
+                  <Line
+                    points={[element.x + element.width + 15, element.y, element.x + element.width + 15, element.y + element.height]}
+                    stroke="#1e40af"
+                    strokeWidth={1}
+                    dash={[4, 4]}
+                  />
+                  <Text
+                    x={element.x + element.width + 20}
+                    y={element.y + element.height / 2 - 10}
+                    text={formatMeasurement(heightCm)}
+                    fontSize={11}
+                    fontStyle="bold"
+                    fill="#1e40af"
+                    align="center"
+                  />
+                </Group>
+              );
+            })}
+            
+            {/* Measurement Lines for Doors/Windows */}
+            {showMeasurements && [...doors, ...windows].map((element) => {
+              const widthCm = pixelsToRealUnit(element.width);
+              
+              return (
+                <Group key={`measure-${element.id}`}>
+                  <Text
+                    x={element.x + element.width / 2 - 25}
+                    y={element.y - 20}
+                    text={formatMeasurement(widthCm)}
+                    fontSize={10}
+                    fontStyle="bold"
+                    fill="#0d9488"
+                    align="center"
+                  />
+                </Group>
+              );
+            })}
+            
+            {/* Measurement Lines for Furniture */}
+            {showMeasurements && furniture.map((item) => {
+              const widthCm = pixelsToRealUnit(item.width);
+              const heightCm = pixelsToRealUnit(item.height);
+              
+              return (
+                <Group key={`measure-${item.id}`}>
+                  <Text
+                    x={item.x + item.width / 2 - 25}
+                    y={item.y - 20}
+                    text={`${formatMeasurement(widthCm)} × ${formatMeasurement(heightCm)}`}
+                    fontSize={10}
+                    fontStyle="bold"
+                    fill="#7c3aed"
+                    align="center"
+                  />
+                </Group>
+              );
+            })}
+            
             {/* Drawing preview */}
             {isDrawing && drawStart && (
               <Circle
