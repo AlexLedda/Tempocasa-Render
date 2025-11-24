@@ -165,9 +165,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Drag & Drop per tutti gli elementi canvas"
-    - "Ridimensionamento elementi con maniglie"
-    - "Controlli immagine di sfondo (scala, posizione, opacità)"
+    - "Editor Konva - Funzionalità Base Complete"
+    - "Misure in Tempo Reale e Dimension Lines"
+    - "Copy/Paste e Duplicazione Elementi"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
