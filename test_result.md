@@ -129,15 +129,18 @@ backend:
 frontend:
   - task: "Editor Konva - Funzionalità Base Complete"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Editor Konva implementato con: drag/drop nativo, resize con Transformer, undo/redo, snap-to-grid, calibrazione scala, spessore muri, libreria estesa 70+ elementi, custom element upload, controlli immagine sfondo. Sostituisce FloorPlanEditor2D_v2."
+      - working: false
+        agent: "testing"
+        comment: "❌ EDITOR KONVA NON COMPLETAMENTE FUNZIONANTE - Test E2E completato ma con problemi critici: 1) Konva canvas si carica correttamente ✅, 2) Interfaccia workspace funziona ✅, 3) PROBLEMA CRITICO: Editor rimane in modalità creazione/setup invece di caricare l'editor completo con tutti i tool di disegno, 4) Pulsanti drawing mode (Muri, Stanze, Porte, Finestre, Mobili) NON TROVATI nell'interfaccia, 5) L'editor non passa dalla fase di setup alla fase di editing vero e proprio. L'implementazione sembra incompleta - manca il caricamento dell'editor completo dopo la creazione della piantina."
   
   - task: "Misure in Tempo Reale e Dimension Lines"
     implemented: true
@@ -145,11 +148,14 @@ frontend:
     file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "NUOVA FUNZIONALITÀ: Implementato sistema completo di misure real-time con: 1) Helper functions pixelsToRealUnit() e formatMeasurement(), 2) Rendering dimension lines per walls (lunghezza), rooms/floors (larghezza x altezza con linee tratteggiate), doors/windows (larghezza), furniture (dimensioni complete), 3) Toggle mostra/nascondi misure, 4) Selector unità (cm/m/auto). Misure si aggiornano automaticamente con scale calibrata. Linee 1177-1270."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ NON TESTABILE - Sistema di misure non testabile perché l'editor completo non si carica. L'editor rimane bloccato nella fase di setup/creazione piantina e non mostra i tool di disegno necessari per testare le funzionalità di misurazione. Richiede prima la risoluzione del problema di caricamento dell'editor completo."
   
   - task: "Copy/Paste e Duplicazione Elementi"
     implemented: true
@@ -157,11 +163,14 @@ frontend:
     file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "NUOVA FUNZIONALITÀ: Implementato sistema copy/paste completo con: 1) State clipboard per memorizzare elemento, 2) Funzioni copySelected(), pasteElement(), duplicateSelected() con offset automatico 30px, 3) Keyboard shortcuts Ctrl+C/Ctrl+V/Ctrl+D, 4) Pulsanti UI 'Copia', 'Incolla', 'Duplica' nella toolbar, 5) Toast notifications per feedback utente. Funziona con tutti i tipi di elementi (walls, rooms, floors, doors, windows, furniture). Linee 214-292."
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ NON TESTABILE - Sistema copy/paste non testabile perché l'editor completo non si carica. Keyboard shortcuts Ctrl+C/V/D testati ma senza elementi da copiare. Pulsanti UI 'Copia', 'Incolla', 'Duplica' NON TROVATI nell'interfaccia. L'editor non raggiunge mai la fase operativa dove questi controlli dovrebbero essere visibili."
 
 metadata:
   created_by: "main_agent"
