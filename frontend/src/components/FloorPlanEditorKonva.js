@@ -212,6 +212,92 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     }
   };
   
+  // Copy/Paste functions
+  const copySelected = () => {
+    if (!selectedId) {
+      toast.error('Nessun elemento selezionato');
+      return;
+    }
+    
+    // Find selected element in all arrays
+    const selectedWall = walls.find(w => w.id === selectedId);
+    const selectedRoom = rooms.find(r => r.id === selectedId);
+    const selectedFloor = floors.find(f => f.id === selectedId);
+    const selectedDoor = doors.find(d => d.id === selectedId);
+    const selectedWindow = windows.find(w => w.id === selectedId);
+    const selectedFurniture = furniture.find(f => f.id === selectedId);
+    
+    const element = selectedWall || selectedRoom || selectedFloor || selectedDoor || selectedWindow || selectedFurniture;
+    
+    if (element) {
+      let type = 'wall';
+      if (selectedRoom) type = 'room';
+      if (selectedFloor) type = 'floor';
+      if (selectedDoor) type = 'door';
+      if (selectedWindow) type = 'window';
+      if (selectedFurniture) type = 'furniture';
+      
+      setClipboard({ type, element: JSON.parse(JSON.stringify(element)) });
+      toast.success('Elemento copiato! Premi Ctrl+V per incollare');
+    }
+  };
+  
+  const pasteElement = () => {
+    if (!clipboard) {
+      toast.error('Nessun elemento da incollare');
+      return;
+    }
+    
+    const offset = 30; // Offset in pixels to avoid exact overlap
+    const newElement = JSON.parse(JSON.stringify(clipboard.element));
+    newElement.id = `${clipboard.type}-${Date.now()}`;
+    
+    // Apply offset
+    if (newElement.x !== undefined) {
+      newElement.x += offset;
+      newElement.y += offset;
+    }
+    if (newElement.points) {
+      // For walls
+      newElement.points = newElement.points.map((p, i) => 
+        i % 2 === 0 ? p + offset : p + offset
+      );
+    }
+    
+    // Add to appropriate array
+    switch (clipboard.type) {
+      case 'wall':
+        setWalls([...walls, newElement]);
+        break;
+      case 'room':
+        setRooms([...rooms, newElement]);
+        break;
+      case 'floor':
+        setFloors([...floors, newElement]);
+        break;
+      case 'door':
+        setDoors([...doors, newElement]);
+        break;
+      case 'window':
+        setWindows([...windows, newElement]);
+        break;
+      case 'furniture':
+        setFurniture([...furniture, newElement]);
+        break;
+    }
+    
+    saveToHistory();
+    setSelectedId(newElement.id);
+    toast.success('Elemento incollato!');
+  };
+  
+  const duplicateSelected = () => {
+    copySelected();
+    if (clipboard) {
+      pasteElement();
+    }
+  };
+  
   // Handle canvas click
   const handleStageClick = (e) => {
     // Check if clicking on empty area
