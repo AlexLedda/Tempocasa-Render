@@ -205,7 +205,11 @@ const WorkspacePage = () => {
         canvas_data: canvasData
       });
 
-      toast.success('Disegno salvato con successo!');
+      toast.success('Disegno salvato con successo! Apro editor...');
+      
+      // Automatically open the editor with the newly created plan
+      setSelectedPlan(response.data);
+      
       setPlanName('');
       // Clear canvas
       const ctx = canvasRef.current.getContext('2d');
