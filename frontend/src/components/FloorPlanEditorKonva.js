@@ -451,6 +451,15 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       } else if (e.ctrlKey && e.key === 'y') {
         e.preventDefault();
         redo();
+      } else if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault();
+        copySelected();
+      } else if (e.ctrlKey && e.key === 'v') {
+        e.preventDefault();
+        pasteElement();
+      } else if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        duplicateSelected();
       } else if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         if (e.key === 'v' || e.key === 'V') setMode('view');
         else if (e.key === 's' || e.key === 'S') setMode('move');
@@ -464,7 +473,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedId, snapToGrid, history, historyIndex]);
+  }, [selectedId, snapToGrid, history, historyIndex, clipboard, walls, rooms, floors, doors, windows, furniture]);
   
   return (
     <Card className="p-6 bg-gradient-to-br from-slate-50 to-blue-50">
