@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implementare funzionalità di drag & drop e ridimensionamento per tutti gli elementi dell'editor 2D (muri, stanze, porte, finestre, mobili). Aggiungere controlli slider per posizione e scala dell'immagine di sfondo per allineamento preciso con la griglia."
+user_problem_statement: "SESSIONE 2: Implementate nuove funzionalità nell'editor Konva: 1) Misure in Tempo Reale con dimension lines professionali e toggle unità (cm/m/auto), 2) Sistema Copy/Paste/Duplicate con Ctrl+C/V/D e pulsanti UI. Editor ora completo con calibrazione scala, spessore muri, undo/redo, snap-to-grid, drag/drop, resize, libreria estesa, custom elements, e misure real-time."
 
 backend:
   - task: "API esistenti per floor plans"
