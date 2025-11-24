@@ -119,6 +119,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ BACKEND API TEST COMPLETATO - Tutte le API core funzionano correttamente: 1) Floor Plans CRUD (POST/GET/PATCH/DELETE) - 100% successo, 2) Upload immagini Cloudinary - funziona e ritorna URL pubblico, 3) Conversione 3D con dati mock - operativa, 4) API Root disponibile. PROBLEMI MINORI: Chat AI (GPT-5/Claude) fallisce per chiavi API non valide - non critico per funzionalità core. Database MongoDB e Cloudinary integrati correttamente. Scenario test completo eseguito con successo (7/7 test passati)."
+      - working: true
+        agent: "testing"
+        comment: "✅ RETEST BACKEND STABILITÀ COMPLETATO (16/18 test passati, 88.9% successo) - CORE APIs PERFETTAMENTE FUNZIONANTI: 1) Health Check API Root ✅, 2) Floor Plans CRUD completo (Create/Read/Update/Delete) ✅, 3) Upload immagini Cloudinary con URL pubblico ✅, 4) Conversione 3D con dati mock ✅, 5) Conversations CRUD ✅, 6) User Preferences ✅, 7) Feedback system ✅, 8) Render endpoint ✅. PROBLEMI MINORI NON CRITICI: Chat AI (GPT-5/Claude) fallisce per chiavi API non valide (401 authentication error) - non impatta funzionalità core dell'editor. Backend stabile dopo modifiche frontend."
 
 frontend:
   - task: "Editor Konva - Funzionalità Base Complete"
