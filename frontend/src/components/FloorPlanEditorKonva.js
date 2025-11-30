@@ -112,10 +112,10 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       img.onload = () => {
         setBackgroundImg(img);
         
-        // Auto-fit image to canvas
+        // Auto-fit image to canvas - FIX: ridotto a 60% per evitare immagini troppo grandi
         const scaleX = canvasWidth / img.width;
         const scaleY = canvasHeight / img.height;
-        const autoScale = Math.min(scaleX, scaleY, 1); // Don't scale up
+        const autoScale = Math.min(scaleX, scaleY, 0.6); // Max 60% per dare spazio al disegno
         
         setImageScale(autoScale);
         
@@ -124,6 +124,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         const centeredY = (canvasHeight - img.height * autoScale) / 2;
         setImagePosition({ x: centeredX, y: centeredY });
         
+        toast.info(`📐 Piantina caricata al ${(autoScale * 100).toFixed(0)}% - Usa slider Scala Immagine per regolare`);
         console.log('Background image loaded and fitted for Konva');
       };
     }
