@@ -832,16 +832,32 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label className="text-sm">Scala Immagine</Label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="3"
-                    step="0.1"
-                    value={imageScale}
-                    onChange={(e) => setImageScale(parseFloat(e.target.value))}
-                    className="w-full mt-1"
-                  />
-                  <p className="text-xs text-blue-600 mt-1">{(imageScale * 100).toFixed(0)}%</p>
+                  <div className="flex gap-2 items-center mt-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImageScale(Math.max(0.1, imageScale - 0.1))}
+                    >
+                      -
+                    </Button>
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="3"
+                      step="0.1"
+                      value={imageScale}
+                      onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setImageScale(Math.min(3, imageScale + 0.1))}
+                    >
+                      +
+                    </Button>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-1 text-center">{(imageScale * 100).toFixed(0)}%</p>
                 </div>
                 
                 <div>
