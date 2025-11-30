@@ -636,10 +636,13 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           )}
           
           {/* Scale Calibration */}
-          <Card className="p-4 bg-amber-50 border-amber-200">
-            <h4 className="font-semibold text-amber-900 mb-2">📏 Calibrazione Scala</h4>
-            <p className="text-xs text-amber-700 mb-3">
-              Calibra la scala per avere misure reali. Traccia una linea di riferimento sulla planimetria.
+          <Card className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 shadow-md">
+            <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
+              📏 Calibrazione Scala
+              <span className="text-xs bg-amber-200 px-2 py-1 rounded-full font-normal">Importante</span>
+            </h4>
+            <p className="text-xs text-amber-800 mb-3 leading-relaxed">
+              <strong>Stile Homestyler:</strong> Traccia una linea su una dimensione nota della planimetria (es: larghezza porta, lunghezza parete) e inserisci la misura reale per calibrare tutto l'editor.
             </p>
             
             {!isCalibrating ? (
