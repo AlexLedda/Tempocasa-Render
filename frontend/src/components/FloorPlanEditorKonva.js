@@ -1318,34 +1318,100 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
             
             {/* Walls */}
             {walls.map((wall) => (
-              <Line
-                key={wall.id}
-                points={wall.points}
-                stroke={wall.stroke}
-                strokeWidth={wall.thickness ? wall.thickness * scale : wall.strokeWidth}
-                lineCap="round"
-                draggable={mode === 'move'}
-                onClick={() => setSelectedId(wall.id)}
-                onDragEnd={(e) => {
-                  const newWalls = walls.map(w => {
-                    if (w.id === wall.id) {
-                      const node = e.target;
-                      return {
-                        ...w,
-                        points: w.points.map((p, i) => 
-                          i % 2 === 0 ? p + node.x() : p + node.y()
-                        )
-                      };
-                    }
-                    return w;
-                  });
-                  setWalls(newWalls);
-                  e.target.position({ x: 0, y: 0 });
-                  saveToHistory();
-                }}
-                shadowBlur={selectedId === wall.id ? 12 : 0}
-                shadowColor={selectedId === wall.id ? 'rgba(239, 68, 68, 0.8)' : 'transparent'}
-              />
+              <Group key={`wall-group-${wall.id}`}>
+                {/* Invisible hit area for easier clicking */}
+                <Line
+                  points={wall.points}
+                  stroke="transparent"
+                  strokeWidth={Math.max(20, (wall.thickness || 20) * scale)}
+                  lineCap="round"
+                  onClick={() => setSelectedId(wall.id)}
+                  hitStrokeWidth={30}
+                />
+                
+                {/* Actual visible wall */}
+                <Line
+                  points={wall.points}
+                  stroke={selectedId === wall.id ? '#ef4444' : wall.stroke}
+                  strokeWidth={(wall.thickness || 20) * scale}
+                  lineCap="round"
+                  draggable={mode === 'move'}
+                  onClick={() => setSelectedId(wall.id)}
+                  onDragEnd={(e) => {
+                    const newWalls = walls.map(w => {
+                      if (w.id === wall.id) {
+                        const node = e.target;
+                        return {
+                          ...w,
+                          points: w.points.map((p, i) => 
+                            i % 2 === 0 ? p + node.x() : p + node.y()
+                          )
+                        };
+                      }
+                      return w;
+                    });
+                    setWalls(newWalls);
+                    e.target.position({ x: 0, y: 0 });
+                    saveToHistory();
+                  }}
+                  shadowBlur={selectedId === wall.id ? 15 : 0}
+                  shadowColor={selectedId === wall.id ? '#ef4444' : 'transparent'}
+                  listening={mode !== 'move'}
+                />
+                
+                {/* Selection handles for selected wall */}
+                {selectedId === wall.id && (
+                  <>
+                    {/* Start point handle */}
+                    <Circle
+                      x={wall.points[0]}
+                      y={wall.points[1]}
+                      radius={8}
+                      fill="#ef4444"
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                      draggable
+                      onDragMove={(e) => {
+                        const newWalls = walls.map(w => {
+                          if (w.id === wall.id) {
+                            return {
+                              ...w,
+                              points: [e.target.x(), e.target.y(), w.points[2], w.points[3]]
+                            };
+                          }
+                          return w;
+                        });
+                        setWalls(newWalls);
+                      }}
+                      onDragEnd={() => saveToHistory()}
+                    />
+                    
+                    {/* End point handle */}
+                    <Circle
+                      x={wall.points[2]}
+                      y={wall.points[3]}
+                      radius={8}
+                      fill="#ef4444"
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                      draggable
+                      onDragMove={(e) => {
+                        const newWalls = walls.map(w => {
+                          if (w.id === wall.id) {
+                            return {
+                              ...w,
+                              points: [w.points[0], w.points[1], e.target.x(), e.target.y()]
+                            };
+                          }
+                          return w;
+                        });
+                        setWalls(newWalls);
+                      }}
+                      onDragEnd={() => saveToHistory()}
+                    />
+                  </>
+                )}
+              </Group>
             ))}
             
             {/* Measurement Lines for Walls */}
