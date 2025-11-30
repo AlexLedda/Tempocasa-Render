@@ -1229,25 +1229,78 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               />
             )}
             
-            {/* Grid - Main lines every meter */}
-            {Array.from({ length: Math.ceil(canvasWidth / 100) + 1 }, (_, i) => (
-              <Line
-                key={`v-${i}`}
-                points={[i * 100, 0, i * 100, canvasHeight]}
-                stroke="#94a3b8"
-                strokeWidth={i % 5 === 0 ? 1.5 : 0.5}
-                opacity={i % 5 === 0 ? 0.6 : 0.3}
-              />
-            ))}
-            {Array.from({ length: Math.ceil(canvasHeight / 100) + 1 }, (_, i) => (
-              <Line
-                key={`h-${i}`}
-                points={[0, i * 100, canvasWidth, i * 100]}
-                stroke="#94a3b8"
-                strokeWidth={i % 5 === 0 ? 1.5 : 0.5}
-                opacity={i % 5 === 0 ? 0.6 : 0.3}
-              />
-            ))}
+            {/* Grid - Carta Millimetrata Style */}
+            {showGrid && (
+              <>
+                {/* Linee sottili ogni 20px (griglia fine) */}
+                {Array.from({ length: Math.ceil(canvasWidth / 20) + 1 }, (_, i) => (
+                  <Line
+                    key={`v-fine-${i}`}
+                    points={[i * 20, 0, i * 20, canvasHeight]}
+                    stroke="#e2e8f0"
+                    strokeWidth={0.5}
+                    opacity={0.5}
+                    listening={false}
+                  />
+                ))}
+                {Array.from({ length: Math.ceil(canvasHeight / 20) + 1 }, (_, i) => (
+                  <Line
+                    key={`h-fine-${i}`}
+                    points={[0, i * 20, canvasWidth, i * 20]}
+                    stroke="#e2e8f0"
+                    strokeWidth={0.5}
+                    opacity={0.5}
+                    listening={false}
+                  />
+                ))}
+                
+                {/* Linee medie ogni 100px (griglia principale) */}
+                {Array.from({ length: Math.ceil(canvasWidth / 100) + 1 }, (_, i) => (
+                  <Line
+                    key={`v-main-${i}`}
+                    points={[i * 100, 0, i * 100, canvasHeight]}
+                    stroke={i % 5 === 0 ? '#3b82f6' : '#94a3b8'}
+                    strokeWidth={i % 5 === 0 ? 2 : 1}
+                    opacity={i % 5 === 0 ? 0.7 : 0.5}
+                    listening={false}
+                  />
+                ))}
+                {Array.from({ length: Math.ceil(canvasHeight / 100) + 1 }, (_, i) => (
+                  <Line
+                    key={`h-main-${i}`}
+                    points={[0, i * 100, canvasWidth, i * 100]}
+                    stroke={i % 5 === 0 ? '#3b82f6' : '#94a3b8'}
+                    strokeWidth={i % 5 === 0 ? 2 : 1}
+                    opacity={i % 5 === 0 ? 0.7 : 0.5}
+                    listening={false}
+                  />
+                ))}
+                
+                {/* Labels per griglia ogni 500px */}
+                {Array.from({ length: Math.ceil(canvasWidth / 500) + 1 }, (_, i) => (
+                  <Text
+                    key={`label-v-${i}`}
+                    x={i * 500 + 5}
+                    y={5}
+                    text={`${i * 5}m`}
+                    fontSize={10}
+                    fill="#64748b"
+                    listening={false}
+                  />
+                ))}
+                {Array.from({ length: Math.ceil(canvasHeight / 500) + 1 }, (_, i) => (
+                  <Text
+                    key={`label-h-${i}`}
+                    x={5}
+                    y={i * 500 + 5}
+                    text={`${i * 5}m`}
+                    fontSize={10}
+                    fill="#64748b"
+                    listening={false}
+                  />
+                ))}
+              </>
+            )}
             
             {/* Floors */}
             {floors.map((floor) => (
