@@ -910,21 +910,22 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                       variant="outline"
                       onClick={() => {
                         if (backgroundImg) {
-                          // Auto-fit
+                          // Auto-fit con 60% massimo per dare spazio al disegno
                           const scaleX = canvasWidth / backgroundImg.width;
                           const scaleY = canvasHeight / backgroundImg.height;
-                          const autoScale = Math.min(scaleX, scaleY, 1);
+                          const autoScale = Math.min(scaleX, scaleY, 0.6);
                           setImageScale(autoScale);
                           
                           const centeredX = (canvasWidth - backgroundImg.width * autoScale) / 2;
                           const centeredY = (canvasHeight - backgroundImg.height * autoScale) / 2;
                           setImagePosition({ x: centeredX, y: centeredY });
                           setImageOpacity(0.5);
+                          toast.success('Immagine adattata al 60% - ideale per disegnare');
                         }
                       }}
-                      title="Adatta immagine al canvas"
+                      title="Adatta immagine al canvas (60%)"
                     >
-                      Fit
+                      📐 Fit 60%
                     </Button>
                   </div>
                 </div>
