@@ -705,7 +705,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               <span className="text-xs bg-amber-200 px-2 py-1 rounded-full font-normal">Importante</span>
             </h4>
             <p className="text-xs text-amber-800 mb-3 leading-relaxed">
-              <strong>Stile Homestyler:</strong> Traccia una linea su una dimensione nota della planimetria (es: larghezza porta, lunghezza parete) e inserisci la misura reale per calibrare tutto l'editor.
+              <strong>Stile Homestyler:</strong> Traccia una linea su una dimensione nota della planimetria (es: larghezza porta, lunghezza parete) e inserisci la misura reale per calibrare tutto l&apos;editor.
             </p>
             
             {!isCalibrating ? (
