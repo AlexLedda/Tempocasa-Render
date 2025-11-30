@@ -675,16 +675,50 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   </p>
                 )}
                 {calibrationStart && calibrationEnd && (
-                  <div className="space-y-2">
-                    <Label className="text-sm">Lunghezza reale (cm):</Label>
-                    <input
-                      type="number"
-                      value={calibrationRealLength}
-                      onChange={(e) => setCalibrationRealLength(parseFloat(e.target.value))}
-                      className="w-full px-3 py-2 border border-amber-300 rounded"
-                      min="1"
-                      step="10"
-                    />
+                  <div className="space-y-3">
+                    <div className="bg-amber-100 border border-amber-300 rounded p-3">
+                      <p className="text-xs font-semibold text-amber-900 mb-1">📏 Distanza tracciata:</p>
+                      <p className="text-lg font-bold text-amber-800">
+                        {Math.sqrt(
+                          Math.pow(calibrationEnd.x - calibrationStart.x, 2) + 
+                          Math.pow(calibrationEnd.y - calibrationStart.y, 2)
+                        ).toFixed(0)} pixel
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-semibold">Lunghezza reale di questa distanza:</Label>
+                      <div className="flex gap-2 mt-2">
+                        <div className="flex-1">
+                          <input
+                            type="number"
+                            value={calibrationRealLength}
+                            onChange={(e) => setCalibrationRealLength(parseFloat(e.target.value))}
+                            className="w-full px-3 py-2 border-2 border-amber-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            min="1"
+                            step="10"
+                            placeholder="es: 300"
+                          />
+                        </div>
+                        <select 
+                          className="px-3 py-2 border-2 border-amber-400 rounded-lg"
+                          onChange={(e) => {
+                            if (e.target.value === 'm') {
+                              setCalibrationRealLength(calibrationRealLength / 100);
+                            } else if (e.target.value === 'cm' && calibrationRealLength < 10) {
+                              setCalibrationRealLength(calibrationRealLength * 100);
+                            }
+                          }}
+                        >
+                          <option value="cm">cm</option>
+                          <option value="m">m</option>
+                        </select>
+                      </div>
+                      <p className="text-xs text-amber-700 mt-1">
+                        💡 Es: se hai tracciato una porta standard, inserisci 90cm o 0.9m
+                      </p>
+                    </div>
+                    
                     <div className="flex gap-2">
                       <Button
                         onClick={() => {
@@ -697,11 +731,11 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                           setIsCalibrating(false);
                           setCalibrationStart(null);
                           setCalibrationEnd(null);
-                          toast.success(`Scala calibrata! ${(1/newScale).toFixed(2)} px = 1 cm`);
+                          toast.success(`✅ Scala calibrata! 1cm = ${(1/newScale).toFixed(2)}px`);
                         }}
-                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold"
                       >
-                        ✅ Applica Scala
+                        ✅ Applica e Salva
                       </Button>
                       <Button
                         onClick={() => {
@@ -711,6 +745,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                           toast.info('Calibrazione annullata');
                         }}
                         variant="outline"
+                        className="border-2"
                       >
                         ❌ Annulla
                       </Button>
