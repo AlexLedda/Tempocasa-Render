@@ -555,8 +555,66 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               >
                 🧲 Snap: {snapToGrid ? 'ON' : 'OFF'}
               </Button>
+              
+              <Button
+                size="sm"
+                variant={showGrid ? 'default' : 'outline'}
+                onClick={() => {
+                  setShowGrid(!showGrid);
+                  toast.info(`Griglia: ${!showGrid ? 'Visibile' : 'Nascosta'}`);
+                }}
+              >
+                📐 Griglia: {showGrid ? 'ON' : 'OFF'}
+              </Button>
             </div>
           </div>
+          
+          {/* Zoom Controls - Nuovo */}
+          <Card className="p-3 bg-purple-50 border-purple-200">
+            <h4 className="font-semibold text-purple-900 mb-2 text-sm">🔍 Controlli Vista Canvas</h4>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const newZoom = Math.max(0.5, canvasZoom - 0.1);
+                  setCanvasZoom(newZoom);
+                  toast.info(`Zoom: ${(newZoom * 100).toFixed(0)}%`);
+                }}
+                disabled={canvasZoom <= 0.5}
+              >
+                🔍-
+              </Button>
+              <span className="text-xs font-mono bg-white px-2 py-1 rounded border">
+                {(canvasZoom * 100).toFixed(0)}%
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  const newZoom = Math.min(2, canvasZoom + 0.1);
+                  setCanvasZoom(newZoom);
+                  toast.info(`Zoom: ${(newZoom * 100).toFixed(0)}%`);
+                }}
+                disabled={canvasZoom >= 2}
+              >
+                🔍+
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setCanvasZoom(1);
+                  toast.info('Zoom reset a 100%');
+                }}
+              >
+                ↺ Reset
+              </Button>
+            </div>
+            <p className="text-xs text-purple-700 mt-2">
+              💡 Usa zoom per vedere meglio i dettagli della piantina
+            </p>
+          </Card>
           
           <div className="grid grid-cols-4 gap-2">
             <Button
