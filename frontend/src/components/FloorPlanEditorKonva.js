@@ -75,6 +75,8 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   // Drawing state
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState(null);
+  const [wallLengthInput, setWallLengthInput] = useState(''); // For numeric input during wall drawing
+  const [showWallLengthInput, setShowWallLengthInput] = useState(false);
   
   // History for undo/redo
   const [history, setHistory] = useState([]);
