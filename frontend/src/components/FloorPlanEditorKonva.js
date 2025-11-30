@@ -95,6 +95,10 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   // Copy/Paste clipboard
   const [clipboard, setClipboard] = useState(null);
   
+  // Grid and canvas
+  const [showGrid, setShowGrid] = useState(true);
+  const [canvasZoom, setCanvasZoom] = useState(1);
+  
   // Canvas dimensions
   const canvasWidth = 1400;
   const canvasHeight = 900;
