@@ -1273,6 +1273,8 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           onClick={handleStageClick}
           onMouseDown={handleStageMouseDown}
           onMouseUp={handleStageMouseUp}
+          scaleX={canvasZoom}
+          scaleY={canvasZoom}
         >
           <Layer>
             {/* Background Image */}
