@@ -7,6 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Trash2, Move, MousePointer, Type, Square, LayoutTemplate, DoorOpen, Maximize, ZoomIn, ZoomOut, Save, Download, Home, Settings2, Grid, ScanLine, Ruler, MousePointer2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { detectRooms } from '../utils/roomDetection';
+import { useEditorHistory } from '../hooks/useEditorHistory';
+import { useBackgroundLayer } from '../hooks/useBackgroundLayer';
+import { calculateSmartSnap, pixelsToRealUnit, formatMeasurement, snapToGridCoords } from '../utils/editorUtils';
 import axios from 'axios';
 import { EXTENDED_LIBRARY, getAllItems, searchItems } from '../data/extendedLibrary';
 
@@ -82,16 +85,6 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [wallLengthInput, setWallLengthInput] = useState(''); // For numeric input during wall drawing
   const [showWallLengthInput, setShowWallLengthInput] = useState(false);
 
-  // History for undo/redo
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-
-  // Background image
-  const [backgroundImg, setBackgroundImg] = useState(null);
-  const [imageOpacity, setImageOpacity] = useState(0.5);
-  const [imageScale, setImageScale] = useState(1);
-  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
-
   // Measurements
   const [showMeasurements, setShowMeasurements] = useState(true);
   const [measurementUnit, setMeasurementUnit] = useState('auto'); // 'cm', 'm', 'auto'
@@ -107,195 +100,72 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const canvasWidth = 1400;
   const canvasHeight = 900;
 
-  // Load background image and auto-fit
+  // --- CUSTOM HOOKS ---
+
+  // History Management (Undo/Redo)
+  const {
+    history,
+    historyIndex,
+    addToHistory,
+    undo,
+    redo,
+    canUndo,
+    canRedo
+  } = useEditorHistory();
+
+  // Background Image Management
+  const {
+    backgroundImg,
+    imageOpacity,
+    setImageOpacity,
+    imageScale,
+    setImageScale,
+    imagePosition,
+    setImagePosition,
+    loadFloorPlan
+  } = useBackgroundLayer(canvasWidth, canvasHeight);
+
+  // Initialize Background if prop changes
   useEffect(() => {
     if (floorPlanImage) {
-      const img = new window.Image();
-      img.crossOrigin = 'anonymous';
-      img.src = floorPlanImage;
-      img.onload = () => {
-        setBackgroundImg(img);
-
-        // Auto-fit image to canvas - FIX: ridotto a 60% per evitare immagini troppo grandi
-        const scaleX = canvasWidth / img.width;
-        const scaleY = canvasHeight / img.height;
-        const autoScale = Math.min(scaleX, scaleY, 0.6); // Max 60% per dare spazio al disegno
-
-        setImageScale(autoScale);
-
-        // Center the image
-        const centeredX = (canvasWidth - img.width * autoScale) / 2;
-        const centeredY = (canvasHeight - img.height * autoScale) / 2;
-        setImagePosition({ x: centeredX, y: centeredY });
-
-        toast.info(`📐 Piantina caricata al ${(autoScale * 100).toFixed(0)}% - Usa slider Scala Immagine per regolare`);
-        console.log('Background image loaded and fitted for Konva');
-      };
+      loadFloorPlan(floorPlanImage);
     }
   }, [floorPlanImage]);
 
-  // Snap to grid helper
-  const snapToGridCoords = (x, y) => {
-    if (!snapToGrid) return { x, y };
-    const gridSize = scale * 10; // 10cm grid
-    return {
-      x: Math.round(x / gridSize) * gridSize,
-      y: Math.round(y / gridSize) * gridSize
-    };
-  };
-
-  /**
-   * SMART SNAP CALCULATION
-   * Checks for endpoints and alignments with other walls.
-   * Priority: Endpoint Snap > Alignment Snap > Grid Snap
-   */
-  const calculateSmartSnap = (x, y) => {
-    const SNAP_TOLERANCE = 15; // pixels
-    let snappedX = x;
-    let snappedY = y;
-    let guides = [];
-
-    // If Grid Snap is ON, start with grid coordinates as base
-    if (snapToGrid) {
-      const gridSnapped = snapToGridCoords(x, y);
-      snappedX = gridSnapped.x;
-      snappedY = gridSnapped.y;
-    }
-
-    // 1. ENDPOINT SNAP (High Priority)
-    // Check if close to any existing wall start/end points
-    let endpointSnapFound = false;
-
-    // Collect all significant points from existing walls
-    const pointsOfInterest = [];
-    walls.forEach(wall => {
-      pointsOfInterest.push({ x: wall.points[0], y: wall.points[1] }); // Start
-      pointsOfInterest.push({ x: wall.points[2], y: wall.points[3] }); // End
-    });
-
-    for (const p of pointsOfInterest) {
-      if (Math.abs(p.x - x) < SNAP_TOLERANCE && Math.abs(p.y - y) < SNAP_TOLERANCE) {
-        snappedX = p.x;
-        snappedY = p.y;
-        endpointSnapFound = true;
-        break; // Found an exact point match, stop searching
-      }
-    }
-
-    if (endpointSnapFound) {
-      return { x: snappedX, y: snappedY, guidelines: [] }; // No guides needed for direct point snap
-    }
-
-    // 2. ALIGNMENT SNAP (Medium Priority)
-    // If no endpoint match, check for horizontal/vertical alignment with other points
-
-    // Check X alignment (Vertical Guide)
-    for (const p of pointsOfInterest) {
-      if (Math.abs(p.x - x) < SNAP_TOLERANCE) {
-        snappedX = p.x;
-        guides.push({
-          points: [p.x, -10000, p.x, 10000], // Infinite vertical line
-          stroke: '#fca5a5',
-          dash: [4, 4]
-        });
-        break; // Snap to first X alignment found
-      }
-    }
-
-    // Check Y alignment (Horizontal Guide)
-    for (const p of pointsOfInterest) {
-      if (Math.abs(p.y - y) < SNAP_TOLERANCE) {
-        snappedY = p.y;
-        guides.push({
-          points: [-10000, p.y, 10000, p.y], // Infinite horizontal line
-          stroke: '#fca5a5',
-          dash: [4, 4]
-        });
-        break; // Snap to first Y alignment found
-      }
-    }
-
-    return { x: snappedX, y: snappedY, guidelines: guides };
-  };
-
-  // Measurement helper functions
-  const pixelsToRealUnit = (pixels) => {
-    // scale is pixels per cm, so pixels / scale = cm
-    return pixels / scale;
-  };
-
-  const formatMeasurement = (cm) => {
-    if (measurementUnit === 'cm') {
-      return `${cm.toFixed(1)} cm`;
-    } else if (measurementUnit === 'm') {
-      return `${(cm / 100).toFixed(2)} m`;
-    } else {
-      // Auto: use m for > 100cm, cm otherwise
-      if (cm >= 100) {
-        return `${(cm / 100).toFixed(2)} m`;
-      } else {
-        return `${cm.toFixed(1)} cm`;
-      }
-    }
-  };
-
-  // Save to history
+  // Wrapper for saveToHistory to maintain compatibility
   const saveToHistory = () => {
     const currentState = {
-      walls: JSON.parse(JSON.stringify(walls)),
-      rooms: JSON.parse(JSON.stringify(rooms)),
-      floors: JSON.parse(JSON.stringify(floors)),
-      doors: JSON.parse(JSON.stringify(doors)),
-      windows: JSON.parse(JSON.stringify(windows)),
-      furniture: JSON.parse(JSON.stringify(furniture))
+      walls,
+      rooms,
+      floors,
+      doors,
+      windows,
+      furniture
     };
-
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(currentState);
-
-    if (newHistory.length > 50) {
-      newHistory.shift();
-    } else {
-      setHistoryIndex(historyIndex + 1);
-    }
-
-    setHistory(newHistory);
+    addToHistory(currentState);
   };
 
-  // Undo/Redo
-  const undo = () => {
-    if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      const state = history[newIndex];
-
-      setWalls(JSON.parse(JSON.stringify(state.walls)));
-      setRooms(JSON.parse(JSON.stringify(state.rooms)));
-      setFloors(JSON.parse(JSON.stringify(state.floors)));
-      setDoors(JSON.parse(JSON.stringify(state.doors)));
-      setWindows(JSON.parse(JSON.stringify(state.windows)));
-      setFurniture(JSON.parse(JSON.stringify(state.furniture)));
-
-      setHistoryIndex(newIndex);
-      toast.success('Annullato');
-    }
+  // Wrappers for undo/redo to update local state
+  const handleUndo = () => {
+    const state = undo();
+    if (state) restoreState(state);
   };
 
-  const redo = () => {
-    if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      const state = history[newIndex];
-
-      setWalls(JSON.parse(JSON.stringify(state.walls)));
-      setRooms(JSON.parse(JSON.stringify(state.rooms)));
-      setFloors(JSON.parse(JSON.stringify(state.floors)));
-      setDoors(JSON.parse(JSON.stringify(state.doors)));
-      setWindows(JSON.parse(JSON.stringify(state.windows)));
-      setFurniture(JSON.parse(JSON.stringify(state.furniture)));
-
-      setHistoryIndex(newIndex);
-      toast.success('Ripristinato');
-    }
+  const handleRedo = () => {
+    const state = redo();
+    if (state) restoreState(state);
   };
+
+  const restoreState = (state) => {
+    setWalls(state.walls);
+    setRooms(state.rooms);
+    setFloors(state.floors);
+    setDoors(state.doors);
+    setWindows(state.windows);
+    setFurniture(state.furniture);
+  };
+
+
 
   // Copy/Paste functions
   const copySelected = () => {
@@ -393,7 +263,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       // Place element from library if selected
       if (selectedLibraryItem && (mode === 'door' || mode === 'window' || mode === 'furniture' || mode === 'floor')) {
         const pos = e.target.getStage().getPointerPosition();
-        const snapped = snapToGridCoords(pos.x, pos.y);
+        const snapped = snapToGridCoords(pos.x, pos.y, scale * 10, snapToGrid);
 
         if (mode === 'door') {
           const newDoor = {
@@ -535,7 +405,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       const pos = e.target.getStage().getPointerPosition();
 
       // USE SMART SNAP instead of simple grid snap
-      const smartResult = calculateSmartSnap(pos.x, pos.y);
+      const smartResult = calculateSmartSnap(pos.x, pos.y, walls, snapToGrid, scale);
       const snapped = { x: smartResult.x, y: smartResult.y };
 
       if (!isDrawing) {
@@ -576,7 +446,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       const pos = e.target.getStage().getPointerPosition();
 
       // Calculate Smart Snap
-      const smartResult = calculateSmartSnap(pos.x, pos.y);
+      const smartResult = calculateSmartSnap(pos.x, pos.y, walls, snapToGrid, scale);
 
       setTempEnd({ x: smartResult.x, y: smartResult.y });
       setSnapLines(smartResult.guidelines); // Update visual guidelines
@@ -700,11 +570,11 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
 
             {/* Quick Actions (Undo/Redo/Save) */}
             <div className="grid grid-cols-2 gap-2">
-              <Button size="sm" variant="outline" onClick={undo} disabled={historyIndex <= 0} className="w-full">
-                ↶ Undo
+              <Button size="sm" variant="outline" onClick={handleUndo} disabled={!canUndo} className="w-full">
+                <RotateCcw className="h-4 w-4 mr-2" /> Undo
               </Button>
-              <Button size="sm" variant="outline" onClick={redo} disabled={historyIndex >= history.length - 1} className="w-full">
-                ↷ Redo
+              <Button size="sm" variant="outline" onClick={handleRedo} disabled={!canRedo} className="w-full">
+                <RotateCw className="h-4 w-4 mr-2" /> Redo
               </Button>
               <Button
                 onClick={() => {
@@ -1394,8 +1264,8 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                         Math.sqrt(
                           Math.pow(tempEnd.x - drawStart.x, 2) +
                           Math.pow(tempEnd.y - drawStart.y, 2)
-                        )
-                      )
+                        ), scale
+                      ), measurementUnit
                     )}
                     fontSize={14}
                     fill="#3b82f6"
@@ -1411,7 +1281,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
             {showMeasurements && walls.map((wall) => {
               const [x1, y1, x2, y2] = wall.points;
               const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-              const lengthCm = pixelsToRealUnit(length);
+              const lengthCm = pixelsToRealUnit(length, scale);
               const midX = (x1 + x2) / 2;
               const midY = (y1 + y2) / 2;
 
@@ -1426,7 +1296,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   <Text
                     x={midX + offsetX - 30}
                     y={midY + offsetY - 10}
-                    text={formatMeasurement(lengthCm)}
+                    text={formatMeasurement(lengthCm, measurementUnit)}
                     fontSize={12}
                     fontStyle="bold"
                     fill="#1e40af"
@@ -1439,8 +1309,8 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
 
             {/* Measurement Lines for Rooms/Floors */}
             {showMeasurements && [...rooms, ...floors].map((element) => {
-              const widthCm = pixelsToRealUnit(element.width);
-              const heightCm = pixelsToRealUnit(element.height);
+              const widthCm = pixelsToRealUnit(element.width, scale);
+              const heightCm = pixelsToRealUnit(element.height, scale);
 
               return (
                 <Group key={`measure-${element.id}`}>
@@ -1454,7 +1324,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   <Text
                     x={element.x + element.width / 2 - 30}
                     y={element.y - 30}
-                    text={formatMeasurement(widthCm)}
+                    text={formatMeasurement(widthCm, measurementUnit)}
                     fontSize={11}
                     fontStyle="bold"
                     fill="#1e40af"
@@ -1471,7 +1341,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   <Text
                     x={element.x + element.width + 20}
                     y={element.y + element.height / 2 - 10}
-                    text={formatMeasurement(heightCm)}
+                    text={formatMeasurement(heightCm, measurementUnit)}
                     fontSize={11}
                     fontStyle="bold"
                     fill="#1e40af"
@@ -1483,14 +1353,15 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
 
             {/* Measurement Lines for Doors/Windows */}
             {showMeasurements && [...doors, ...windows].map((element) => {
-              const widthCm = pixelsToRealUnit(element.width);
+              const widthCm = pixelsToRealUnit(element.width, scale);
+              // const heightCm = pixelsToRealUnit(element.height, scale); // unused in this block?
 
               return (
                 <Group key={`measure-${element.id}`}>
                   <Text
                     x={element.x + element.width / 2 - 25}
                     y={element.y - 20}
-                    text={formatMeasurement(widthCm)}
+                    text={formatMeasurement(widthCm, measurementUnit)}
                     fontSize={10}
                     fontStyle="bold"
                     fill="#0d9488"
@@ -1502,15 +1373,15 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
 
             {/* Measurement Lines for Furniture */}
             {showMeasurements && furniture.map((item) => {
-              const widthCm = pixelsToRealUnit(item.width);
-              const heightCm = pixelsToRealUnit(item.height);
+              const widthCm = pixelsToRealUnit(item.width, scale);
+              const heightCm = pixelsToRealUnit(item.height, scale);
 
               return (
                 <Group key={`measure-${item.id}`}>
                   <Text
                     x={item.x + item.width / 2 - 25}
                     y={item.y - 20}
-                    text={`${formatMeasurement(widthCm)} × ${formatMeasurement(heightCm)}`}
+                    text={`${formatMeasurement(widthCm, measurementUnit)} × ${formatMeasurement(heightCm, measurementUnit)}`}
                     fontSize={10}
                     fontStyle="bold"
                     fill="#7c3aed"
