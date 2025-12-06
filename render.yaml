@@ -1,7 +1,7 @@
 services:
   # Backend Service
   - type: web
-    name: vision3d-backend
+    name: tempocasa-backend
     env: python
     region: frankfurt
     buildCommand: "cd backend && pip install --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/ -r requirements.txt"
@@ -30,7 +30,7 @@ services:
 
   # Frontend Service
   - type: web
-    name: vision3d-frontend
+    name: tempocasa-frontend
     env: node
     region: frankfurt
     buildCommand: "cd frontend && yarn install && yarn build"
