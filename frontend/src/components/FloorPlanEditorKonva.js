@@ -4,8 +4,10 @@ import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Trash2, Move, MousePointer, Type, Square, LayoutTemplate, DoorOpen, Maximize, ZoomIn, ZoomOut, Save, Download, Home, Settings2, Grid, ScanLine, Ruler, MousePointer2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Grid3x3, Square, DoorOpen, Maximize2, Move, Save, Trash2, Search, Upload, Plus } from 'lucide-react';
+import { detectRooms } from '../utils/roomDetection';
+import axios from 'axios';
 import { EXTENDED_LIBRARY, getAllItems, searchItems } from '../data/extendedLibrary';
 
 // Mantieni compatibilità per ora
@@ -76,6 +78,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState(null);
   const [tempEnd, setTempEnd] = useState(null); // For preview line
+  const [snapLines, setSnapLines] = useState([]); // Visual guides for smart snapping
   const [wallLengthInput, setWallLengthInput] = useState(''); // For numeric input during wall drawing
   const [showWallLengthInput, setShowWallLengthInput] = useState(false);
 
@@ -139,6 +142,80 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       x: Math.round(x / gridSize) * gridSize,
       y: Math.round(y / gridSize) * gridSize
     };
+  };
+
+  /**
+   * SMART SNAP CALCULATION
+   * Checks for endpoints and alignments with other walls.
+   * Priority: Endpoint Snap > Alignment Snap > Grid Snap
+   */
+  const calculateSmartSnap = (x, y) => {
+    const SNAP_TOLERANCE = 15; // pixels
+    let snappedX = x;
+    let snappedY = y;
+    let guides = [];
+
+    // If Grid Snap is ON, start with grid coordinates as base
+    if (snapToGrid) {
+      const gridSnapped = snapToGridCoords(x, y);
+      snappedX = gridSnapped.x;
+      snappedY = gridSnapped.y;
+    }
+
+    // 1. ENDPOINT SNAP (High Priority)
+    // Check if close to any existing wall start/end points
+    let endpointSnapFound = false;
+
+    // Collect all significant points from existing walls
+    const pointsOfInterest = [];
+    walls.forEach(wall => {
+      pointsOfInterest.push({ x: wall.points[0], y: wall.points[1] }); // Start
+      pointsOfInterest.push({ x: wall.points[2], y: wall.points[3] }); // End
+    });
+
+    for (const p of pointsOfInterest) {
+      if (Math.abs(p.x - x) < SNAP_TOLERANCE && Math.abs(p.y - y) < SNAP_TOLERANCE) {
+        snappedX = p.x;
+        snappedY = p.y;
+        endpointSnapFound = true;
+        break; // Found an exact point match, stop searching
+      }
+    }
+
+    if (endpointSnapFound) {
+      return { x: snappedX, y: snappedY, guidelines: [] }; // No guides needed for direct point snap
+    }
+
+    // 2. ALIGNMENT SNAP (Medium Priority)
+    // If no endpoint match, check for horizontal/vertical alignment with other points
+
+    // Check X alignment (Vertical Guide)
+    for (const p of pointsOfInterest) {
+      if (Math.abs(p.x - x) < SNAP_TOLERANCE) {
+        snappedX = p.x;
+        guides.push({
+          points: [p.x, -10000, p.x, 10000], // Infinite vertical line
+          stroke: '#fca5a5',
+          dash: [4, 4]
+        });
+        break; // Snap to first X alignment found
+      }
+    }
+
+    // Check Y alignment (Horizontal Guide)
+    for (const p of pointsOfInterest) {
+      if (Math.abs(p.y - y) < SNAP_TOLERANCE) {
+        snappedY = p.y;
+        guides.push({
+          points: [-10000, p.y, 10000, p.y], // Infinite horizontal line
+          stroke: '#fca5a5',
+          dash: [4, 4]
+        });
+        break; // Snap to first Y alignment found
+      }
+    }
+
+    return { x: snappedX, y: snappedY, guidelines: guides };
   };
 
   // Measurement helper functions
@@ -381,6 +458,65 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     }
   };
 
+  // Room Detection Integration
+  const runRoomDetection = (currentWalls) => {
+    // Run detection logic
+    const detectedRooms = detectRooms(currentWalls);
+
+    if (detectedRooms.length > 0) {
+      // Find NEW rooms only (compare by approximate centroid or area to avoid duplicates strictly?)
+      // For now, simpler: Try to merge or just replace?
+      // Replacing "auto-generated" rooms might be annoying if user customized them.
+      // Strategy: Only add if no room exists in roughly that center.
+
+      let newRoomsAdded = 0;
+      const updatedRooms = [...rooms];
+
+      detectedRooms.forEach(dRoom => {
+        // Calculate centroid
+        const cx = dRoom.points.reduce((sum, p) => sum + p.x, 0) / dRoom.points.length;
+        const cy = dRoom.points.reduce((sum, p) => sum + p.y, 0) / dRoom.points.length;
+
+        // Check if a room already exists covering this centroid
+        const exists = rooms.some(r => {
+          // Simple bounding box check or point-in-polygon logic
+          // Here we just check distance to center
+          return Math.abs(r.x + r.width / 2 - cx) < 50 && Math.abs(r.y + r.height / 2 - cy) < 50;
+        });
+
+        if (!exists) {
+          // Create proper room object matching our schema
+          // bounding box
+          const minX = Math.min(...dRoom.points.map(p => p.x));
+          const minY = Math.min(...dRoom.points.map(p => p.y));
+          const maxX = Math.max(...dRoom.points.map(p => p.x));
+          const maxY = Math.max(...dRoom.points.map(p => p.y));
+
+          const newRoom = {
+            id: dRoom.id,
+            x: minX,
+            y: minY,
+            width: maxX - minX,
+            height: maxY - minY,
+            name: 'Nuova Stanza',
+            type: 'living_room',
+            opacity: 0.3,
+            fill: '#e0f2fe', // Light blue
+            customPoints: dRoom.points.flatMap(p => [p.x - minX, p.y - minY]) // Local coordinates for Polygon
+          };
+
+          updatedRooms.push(newRoom);
+          newRoomsAdded++;
+        }
+      });
+
+      if (newRoomsAdded > 0) {
+        setRooms(updatedRooms);
+        toast.success(`🏠 ${newRoomsAdded} Stanza/e rilevata/e automaticamente!`);
+      }
+    }
+  };
+
   // Handle continuous wall drawing
   const handleStageMouseDown = (e) => {
     // Calibration mode
@@ -397,7 +533,10 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     // Wall drawing logic - Continuous Mode
     if (mode === 'wall') {
       const pos = e.target.getStage().getPointerPosition();
-      const snapped = snapToGridCoords(pos.x, pos.y);
+
+      // USE SMART SNAP instead of simple grid snap
+      const smartResult = calculateSmartSnap(pos.x, pos.y);
+      const snapped = { x: smartResult.x, y: smartResult.y };
 
       if (!isDrawing) {
         // First click: Start drawing
@@ -416,8 +555,12 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
 
         // Don't create wall if length is 0 (double click on same spot)
         if (drawStart.x !== snapped.x || drawStart.y !== snapped.y) {
-          setWalls([...walls, newWall]);
+          const updatedWalls = [...walls, newWall];
+          setWalls(updatedWalls);
           saveToHistory();
+
+          // Try to detect rooms immediately
+          runRoomDetection(updatedWalls);
 
           // Continue drawing from the end point
           setDrawStart(snapped);
@@ -427,12 +570,19 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     }
   };
 
-  // Handle mouse move for preview
+  // Handle mouse move for preview and guides
   const handleStageMouseMove = (e) => {
     if (mode === 'wall' && isDrawing) {
       const pos = e.target.getStage().getPointerPosition();
-      const snapped = snapToGridCoords(pos.x, pos.y);
-      setTempEnd(snapped);
+
+      // Calculate Smart Snap
+      const smartResult = calculateSmartSnap(pos.x, pos.y);
+
+      setTempEnd({ x: smartResult.x, y: smartResult.y });
+      setSnapLines(smartResult.guidelines); // Update visual guidelines
+    } else {
+      // Clear guidelines when not drawing
+      if (snapLines.length > 0) setSnapLines([]);
     }
   };
 
@@ -1427,6 +1577,18 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 />
               </>
             )}
+            {/* Smart Snap Guidelines */}
+            {isDrawing && snapLines.map((line, i) => (
+              <Line
+                key={`snap-guide-${i}`}
+                points={line.points}
+                stroke={line.stroke}
+                dash={line.dash}
+                strokeWidth={1}
+                opacity={0.8}
+              />
+            ))}
+
           </Layer>
         </Stage>
       </div>
