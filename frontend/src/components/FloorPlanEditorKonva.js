@@ -44,7 +44,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [mode, setMode] = useState('view');
   const [scale, setScale] = useState(0.1); // 0.1 pixels per cm (default)
   const [wallThickness, setWallThickness] = useState(20); // cm
-  
+
   // Elements
   const [walls, setWalls] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -52,57 +52,58 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
   const [doors, setDoors] = useState([]);
   const [windows, setWindows] = useState([]);
   const [furniture, setFurniture] = useState([]);
-  
+
   // UI State
   const [selectedId, setSelectedId] = useState(null);
   const [selectedLibraryItem, setSelectedLibraryItem] = useState(null);
   const [wallColor, setWallColor] = useState('#0f172a');
   const [snapToGrid, setSnapToGrid] = useState(true);
-  
+
   // Search and filter
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  
+
   // Custom elements
   const [customElements, setCustomElements] = useState([]);
-  
+
   // Scale calibration
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [calibrationStart, setCalibrationStart] = useState(null);
   const [calibrationEnd, setCalibrationEnd] = useState(null);
   const [calibrationRealLength, setCalibrationRealLength] = useState(500); // cm
-  
+
   // Drawing state
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawStart, setDrawStart] = useState(null);
+  const [tempEnd, setTempEnd] = useState(null); // For preview line
   const [wallLengthInput, setWallLengthInput] = useState(''); // For numeric input during wall drawing
   const [showWallLengthInput, setShowWallLengthInput] = useState(false);
-  
+
   // History for undo/redo
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
-  
+
   // Background image
   const [backgroundImg, setBackgroundImg] = useState(null);
   const [imageOpacity, setImageOpacity] = useState(0.5);
   const [imageScale, setImageScale] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
-  
+
   // Measurements
   const [showMeasurements, setShowMeasurements] = useState(true);
   const [measurementUnit, setMeasurementUnit] = useState('auto'); // 'cm', 'm', 'auto'
-  
+
   // Copy/Paste clipboard
   const [clipboard, setClipboard] = useState(null);
-  
+
   // Grid and canvas
   const [showGrid, setShowGrid] = useState(true);
   const [canvasZoom, setCanvasZoom] = useState(1);
-  
+
   // Canvas dimensions
   const canvasWidth = 1400;
   const canvasHeight = 900;
-  
+
   // Load background image and auto-fit
   useEffect(() => {
     if (floorPlanImage) {
@@ -111,25 +112,25 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       img.src = floorPlanImage;
       img.onload = () => {
         setBackgroundImg(img);
-        
+
         // Auto-fit image to canvas - FIX: ridotto a 60% per evitare immagini troppo grandi
         const scaleX = canvasWidth / img.width;
         const scaleY = canvasHeight / img.height;
         const autoScale = Math.min(scaleX, scaleY, 0.6); // Max 60% per dare spazio al disegno
-        
+
         setImageScale(autoScale);
-        
+
         // Center the image
         const centeredX = (canvasWidth - img.width * autoScale) / 2;
         const centeredY = (canvasHeight - img.height * autoScale) / 2;
         setImagePosition({ x: centeredX, y: centeredY });
-        
+
         toast.info(`📐 Piantina caricata al ${(autoScale * 100).toFixed(0)}% - Usa slider Scala Immagine per regolare`);
         console.log('Background image loaded and fitted for Konva');
       };
     }
   }, [floorPlanImage]);
-  
+
   // Snap to grid helper
   const snapToGridCoords = (x, y) => {
     if (!snapToGrid) return { x, y };
@@ -139,13 +140,13 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       y: Math.round(y / gridSize) * gridSize
     };
   };
-  
+
   // Measurement helper functions
   const pixelsToRealUnit = (pixels) => {
     // scale is pixels per cm, so pixels / scale = cm
     return pixels / scale;
   };
-  
+
   const formatMeasurement = (cm) => {
     if (measurementUnit === 'cm') {
       return `${cm.toFixed(1)} cm`;
@@ -160,7 +161,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       }
     }
   };
-  
+
   // Save to history
   const saveToHistory = () => {
     const currentState = {
@@ -171,61 +172,61 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       windows: JSON.parse(JSON.stringify(windows)),
       furniture: JSON.parse(JSON.stringify(furniture))
     };
-    
+
     const newHistory = history.slice(0, historyIndex + 1);
     newHistory.push(currentState);
-    
+
     if (newHistory.length > 50) {
       newHistory.shift();
     } else {
       setHistoryIndex(historyIndex + 1);
     }
-    
+
     setHistory(newHistory);
   };
-  
+
   // Undo/Redo
   const undo = () => {
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       const state = history[newIndex];
-      
+
       setWalls(JSON.parse(JSON.stringify(state.walls)));
       setRooms(JSON.parse(JSON.stringify(state.rooms)));
       setFloors(JSON.parse(JSON.stringify(state.floors)));
       setDoors(JSON.parse(JSON.stringify(state.doors)));
       setWindows(JSON.parse(JSON.stringify(state.windows)));
       setFurniture(JSON.parse(JSON.stringify(state.furniture)));
-      
+
       setHistoryIndex(newIndex);
       toast.success('Annullato');
     }
   };
-  
+
   const redo = () => {
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
       const state = history[newIndex];
-      
+
       setWalls(JSON.parse(JSON.stringify(state.walls)));
       setRooms(JSON.parse(JSON.stringify(state.rooms)));
       setFloors(JSON.parse(JSON.stringify(state.floors)));
       setDoors(JSON.parse(JSON.stringify(state.doors)));
       setWindows(JSON.parse(JSON.stringify(state.windows)));
       setFurniture(JSON.parse(JSON.stringify(state.furniture)));
-      
+
       setHistoryIndex(newIndex);
       toast.success('Ripristinato');
     }
   };
-  
+
   // Copy/Paste functions
   const copySelected = () => {
     if (!selectedId) {
       toast.error('Nessun elemento selezionato');
       return;
     }
-    
+
     // Find selected element in all arrays
     const selectedWall = walls.find(w => w.id === selectedId);
     const selectedRoom = rooms.find(r => r.id === selectedId);
@@ -233,9 +234,9 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     const selectedDoor = doors.find(d => d.id === selectedId);
     const selectedWindow = windows.find(w => w.id === selectedId);
     const selectedFurniture = furniture.find(f => f.id === selectedId);
-    
+
     const element = selectedWall || selectedRoom || selectedFloor || selectedDoor || selectedWindow || selectedFurniture;
-    
+
     if (element) {
       let type = 'wall';
       if (selectedRoom) type = 'room';
@@ -243,22 +244,22 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       if (selectedDoor) type = 'door';
       if (selectedWindow) type = 'window';
       if (selectedFurniture) type = 'furniture';
-      
+
       setClipboard({ type, element: JSON.parse(JSON.stringify(element)) });
       toast.success('Elemento copiato! Premi Ctrl+V per incollare');
     }
   };
-  
+
   const pasteElement = () => {
     if (!clipboard) {
       toast.error('Nessun elemento da incollare');
       return;
     }
-    
+
     const offset = 30; // Offset in pixels to avoid exact overlap
     const newElement = JSON.parse(JSON.stringify(clipboard.element));
     newElement.id = `${clipboard.type}-${Date.now()}`;
-    
+
     // Apply offset
     if (newElement.x !== undefined) {
       newElement.x += offset;
@@ -266,11 +267,11 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
     }
     if (newElement.points) {
       // For walls
-      newElement.points = newElement.points.map((p, i) => 
+      newElement.points = newElement.points.map((p, i) =>
         i % 2 === 0 ? p + offset : p + offset
       );
     }
-    
+
     // Add to appropriate array
     switch (clipboard.type) {
       case 'wall':
@@ -292,28 +293,31 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         setFurniture([...furniture, newElement]);
         break;
     }
-    
+
     saveToHistory();
     setSelectedId(newElement.id);
     toast.success('Elemento incollato!');
   };
-  
+
   const duplicateSelected = () => {
     copySelected();
     if (clipboard) {
       pasteElement();
     }
   };
-  
+
   // Handle canvas click
   const handleStageClick = (e) => {
     // Check if clicking on empty area
     if (e.target === e.target.getStage()) {
+      // If we are in wall mode and drawing, we handle clicks in handleStageMouseDown
+      // But if we want to double click to finish, we can handle it here or in a separate handler
+
       // Place element from library if selected
       if (selectedLibraryItem && (mode === 'door' || mode === 'window' || mode === 'furniture' || mode === 'floor')) {
         const pos = e.target.getStage().getPointerPosition();
         const snapped = snapToGridCoords(pos.x, pos.y);
-        
+
         if (mode === 'door') {
           const newDoor = {
             id: `door-${Date.now()}`,
@@ -368,13 +372,16 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         }
         return;
       }
-      
-      setSelectedId(null);
+
+      // Deselect if not placing anything and not drawing wall
+      if (!isDrawing) {
+        setSelectedId(null);
+      }
       return;
     }
   };
-  
-  // Handle stage mouse down for drawing
+
+  // Handle continuous wall drawing
   const handleStageMouseDown = (e) => {
     // Calibration mode
     if (isCalibrating) {
@@ -386,43 +393,63 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       }
       return;
     }
-    
-    if (mode === 'wall' && !isDrawing) {
+
+    // Wall drawing logic - Continuous Mode
+    if (mode === 'wall') {
       const pos = e.target.getStage().getPointerPosition();
       const snapped = snapToGridCoords(pos.x, pos.y);
-      setDrawStart(snapped);
-      setIsDrawing(true);
+
+      if (!isDrawing) {
+        // First click: Start drawing
+        setIsDrawing(true);
+        setDrawStart(snapped);
+        setTempEnd(snapped);
+      } else {
+        // Second click (or subsequent): Complete segment and start next
+        const newWall = {
+          id: `wall-${Date.now()}`,
+          points: [drawStart.x, drawStart.y, snapped.x, snapped.y],
+          stroke: wallColor,
+          strokeWidth: wallThickness * scale,
+          thickness: wallThickness // Store in cm
+        };
+
+        // Don't create wall if length is 0 (double click on same spot)
+        if (drawStart.x !== snapped.x || drawStart.y !== snapped.y) {
+          setWalls([...walls, newWall]);
+          saveToHistory();
+
+          // Continue drawing from the end point
+          setDrawStart(snapped);
+          setTempEnd(snapped);
+        }
+      }
     }
   };
-  
-  // Handle stage mouse up for drawing
+
+  // Handle mouse move for preview
+  const handleStageMouseMove = (e) => {
+    if (mode === 'wall' && isDrawing) {
+      const pos = e.target.getStage().getPointerPosition();
+      const snapped = snapToGridCoords(pos.x, pos.y);
+      setTempEnd(snapped);
+    }
+  };
+
+  // Handle mouse up (mostly for other tools now)
   const handleStageMouseUp = (e) => {
-    if (mode === 'wall' && isDrawing && drawStart) {
-      const pos = e.target.getStage().getPointerPosition();
-      const snapped = snapToGridCoords(pos.x, pos.y);
-      
-      const newWall = {
-        id: `wall-${Date.now()}`,
-        points: [drawStart.x, drawStart.y, snapped.x, snapped.y],
-        stroke: wallColor,
-        strokeWidth: wallThickness * scale,
-        thickness: wallThickness // Store in cm
-      };
-      
-      setWalls([...walls, newWall]);
-      saveToHistory();
-      setIsDrawing(false);
-      setDrawStart(null);
-      toast.success('Muro aggiunto!');
-    }
+    // For wall mode, we do nothing on mouse up as we use click-click logic
+    // drawing is finished by Esc or double click (handled by logic)
+
+    // Reset dragging state if needed for other checks
   };
-  
+
   // Delete selected element
   const deleteSelected = () => {
     if (!selectedId) return;
-    
+
     saveToHistory();
-    
+
     if (selectedId.startsWith('wall-')) {
       setWalls(walls.filter(w => w.id !== selectedId));
       toast.success('Muro rimosso!');
@@ -442,10 +469,10 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
       setFurniture(furniture.filter(f => f.id !== selectedId));
       toast.success('Arredamento rimosso!');
     }
-    
+
     setSelectedId(null);
   };
-  
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -474,204 +501,136 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
         else if (e.key === 'g' || e.key === 'G') {
           setSnapToGrid(!snapToGrid);
           toast.info(`Snap to Grid: ${!snapToGrid ? 'ON' : 'OFF'}`);
+        } else if (e.key === 'Escape') {
+          // Cancel drawing or measurements
+          if (isDrawing) {
+            setIsDrawing(false);
+            setDrawStart(null);
+            setTempEnd(null);
+            toast.info('Disegno annullato');
+          } else if (isCalibrating) {
+            setIsCalibrating(false);
+            setCalibrationStart(null);
+            setCalibrationEnd(null);
+            toast.info('Calibrazione annullata');
+          } else {
+            setSelectedId(null);
+          }
         }
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [selectedId, snapToGrid, history, historyIndex, clipboard, walls, rooms, floors, doors, windows, furniture]);
-  
+
   return (
-    <Card className="p-6 bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-xl font-bold text-slate-900">Editor 2D Pianta - Konva</h3>
+    <div className="flex h-[calc(100vh-120px)] w-full bg-slate-50 border rounded-xl shadow-lg overflow-hidden">
+      {/* LEFT SIDEBAR - Tools & Library */}
+      <div className="w-[320px] bg-white border-r flex flex-col z-10 shadow-lg">
+        <div className="p-4 border-b bg-slate-50">
+          <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <span className="text-xl">📐</span> Editor Pianta
+          </h3>
           {selectedId && (
-            <p className="text-sm text-blue-600 mt-1">
-              ✓ Elemento selezionato: <strong>{selectedId}</strong>
-            </p>
+            <div className="mt-2 text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-100 truncate">
+              Selezione: <strong>{selectedId}</strong>
+            </div>
           )}
         </div>
-        <div className="flex gap-2">
-          {selectedId && (
-            <>
-              <Button onClick={copySelected} variant="outline" size="sm">
-                📋 Copia
-              </Button>
-              <Button onClick={duplicateSelected} variant="outline" size="sm">
-                📑 Duplica
-              </Button>
-              <Button onClick={deleteSelected} variant="destructive" size="sm">
-                <Trash2 className="w-4 h-4 mr-1" />
-                Elimina
-              </Button>
-            </>
-          )}
-          {clipboard && !selectedId && (
-            <Button onClick={pasteElement} variant="outline" size="sm">
-              📋 Incolla
-            </Button>
-          )}
-          <Button
-            onClick={() => {
-              const data = { walls, rooms, floors, doors, windows, furniture };
-              onSave(data);
-            }}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Salva
-          </Button>
-        </div>
-      </div>
-      
-      <Tabs defaultValue="tools" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="tools">🛠️ Strumenti</TabsTrigger>
-          <TabsTrigger value="library">📚 Libreria Elementi</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="tools" className="space-y-4">
-          {/* Quick Actions Bar */}
-          <div className="flex items-center justify-between p-2 bg-slate-100 rounded-lg">
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={undo} disabled={historyIndex <= 0}>
+
+        <Tabs defaultValue="tools" className="flex-1 flex flex-col overflow-hidden">
+          <TabsList className="w-full grid grid-cols-2 rounded-none p-0 border-b h-12">
+            <TabsTrigger value="tools" className="h-full rounded-none data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500">🛠️ Strumenti</TabsTrigger>
+            <TabsTrigger value="library" className="h-full rounded-none data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-purple-500">📚 Libreria</TabsTrigger>
+          </TabsList>
+
+          {/* TAB TOOLS */}
+          <TabsContent value="tools" className="flex-1 overflow-y-auto p-4 space-y-6">
+
+            {/* Quick Actions (Undo/Redo/Save) */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button size="sm" variant="outline" onClick={undo} disabled={historyIndex <= 0} className="w-full">
                 ↶ Undo
               </Button>
-              <Button size="sm" variant="outline" onClick={redo} disabled={historyIndex >= history.length - 1}>
+              <Button size="sm" variant="outline" onClick={redo} disabled={historyIndex >= history.length - 1} className="w-full">
                 ↷ Redo
               </Button>
-            </div>
-            
-            <div className="flex gap-2 items-center">
               <Button
-                size="sm"
-                variant={snapToGrid ? 'default' : 'outline'}
                 onClick={() => {
-                  setSnapToGrid(!snapToGrid);
-                  toast.info(`Snap to Grid: ${!snapToGrid ? 'ON' : 'OFF'}`);
+                  const data = { walls, rooms, floors, doors, windows, furniture };
+                  onSave(data);
                 }}
+                className="col-span-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow"
               >
-                🧲 Snap: {snapToGrid ? 'ON' : 'OFF'}
-              </Button>
-              
-              <Button
-                size="sm"
-                variant={showGrid ? 'default' : 'outline'}
-                onClick={() => {
-                  setShowGrid(!showGrid);
-                  toast.info(`Griglia: ${!showGrid ? 'Visibile' : 'Nascosta'}`);
-                }}
-              >
-                📐 Griglia: {showGrid ? 'ON' : 'OFF'}
+                <Save className="w-4 h-4 mr-2" /> Salva Progetto
               </Button>
             </div>
-          </div>
-          
-          {/* Zoom Controls - Nuovo */}
-          <Card className="p-3 bg-purple-50 border-purple-200">
-            <h4 className="font-semibold text-purple-900 mb-2 text-sm">🔍 Controlli Vista Canvas</h4>
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  const newZoom = Math.max(0.5, canvasZoom - 0.1);
-                  setCanvasZoom(newZoom);
-                  toast.info(`Zoom: ${(newZoom * 100).toFixed(0)}%`);
-                }}
-                disabled={canvasZoom <= 0.5}
-              >
-                🔍-
-              </Button>
-              <span className="text-xs font-mono bg-white px-2 py-1 rounded border">
-                {(canvasZoom * 100).toFixed(0)}%
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  const newZoom = Math.min(2, canvasZoom + 0.1);
-                  setCanvasZoom(newZoom);
-                  toast.info(`Zoom: ${(newZoom * 100).toFixed(0)}%`);
-                }}
-                disabled={canvasZoom >= 2}
-              >
-                🔍+
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setCanvasZoom(1);
-                  toast.info('Zoom reset a 100%');
-                }}
-              >
-                ↺ Reset
-              </Button>
+
+            {/* Drawing Modes */}
+            <div className="space-y-3">
+              <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Modalità Disegno</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  onClick={() => setMode('view')}
+                  variant={mode === 'view' ? 'default' : 'outline'}
+                  className={`w-full justify-start ${mode === 'view' ? 'bg-slate-800 text-white hover:bg-slate-900' : ''}`}
+                >
+                  <Move className="w-4 h-4 mr-2" /> Seleziona
+                </Button>
+                <Button
+                  onClick={() => setMode('move')}
+                  variant={mode === 'move' ? 'default' : 'outline'}
+                  className={`w-full justify-start ${mode === 'move' ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}`}
+                >
+                  <span className="mr-2">🖐️</span> Sposta
+                </Button>
+                <Button
+                  onClick={() => setMode('wall')}
+                  variant={mode === 'wall' ? 'default' : 'outline'}
+                  className={`col-span-2 w-full justify-start h-12 ${mode === 'wall' ? 'bg-blue-600 text-white hover:bg-blue-700 ring-2 ring-blue-200' : ''}`}
+                >
+                  <Grid3x3 className="w-5 h-5 mr-3" />
+                  <div className="flex flex-col items-start">
+                    <span>Muri</span>
+                    <span className="text-[10px] opacity-80 font-normal">Disegna stanze • "W"</span>
+                  </div>
+                </Button>
+                <Button
+                  onClick={() => setMode('room')}
+                  variant={mode === 'room' ? 'default' : 'outline'}
+                  className={`col-span-2 w-full justify-start ${mode === 'room' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : ''}`}
+                >
+                  <Square className="w-4 h-4 mr-2" /> Stanza Rettangolare
+                </Button>
+              </div>
             </div>
-            <p className="text-xs text-purple-700 mt-2">
-              💡 Usa zoom per vedere meglio i dettagli della piantina
-            </p>
-          </Card>
-          
-          <div className="grid grid-cols-4 gap-2">
-            <Button
-              onClick={() => setMode('view')}
-              variant={mode === 'view' ? 'default' : 'outline'}
-              className="w-full text-xs px-1"
-            >
-              <Move className="w-3 h-3 mr-1" />
-              Seleziona
-            </Button>
-            <Button
-              onClick={() => setMode('move')}
-              variant={mode === 'move' ? 'default' : 'outline'}
-              className="w-full text-xs px-1"
-            >
-              🖐️ Sposta
-            </Button>
-            <Button
-              onClick={() => setMode('wall')}
-              variant={mode === 'wall' ? 'default' : 'outline'}
-              className="w-full text-xs px-1"
-            >
-              <Grid3x3 className="w-3 h-3 mr-1" />
-              Muro
-            </Button>
-            <Button
-              onClick={() => setMode('room')}
-              variant={mode === 'room' ? 'default' : 'outline'}
-              className="w-full text-xs px-1"
-            >
-              <Square className="w-3 h-3 mr-1" />
-              Stanza
-            </Button>
-          </div>
-          
-          {mode === 'wall' && (
-            <div className="bg-slate-50 p-3 rounded-lg space-y-3">
-              <p className="text-sm text-slate-800">
-                🧱 <strong>Muro:</strong> Clicca punto iniziale, poi clicca punto finale.
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm">Colore Muro:</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <input
-                      type="color"
-                      value={wallColor}
-                      onChange={(e) => setWallColor(e.target.value)}
-                      className="w-12 h-8 rounded border-2 cursor-pointer"
-                    />
-                    <span className="text-xs text-slate-600">{wallColor}</span>
+
+            {/* Contextual Properties (Wall Settings) */}
+            {mode === 'wall' && (
+              <Card className="p-3 bg-blue-50 border-blue-200 animate-in fade-in slide-in-from-top-2">
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="text-sm font-semibold text-blue-900">Impostazioni Muro</h4>
+                  <div className="flex gap-2">
+                    <div
+                      className="w-6 h-6 rounded border cursor-pointer"
+                      style={{ backgroundColor: wallColor }}
+                      title="Colore Muro"
+                    >
+                      <input
+                        type="color"
+                        value={wallColor}
+                        onChange={(e) => setWallColor(e.target.value)}
+                        className="opacity-0 w-full h-full cursor-pointer"
+                      />
+                    </div>
                   </div>
                 </div>
-                
-                <div>
-                  <Label className="text-sm">Spessore Muro: {wallThickness}cm</Label>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs text-blue-700">
+                    <span>Spessore: <strong>{wallThickness}cm</strong></span>
+                  </div>
                   <input
                     type="range"
                     min="10"
@@ -679,616 +638,285 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                     step="5"
                     value={wallThickness}
                     onChange={(e) => setWallThickness(parseInt(e.target.value))}
-                    className="w-full mt-1"
+                    className="w-full accent-blue-600 h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
                   />
-                  <div className="flex justify-between text-xs text-slate-500 mt-1">
+                  <div className="flex justify-between text-[10px] text-blue-400">
                     <span>10cm</span>
                     <span>50cm</span>
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-          
-          {mode === 'move' && (
-            <div className="bg-purple-50 p-3 rounded-lg">
-              <p className="text-sm text-purple-800">
-                🖐️ <strong>Modalità Sposta:</strong> Clicca e trascina qualsiasi elemento!
-              </p>
-            </div>
-          )}
-          
-          {/* Scale Calibration */}
-          <Card className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 shadow-md">
-            <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2">
-              📏 Calibrazione Scala
-              <span className="text-xs bg-amber-200 px-2 py-1 rounded-full font-normal">Importante</span>
-            </h4>
-            <p className="text-xs text-amber-800 mb-3 leading-relaxed">
-              <strong>Stile Homestyler:</strong> Traccia una linea su una dimensione nota della planimetria (es: larghezza porta, lunghezza parete) e inserisci la misura reale per calibrare tutto l&apos;editor.
-            </p>
-            
-            {!isCalibrating ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm">Scala attuale:</Label>
-                  <span className="text-sm font-mono bg-white px-2 py-1 rounded">
-                    {(1 / scale).toFixed(1)} px = 1 cm
-                  </span>
+
+                <div className="mt-3 text-[10px] text-blue-800 bg-blue-100 p-2 rounded leading-tight">
+                  💡 <strong>Tip:</strong> Clicca per iniziare, muovi il mouse, clicca per aggiungere angoli. <strong>Esc</strong> per finire.
                 </div>
-                <Button
-                  onClick={() => {
+              </Card>
+            )}
+
+            {/* Selected Item Actions */}
+            {selectedId && (
+              <div className="space-y-2 pt-4 border-t">
+                <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Azioni Selezione</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button onClick={copySelected} variant="outline" size="sm" className="w-full">
+                    📋 Copia
+                  </Button>
+                  <Button onClick={duplicateSelected} variant="outline" size="sm" className="w-full">
+                    📑 Duplica
+                  </Button>
+                  <Button onClick={deleteSelected} variant="destructive" size="sm" className="col-span-2 w-full">
+                    <Trash2 className="w-4 h-4 mr-2" /> Elimina
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {clipboard && !selectedId && (
+              <Button onClick={pasteElement} variant="secondary" className="w-full border-dashed border-2">
+                📋 Incolla Ultimo Elemento
+              </Button>
+            )}
+
+            {/* Calibration Compact */}
+            <div className="pt-4 border-t">
+              <Button
+                variant={isCalibrating ? "destructive" : "ghost"}
+                size="sm"
+                className="w-full justify-start text-amber-700 hover:text-amber-800 hover:bg-amber-50"
+                onClick={() => {
+                  if (isCalibrating) {
+                    setIsCalibrating(false);
+                    setCalibrationStart(null);
+                    setCalibrationEnd(null);
+                  } else {
                     setIsCalibrating(true);
                     setCalibrationStart(null);
                     setCalibrationEnd(null);
-                    toast.info('Clicca su due punti della planimetria per calibrare');
-                  }}
-                  className="w-full"
-                >
-                  🎯 Avvia Calibrazione
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {!calibrationStart && (
-                  <p className="text-sm text-amber-800">
-                    📍 <strong>Step 1:</strong> Clicca sul primo punto della linea di riferimento
-                  </p>
-                )}
-                {calibrationStart && !calibrationEnd && (
-                  <p className="text-sm text-amber-800">
-                    📍 <strong>Step 2:</strong> Clicca sul secondo punto
-                  </p>
-                )}
-                {calibrationStart && calibrationEnd && (
-                  <div className="space-y-3">
-                    <div className="bg-amber-100 border border-amber-300 rounded p-3">
-                      <p className="text-xs font-semibold text-amber-900 mb-1">📏 Distanza tracciata:</p>
-                      <p className="text-lg font-bold text-amber-800">
-                        {Math.sqrt(
-                          Math.pow(calibrationEnd.x - calibrationStart.x, 2) + 
-                          Math.pow(calibrationEnd.y - calibrationStart.y, 2)
-                        ).toFixed(0)} pixel
-                      </p>
+                    toast.info('Clicca su due punti per calibrare');
+                  }
+                }}
+              >
+                <span className="mr-2">📏</span> {isCalibrating ? "Annulla Calibrazione" : "Calibra Scala"}
+              </Button>
+              {isCalibrating && (
+                <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200 text-xs text-amber-800">
+                  {!calibrationStart ? "1. Clicca primo punto" : !calibrationEnd ? "2. Clicca secondo punto" : "3. Imposta distanza reale"}
+                  {calibrationStart && calibrationEnd && (
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        type="number"
+                        value={calibrationRealLength}
+                        onChange={(e) => setCalibrationRealLength(parseFloat(e.target.value))}
+                        className="w-16 px-1 py-0.5 border rounded text-xs"
+                      />
+                      <select className="text-xs border rounded" onChange={(e) => {
+                        if (e.target.value === 'm') setCalibrationRealLength(calibrationRealLength / 100);
+                        else if (e.target.value === 'cm' && calibrationRealLength < 10) setCalibrationRealLength(calibrationRealLength * 100);
+                      }}>
+                        <option value="cm">cm</option>
+                        <option value="m">m</option>
+                      </select>
+                      <Button size="xs" className="h-6 text-[10px]" onClick={() => {
+                        const pixelLength = Math.sqrt(Math.pow(calibrationEnd.x - calibrationStart.x, 2) + Math.pow(calibrationEnd.y - calibrationStart.y, 2));
+                        const newScale = pixelLength / calibrationRealLength;
+                        setScale(newScale);
+                        setIsCalibrating(false);
+                        setCalibrationStart(null);
+                        setCalibrationEnd(null);
+                        toast.success("Calibrato!");
+                      }}>OK</Button>
                     </div>
-                    
-                    <div>
-                      <Label className="text-sm font-semibold">Lunghezza reale di questa distanza:</Label>
-                      <div className="flex gap-2 mt-2">
-                        <div className="flex-1">
-                          <input
-                            type="number"
-                            value={calibrationRealLength}
-                            onChange={(e) => setCalibrationRealLength(parseFloat(e.target.value))}
-                            className="w-full px-3 py-2 border-2 border-amber-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                            min="1"
-                            step="10"
-                            placeholder="es: 300"
-                          />
-                        </div>
-                        <select 
-                          className="px-3 py-2 border-2 border-amber-400 rounded-lg"
-                          onChange={(e) => {
-                            if (e.target.value === 'm') {
-                              setCalibrationRealLength(calibrationRealLength / 100);
-                            } else if (e.target.value === 'cm' && calibrationRealLength < 10) {
-                              setCalibrationRealLength(calibrationRealLength * 100);
-                            }
-                          }}
-                        >
-                          <option value="cm">cm</option>
-                          <option value="m">m</option>
-                        </select>
-                      </div>
-                      <p className="text-xs text-amber-700 mt-1">
-                        💡 Es: se hai tracciato una porta standard, inserisci 90cm o 0.9m
-                      </p>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={() => {
-                          const pixelLength = Math.sqrt(
-                            Math.pow(calibrationEnd.x - calibrationStart.x, 2) + 
-                            Math.pow(calibrationEnd.y - calibrationStart.y, 2)
-                          );
-                          const newScale = pixelLength / calibrationRealLength;
-                          setScale(newScale);
-                          setIsCalibrating(false);
-                          setCalibrationStart(null);
-                          setCalibrationEnd(null);
-                          toast.success(`✅ Scala calibrata! 1cm = ${(1/newScale).toFixed(2)}px`);
-                        }}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold"
-                      >
-                        ✅ Applica e Salva
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          setIsCalibrating(false);
-                          setCalibrationStart(null);
-                          setCalibrationEnd(null);
-                          toast.info('Calibrazione annullata');
-                        }}
-                        variant="outline"
-                        className="border-2"
-                      >
-                        ❌ Annulla
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-          
-          {/* Image Background Controls */}
-          {floorPlanImage && backgroundImg && (
-            <Card className="p-4 bg-blue-50 border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-2">🖼️ Controlli Immagine di Sfondo</h4>
-              <p className="text-xs text-blue-700 mb-3">
-                💡 <strong>Suggerimento:</strong> Usa questi controlli per allineare la planimetria con la griglia!
-              </p>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-sm">Scala Immagine</Label>
-                  <div className="flex gap-2 items-center mt-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setImageScale(Math.max(0.1, imageScale - 0.1))}
-                    >
-                      -
-                    </Button>
-                    <input
-                      type="range"
-                      min="0.1"
-                      max="3"
-                      step="0.1"
-                      value={imageScale}
-                      onChange={(e) => setImageScale(parseFloat(e.target.value))}
-                      className="flex-1"
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setImageScale(Math.min(3, imageScale + 0.1))}
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <p className="text-xs text-blue-600 mt-1 text-center">{(imageScale * 100).toFixed(0)}%</p>
-                </div>
-                
-                <div>
-                  <Label className="text-sm">Opacità</Label>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="1"
-                    step="0.1"
-                    value={imageOpacity}
-                    onChange={(e) => setImageOpacity(parseFloat(e.target.value))}
-                    className="w-full mt-1"
-                  />
-                  <p className="text-xs text-blue-600 mt-1">{(imageOpacity * 100).toFixed(0)}%</p>
-                </div>
-                
-                <div>
-                  <Label className="text-sm">Posizione</Label>
-                  <div className="flex gap-1 mt-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setImagePosition({ ...imagePosition, x: imagePosition.x - 10 })}
-                    >
-                      ←
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setImagePosition({ ...imagePosition, x: imagePosition.x + 10 })}
-                    >
-                      →
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setImagePosition({ ...imagePosition, y: imagePosition.y - 10 })}
-                    >
-                      ↑
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setImagePosition({ ...imagePosition, y: imagePosition.y + 10 })}
-                    >
-                      ↓
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        if (backgroundImg) {
-                          // Auto-fit con 60% massimo per dare spazio al disegno
-                          const scaleX = canvasWidth / backgroundImg.width;
-                          const scaleY = canvasHeight / backgroundImg.height;
-                          const autoScale = Math.min(scaleX, scaleY, 0.6);
-                          setImageScale(autoScale);
-                          
-                          const centeredX = (canvasWidth - backgroundImg.width * autoScale) / 2;
-                          const centeredY = (canvasHeight - backgroundImg.height * autoScale) / 2;
-                          setImagePosition({ x: centeredX, y: centeredY });
-                          setImageOpacity(0.5);
-                          toast.success('Immagine adattata al 60% - ideale per disegnare');
-                        }
-                      }}
-                      title="Adatta immagine al canvas (60%)"
-                    >
-                      📐 Fit 60%
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          )}
-          
-          {/* Measurements Controls */}
-          <Card className="p-4 bg-indigo-50 border-indigo-200">
-            <h4 className="font-semibold text-indigo-900 mb-2">📐 Controlli Misure</h4>
-            <p className="text-xs text-indigo-700 mb-3">
-              Mostra/nascondi le dimensioni degli elementi in tempo reale
-            </p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm">Mostra Misure:</Label>
-                <Button
-                  size="sm"
-                  variant={showMeasurements ? 'default' : 'outline'}
-                  onClick={() => {
-                    setShowMeasurements(!showMeasurements);
-                    toast.info(`Misure: ${!showMeasurements ? 'Visibili' : 'Nascoste'}`);
-                  }}
-                  className={showMeasurements ? 'bg-indigo-600' : ''}
-                >
-                  {showMeasurements ? '✅ Attivo' : '❌ Disattivo'}
-                </Button>
-              </div>
-              
-              {showMeasurements && (
-                <div>
-                  <Label className="text-sm mb-2 block">Unità di Misura:</Label>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={measurementUnit === 'cm' ? 'default' : 'outline'}
-                      onClick={() => setMeasurementUnit('cm')}
-                      className="flex-1"
-                    >
-                      cm
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={measurementUnit === 'm' ? 'default' : 'outline'}
-                      onClick={() => setMeasurementUnit('m')}
-                      className="flex-1"
-                    >
-                      m
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={measurementUnit === 'auto' ? 'default' : 'outline'}
-                      onClick={() => setMeasurementUnit('auto')}
-                      className="flex-1"
-                    >
-                      Auto
-                    </Button>
-                  </div>
-                  <p className="text-xs text-indigo-600 mt-2">
-                    {measurementUnit === 'auto' ? 'Auto: cm per <100cm, m altrimenti' : `Sempre in ${measurementUnit}`}
-                  </p>
+                  )}
                 </div>
               )}
             </div>
-          </Card>
-          
-          {/* Keyboard Shortcuts Help */}
-          <div className="bg-slate-50 p-3 rounded-lg">
-            <p className="text-xs font-semibold text-slate-700 mb-1">⌨️ Scorciatoie:</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-slate-600">
-              <span><kbd className="bg-white px-1 rounded">V</kbd> Seleziona</span>
-              <span><kbd className="bg-white px-1 rounded">S</kbd> Sposta</span>
-              <span><kbd className="bg-white px-1 rounded">W</kbd> Muro</span>
-              <span><kbd className="bg-white px-1 rounded">G</kbd> Toggle Snap</span>
-              <span><kbd className="bg-white px-1 rounded">Ctrl+Z</kbd> Undo</span>
-              <span><kbd className="bg-white px-1 rounded">Ctrl+Y</kbd> Redo</span>
-              <span><kbd className="bg-white px-1 rounded">Ctrl+C</kbd> Copia</span>
-              <span><kbd className="bg-white px-1 rounded">Ctrl+V</kbd> Incolla</span>
-              <span><kbd className="bg-white px-1 rounded">Ctrl+D</kbd> Duplica</span>
-              <span><kbd className="bg-white px-1 rounded">Canc</kbd> Elimina</span>
-            </div>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="library" className="space-y-4">
-          {/* Search Bar */}
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Cerca elementi... (es: divano, tavolo, porta)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*';
-                input.onchange = (e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                      const newCustom = {
-                        id: `custom-${Date.now()}`,
-                        name: file.name.split('.')[0],
-                        imageUrl: event.target.result,
-                        width: 100,
-                        depth: 100,
-                        icon: '🖼️',
-                        isCustom: true
-                      };
-                      setCustomElements([...customElements, newCustom]);
-                      toast.success('Elemento custom aggiunto!');
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                };
-                input.click();
-              }}
-              title="Carica elemento personalizzato"
-            >
-              <Upload className="w-4 h-4 mr-1" />
-              Carica
-            </Button>
-          </div>
-          
-          {/* Category Filter */}
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              size="sm"
-              variant={selectedCategory === 'all' ? 'default' : 'outline'}
-              onClick={() => setSelectedCategory('all')}
-            >
-              Tutti
-            </Button>
-            {Object.keys(EXTENDED_LIBRARY).map(catKey => (
-              <Button
-                key={catKey}
-                size="sm"
-                variant={selectedCategory === catKey ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory(catKey)}
-              >
-                {EXTENDED_LIBRARY[catKey].icon} {EXTENDED_LIBRARY[catKey].name}
+
+          </TabsContent>
+
+          {/* TAB LIBRARY */}
+          <TabsContent value="library" className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Search Bar */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Cerca..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => document.getElementById('custom-upload').click()}>
+                <Upload className="w-3.5 h-3.5" />
               </Button>
-            ))}
-            {customElements.length > 0 && (
-              <Button
-                size="sm"
-                variant={selectedCategory === 'custom' ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory('custom')}
+              <input id="custom-upload" type="file" className="hidden" accept="image/*" onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => {
+                    setCustomElements([...customElements, {
+                      id: `custom-${Date.now()}`, name: file.name.split('.')[0], imageUrl: ev.target.result, width: 100, depth: 100, icon: '🖼️', isCustom: true
+                    }]);
+                  };
+                  reader.readAsDataURL(file);
+                }
+              }} />
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex gap-1 flex-wrap">
+              <span
+                onClick={() => setSelectedCategory('all')}
+                className={`cursor-pointer px-2 py-1 rounded-full text-[10px] border ${selectedCategory === 'all' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
               >
-                🖼️ Custom ({customElements.length})
-              </Button>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            {/* Custom Elements */}
-            {selectedCategory === 'custom' && customElements.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  🖼️ Elementi Personalizzati
-                </h4>
-                <div className="grid grid-cols-4 gap-2">
+                Tutti
+              </span>
+              {Object.keys(EXTENDED_LIBRARY).map(catKey => (
+                <span
+                  key={catKey}
+                  onClick={() => setSelectedCategory(catKey)}
+                  className={`cursor-pointer px-2 py-1 rounded-full text-[10px] border ${selectedCategory === catKey ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
+                >
+                  {EXTENDED_LIBRARY[catKey].name}
+                </span>
+              ))}
+            </div>
+
+            {/* Library Grid */}
+            <div className="space-y-4 pb-4">
+              {/* Custom Elements */}
+              {selectedCategory === 'custom' && customElements.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
                   {customElements.map(item => (
-                    <Button
-                      key={item.id}
-                      variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
-                      onClick={() => { 
-                        setSelectedLibraryItem(item); 
-                        setMode('furniture'); 
-                      }}
-                      className="h-auto flex-col py-3 relative"
-                    >
-                      <span className="text-2xl mb-1">{item.icon}</span>
-                      <span className="text-xs text-center truncate w-full">{item.name}</span>
-                    </Button>
+                    <div key={item.id} onClick={() => { setSelectedLibraryItem(item); setMode('furniture'); }}
+                      className={`cursor-pointer border rounded p-2 flex flex-col items-center hover:bg-slate-50 ${selectedLibraryItem?.id === item.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''}`}>
+                      <span className="text-xl">{item.icon}</span>
+                      <span className="text-[10px] mt-1 text-center truncate w-full">{item.name}</span>
+                    </div>
                   ))}
                 </div>
-              </div>
-            )}
-            
-            {/* Extended Library Categories */}
-            {(selectedCategory === 'all' || Object.keys(EXTENDED_LIBRARY).includes(selectedCategory)) && 
-              Object.keys(EXTENDED_LIBRARY)
-                .filter(catKey => selectedCategory === 'all' || selectedCategory === catKey)
-                .filter(catKey => {
-                  if (!searchQuery) return true;
-                  const category = EXTENDED_LIBRARY[catKey];
-                  return category.items.some(item => 
-                    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                })
-                .map(catKey => {
-                  const category = EXTENDED_LIBRARY[catKey];
-                  const filteredItems = category.items.filter(item => 
-                    !searchQuery || item.name.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                  
-                  if (filteredItems.length === 0) return null;
-                  
-                  return (
-                    <div key={catKey}>
-                      <h4 className="font-semibold mb-2 flex items-center gap-2">
-                        {category.icon} {category.name} ({filteredItems.length})
-                      </h4>
-                      <div className="grid grid-cols-4 gap-2">
-                        {filteredItems.map(item => (
-                          <Button
-                            key={item.id}
-                            variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
-                            onClick={() => { 
-                              setSelectedLibraryItem({ ...item, category: catKey }); 
-                              setMode(catKey === 'floors' ? 'floor' : catKey === 'doors_windows' ? 'door' : 'furniture'); 
-                            }}
-                            className="h-auto flex-col py-2 text-xs"
-                            style={{
-                              backgroundColor: selectedLibraryItem?.id === item.id ? undefined : 
-                                item.color ? item.color + '20' : undefined,
-                              borderColor: item.color
-                            }}
-                          >
-                            <span className="text-xl mb-1">{item.icon}</span>
-                            <span className="text-xs text-center leading-tight">{item.name}</span>
-                            {(item.width && item.depth) && (
-                              <span className="text-[10px] text-slate-500 mt-0.5">
-                                {item.width}x{item.depth}cm
-                              </span>
-                            )}
-                          </Button>
-                        ))}
+              )}
+
+              {/* Standard Library */}
+              {(selectedCategory === 'all' || Object.keys(EXTENDED_LIBRARY).includes(selectedCategory)) &&
+                Object.keys(EXTENDED_LIBRARY)
+                  .filter(catKey => selectedCategory === 'all' || selectedCategory === catKey)
+                  .map(catKey => {
+                    const category = EXTENDED_LIBRARY[catKey];
+                    const filtered = category.items.filter(i => !searchQuery || i.name.toLowerCase().includes(searchQuery.toLowerCase()));
+                    if (!filtered.length) return null;
+                    return (
+                      <div key={catKey}>
+                        <h5 className="text-xs font-bold text-slate-400 mb-2 uppercase">{category.name}</h5>
+                        <div className="grid grid-cols-3 gap-2">
+                          {filtered.map(item => (
+                            <div
+                              key={item.id}
+                              onClick={() => { setSelectedLibraryItem({ ...item, category: catKey }); setMode(catKey === 'floors' ? 'floor' : catKey === 'doors_windows' ? 'door' : 'furniture'); }}
+                              className={`cursor-pointer border rounded p-2 flex flex-col items-center transition-all hover:scale-105 ${selectedLibraryItem?.id === item.id ? 'ring-2 ring-blue-500 bg-blue-50' : 'bg-white hover:border-blue-300'}`}
+                            >
+                              <span className="text-2xl">{item.icon}</span>
+                              <span className="text-[10px] mt-1 text-center leading-tight">{item.name}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
-            }
-            
-            {/* OLD LIBRARY - Mantengo per compatibilità ma nascosto */}
-            <div className="hidden">
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                🟫 Pavimenti
-              </h4>
-              <div className="grid grid-cols-3 gap-2">
-                {ELEMENT_LIBRARY.floors.map(item => (
-                  <Button
-                    key={item.id}
-                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
-                    onClick={() => { 
-                      setSelectedLibraryItem(item); 
-                      setMode('floor'); 
-                    }}
-                    className="h-auto flex-col py-3"
-                    style={{
-                      backgroundColor: selectedLibraryItem?.id === item.id ? undefined : item.color + '20',
-                      borderColor: item.color
-                    }}
-                  >
-                    <span className="text-2xl mb-1">{item.icon}</span>
-                    <span className="text-xs text-center">{item.name}</span>
-                  </Button>
-                ))}
-              </div>
+                    )
+                  })
+              }
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* MAIN WORKSPACE - Canvas & Floating Controls */}
+      <div className="flex-1 relative bg-slate-100 overflow-hidden cursor-crosshair">
+
+        {/* TOP RIGHT - VIEW CONTROLS */}
+        <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 p-2 bg-white/90 backdrop-blur shadow-sm border rounded-lg">
+          <div className="flex items-center gap-1">
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setCanvasZoom(Math.min(2, canvasZoom + 0.1))}><span className="text-lg">+</span></Button>
+            <span className="text-xs font-mono w-8 text-center">{(canvasZoom * 100).toFixed(0)}%</span>
+            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setCanvasZoom(Math.max(0.5, canvasZoom - 0.1))}><span className="text-lg">-</span></Button>
+          </div>
+          <div className="h-px bg-slate-200 my-1"></div>
+          <Button
+            size="sm"
+            variant={snapToGrid ? "secondary" : "ghost"}
+            className={`h-8 justify-start text-xs ${snapToGrid ? 'bg-blue-100 text-blue-700' : ''}`}
+            onClick={() => { setSnapToGrid(!snapToGrid); toast.info(`Snap: ${!snapToGrid ? 'ON' : 'OFF'}`); }}
+          >
+            <span className="mr-2">🧲</span> Snap
+          </Button>
+          <Button
+            size="sm"
+            variant={showGrid ? "secondary" : "ghost"}
+            className={`h-8 justify-start text-xs ${showGrid ? 'bg-blue-100 text-blue-700' : ''}`}
+            onClick={() => setShowGrid(!showGrid)}
+          >
+            <span className="mr-2">#</span> Grid
+          </Button>
+          <Button
+            size="sm"
+            variant={showMeasurements ? "secondary" : "ghost"}
+            className={`h-8 justify-start text-xs ${showMeasurements ? 'bg-blue-100 text-blue-700' : ''}`}
+            onClick={() => setShowMeasurements(!showMeasurements)}
+          >
+            <span className="mr-2">📏</span> Misure
+          </Button>
+        </div>
+
+        {/* TOP CENTER - IMAGE CONTROLS (Floating HUD) */}
+        {backgroundImg && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 bg-white/90 backdrop-blur shadow-md border rounded-full px-4 py-2 flex items-center gap-4 transition-all hover:bg-white hover:shadow-lg">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500 uppercase">Sfondo</span>
+              <div className="h-4 w-px bg-slate-300 mx-1"></div>
             </div>
 
-            {/* Porte */}
-            <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <DoorOpen className="w-4 h-4" /> Porte
-              </h4>
-              <div className="grid grid-cols-3 gap-2">
-                {ELEMENT_LIBRARY.doors.map(item => (
-                  <Button
-                    key={item.id}
-                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
-                    onClick={() => { 
-                      setSelectedLibraryItem(item); 
-                      setMode('door'); 
-                    }}
-                    className="h-auto flex-col py-3"
-                  >
-                    <span className="text-2xl mb-1">{item.icon}</span>
-                    <span className="text-xs text-center">{item.name}</span>
-                    <span className="text-xs text-slate-500">{item.width}cm</span>
-                  </Button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 group">
+              <span className="text-xs text-slate-400 group-hover:text-blue-500">👁️</span>
+              <input
+                type="range" min="0" max="1" step="0.1"
+                value={imageOpacity} onChange={(e) => setImageOpacity(parseFloat(e.target.value))}
+                className="w-20 accent-blue-500 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+              />
             </div>
 
-            {/* Finestre */}
-            <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <Maximize2 className="w-4 h-4" /> Finestre
-              </h4>
-              <div className="grid grid-cols-3 gap-2">
-                {ELEMENT_LIBRARY.windows.map(item => (
-                  <Button
-                    key={item.id}
-                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
-                    onClick={() => { 
-                      setSelectedLibraryItem(item); 
-                      setMode('window'); 
-                    }}
-                    className="h-auto flex-col py-3"
-                  >
-                    <span className="text-2xl mb-1">{item.icon}</span>
-                    <span className="text-xs text-center">{item.name}</span>
-                    <span className="text-xs text-slate-500">{item.width}cm</span>
-                  </Button>
-                ))}
-              </div>
+            <div className="flex items-center gap-2 group">
+              <span className="text-xs text-slate-400 group-hover:text-blue-500">🔍</span>
+              <input
+                type="range" min="0.1" max="3" step="0.05"
+                value={imageScale} onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                className="w-20 accent-blue-500 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+              />
             </div>
 
-            {/* Mobili */}
-            <div>
-              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                🛋️ Arredamento
-              </h4>
-              <div className="grid grid-cols-3 gap-2">
-                {ELEMENT_LIBRARY.furniture.map(item => (
-                  <Button
-                    key={item.id}
-                    variant={selectedLibraryItem?.id === item.id ? 'default' : 'outline'}
-                    onClick={() => { 
-                      setSelectedLibraryItem(item); 
-                      setMode('furniture'); 
-                    }}
-                    className="h-auto flex-col py-3"
-                  >
-                    <span className="text-2xl mb-1">{item.icon}</span>
-                    <span className="text-xs text-center">{item.name}</span>
-                    <span className="text-xs text-slate-500">{item.width}x{item.depth}cm</span>
-                  </Button>
-                ))}
-              </div>
+            <div className="flex items-center gap-1">
+              <Button size="icon" variant="ghost" className="h-6 w-6 rounded-full" onClick={() => setImagePosition({ x: imagePosition.x - 10, y: imagePosition.y })}>←</Button>
+              <Button size="icon" variant="ghost" className="h-6 w-6 rounded-full" onClick={() => setImagePosition({ x: imagePosition.x, y: imagePosition.y - 10 })}>↑</Button>
+              <Button size="icon" variant="ghost" className="h-6 w-6 rounded-full" onClick={() => setImagePosition({ x: imagePosition.x, y: imagePosition.y + 10 })}>↓</Button>
+              <Button size="icon" variant="ghost" className="h-6 w-6 rounded-full" onClick={() => setImagePosition({ x: imagePosition.x + 10, y: imagePosition.y })}>→</Button>
             </div>
           </div>
-          
-          {/* Info quando elemento selezionato */}
-          {selectedLibraryItem && (
-            <div className="bg-green-50 p-3 rounded-lg mt-4">
-              <p className="text-sm text-green-800">
-                ✅ <strong>{selectedLibraryItem.name}</strong> selezionato. Clicca sul canvas per posizionare.
-              </p>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-      
-      {/* Konva Stage */}
-      <div className="border-2 border-slate-300 rounded-lg overflow-hidden bg-white mt-4 shadow-lg">
+        )}
+
+        {/* BOTTOM RIGHT - ZOOM RESET */}
+        <div className="absolute bottom-4 right-4 z-20">
+          <Button size="sm" variant="outline" className="bg-white shadow-sm" onClick={() => setCanvasZoom(1)}>
+            Reset Vista
+          </Button>
+        </div>
+
+        {/* KONVA STAGE */}
         <Stage
           width={canvasWidth}
           height={canvasHeight}
+
           ref={stageRef}
           onClick={handleStageClick}
           onMouseDown={handleStageMouseDown}
+          onMouseMove={handleStageMouseMove}
           onMouseUp={handleStageMouseUp}
           scaleX={canvasZoom}
           scaleY={canvasZoom}
@@ -1305,7 +933,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 opacity={imageOpacity}
               />
             )}
-            
+
             {/* Grid - Carta Millimetrata Style */}
             {showGrid && (
               <>
@@ -1330,7 +958,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                     listening={false}
                   />
                 ))}
-                
+
                 {/* Linee medie ogni 100px (griglia principale) */}
                 {Array.from({ length: Math.ceil(canvasWidth / 100) + 1 }, (_, i) => (
                   <Line
@@ -1352,7 +980,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                     listening={false}
                   />
                 ))}
-                
+
                 {/* Labels per griglia ogni 500px */}
                 {Array.from({ length: Math.ceil(canvasWidth / 500) + 1 }, (_, i) => (
                   <Text
@@ -1378,7 +1006,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 ))}
               </>
             )}
-            
+
             {/* Floors */}
             {floors.map((floor) => (
               <Rect
@@ -1406,7 +1034,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 shadowColor={selectedId === floor.id ? 'rgba(59, 130, 246, 0.6)' : 'transparent'}
               />
             ))}
-            
+
             {/* Doors */}
             {doors.map((door) => (
               <Rect
@@ -1434,7 +1062,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 shadowColor={selectedId === door.id ? 'rgba(34, 197, 94, 0.5)' : 'transparent'}
               />
             ))}
-            
+
             {/* Windows */}
             {windows.map((window) => (
               <Rect
@@ -1462,7 +1090,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 shadowColor={selectedId === window.id ? 'rgba(59, 130, 246, 0.5)' : 'transparent'}
               />
             ))}
-            
+
             {/* Furniture */}
             {furniture.map((item) => (
               <Rect
@@ -1490,7 +1118,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 shadowColor={selectedId === item.id ? 'rgba(168, 85, 247, 0.5)' : 'transparent'}
               />
             ))}
-            
+
             {/* Walls */}
             {walls.map((wall) => (
               <Group key={`wall-group-${wall.id}`}>
@@ -1503,7 +1131,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   onClick={() => setSelectedId(wall.id)}
                   hitStrokeWidth={30}
                 />
-                
+
                 {/* Actual visible wall */}
                 <Line
                   points={wall.points}
@@ -1518,7 +1146,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                         const node = e.target;
                         return {
                           ...w,
-                          points: w.points.map((p, i) => 
+                          points: w.points.map((p, i) =>
                             i % 2 === 0 ? p + node.x() : p + node.y()
                           )
                         };
@@ -1533,7 +1161,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   shadowColor={selectedId === wall.id ? '#ef4444' : 'transparent'}
                   listening={mode !== 'move'}
                 />
-                
+
                 {/* Selection handles for selected wall */}
                 {selectedId === wall.id && (
                   <>
@@ -1560,7 +1188,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                       }}
                       onDragEnd={() => saveToHistory()}
                     />
-                    
+
                     {/* End point handle */}
                     <Circle
                       x={wall.points[2]}
@@ -1588,7 +1216,47 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 )}
               </Group>
             ))}
-            
+
+            {/* Wall Drawing Preview Line */}
+            {isDrawing && drawStart && tempEnd && (
+              <>
+                <Line
+                  points={[drawStart.x, drawStart.y, tempEnd.x, tempEnd.y]}
+                  stroke="#3b82f6"
+                  strokeWidth={wallThickness * scale * 0.5}
+                  dash={[10, 5]}
+                  opacity={0.7}
+                />
+                <Circle
+                  x={tempEnd.x}
+                  y={tempEnd.y}
+                  radius={5}
+                  fill="#3b82f6"
+                  opacity={0.5}
+                />
+                {/* Length label for preview */}
+                {showMeasurements && (
+                  <Text
+                    x={(drawStart.x + tempEnd.x) / 2}
+                    y={(drawStart.y + tempEnd.y) / 2 - 20}
+                    text={formatMeasurement(
+                      pixelsToRealUnit(
+                        Math.sqrt(
+                          Math.pow(tempEnd.x - drawStart.x, 2) +
+                          Math.pow(tempEnd.y - drawStart.y, 2)
+                        )
+                      )
+                    )}
+                    fontSize={14}
+                    fill="#3b82f6"
+                    align="center"
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                )}
+              </>
+            )}
+
             {/* Measurement Lines for Walls */}
             {showMeasurements && walls.map((wall) => {
               const [x1, y1, x2, y2] = wall.points;
@@ -1596,13 +1264,13 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               const lengthCm = pixelsToRealUnit(length);
               const midX = (x1 + x2) / 2;
               const midY = (y1 + y2) / 2;
-              
+
               // Calculate perpendicular offset for label
               const angle = Math.atan2(y2 - y1, x2 - x1);
               const offsetDist = 25;
               const offsetX = Math.sin(angle) * offsetDist;
               const offsetY = -Math.cos(angle) * offsetDist;
-              
+
               return (
                 <Group key={`measure-${wall.id}`}>
                   <Text
@@ -1618,12 +1286,12 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 </Group>
               );
             })}
-            
+
             {/* Measurement Lines for Rooms/Floors */}
             {showMeasurements && [...rooms, ...floors].map((element) => {
               const widthCm = pixelsToRealUnit(element.width);
               const heightCm = pixelsToRealUnit(element.height);
-              
+
               return (
                 <Group key={`measure-${element.id}`}>
                   {/* Width measurement (top) */}
@@ -1642,7 +1310,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                     fill="#1e40af"
                     align="center"
                   />
-                  
+
                   {/* Height measurement (right) */}
                   <Line
                     points={[element.x + element.width + 15, element.y, element.x + element.width + 15, element.y + element.height]}
@@ -1662,11 +1330,11 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 </Group>
               );
             })}
-            
+
             {/* Measurement Lines for Doors/Windows */}
             {showMeasurements && [...doors, ...windows].map((element) => {
               const widthCm = pixelsToRealUnit(element.width);
-              
+
               return (
                 <Group key={`measure-${element.id}`}>
                   <Text
@@ -1681,12 +1349,12 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 </Group>
               );
             })}
-            
+
             {/* Measurement Lines for Furniture */}
             {showMeasurements && furniture.map((item) => {
               const widthCm = pixelsToRealUnit(item.width);
               const heightCm = pixelsToRealUnit(item.height);
-              
+
               return (
                 <Group key={`measure-${item.id}`}>
                   <Text
@@ -1701,7 +1369,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 </Group>
               );
             })}
-            
+
             {/* Drawing preview */}
             {isDrawing && drawStart && (
               <Circle
@@ -1711,7 +1379,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                 fill="#ef4444"
               />
             )}
-            
+
             {/* Calibration line preview */}
             {isCalibrating && calibrationStart && (
               <Circle
@@ -1727,9 +1395,9 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
               <>
                 <Line
                   points={[
-                    calibrationStart.x, 
-                    calibrationStart.y, 
-                    calibrationEnd.x, 
+                    calibrationStart.x,
+                    calibrationStart.y,
+                    calibrationEnd.x,
                     calibrationEnd.y
                   ]}
                   stroke="#f59e0b"
@@ -1748,7 +1416,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
                   x={(calibrationStart.x + calibrationEnd.x) / 2 - 40}
                   y={(calibrationStart.y + calibrationEnd.y) / 2 - 30}
                   text={`${Math.sqrt(
-                    Math.pow(calibrationEnd.x - calibrationStart.x, 2) + 
+                    Math.pow(calibrationEnd.x - calibrationStart.x, 2) +
                     Math.pow(calibrationEnd.y - calibrationStart.y, 2)
                   ).toFixed(0)} px`}
                   fontSize={14}
@@ -1762,7 +1430,7 @@ const FloorPlanEditorKonva = ({ floorPlanImage, threeDData, onSave }) => {
           </Layer>
         </Stage>
       </div>
-    </Card>
+    </div>
   );
 };
 

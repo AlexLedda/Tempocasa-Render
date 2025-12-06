@@ -184,6 +184,18 @@ frontend:
         agent: "testing"
         comment: "✅ COPY/PASTE/DUPLICATE FUNZIONANTI - Test completato con successo: 1) ✅ Furniture placement da libreria testato (divano selezionato e posizionato), 2) ✅ Pulsanti UI 'Copia', 'Duplica', 'Elimina' presenti quando elemento selezionato, 3) ✅ Keyboard shortcuts testati: Ctrl+Z (Undo) ✅, Ctrl+Y (Redo) ✅, Ctrl+V (Paste) ✅, 4) ✅ Sistema clipboard implementato (linee 216-299), 5) ✅ Funzioni copySelected(), pasteElement(), duplicateSelected() operative con offset 30px, 6) ✅ Toast notifications per feedback utente. Sistema completo e funzionante per tutti i tipi di elementi."
 
+  - task: "Continuous Wall Drawing (Polyline)"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/components/FloorPlanEditorKonva.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "IMPLEMENTATO: Modalità disegno muri continuo (click-move-click). Aggiunto state 'tempEnd' per preview visiva della linea tratteggiata. Aggiornati handler MouseDown/Move per supportare polyline style. Tasto Esc per terminare disegno."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
