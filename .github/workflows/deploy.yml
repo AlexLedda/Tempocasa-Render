@@ -20,13 +20,21 @@ jobs:
         echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> backend/.env
         echo "EMERGENT_LLM_KEY=${{ secrets.EMERGENT_LLM_KEY }}" >> backend/.env
 
+    - name: Clean up before copy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: rm -rf ~/app/Caddyfile
+
     - name: Copy files to EC2
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: "docker-compose.prod.yml,backend,frontend"
+        source: "docker-compose.prod.yml,backend,frontend,Caddyfile"
         target: "~/app"
 
     - name: Deploy via SSH
@@ -37,6 +45,6 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd ~/app
-          echo "REACT_APP_BACKEND_URL=http://${{ secrets.EC2_HOST }}:8000" > .env
+          echo "REACT_APP_BACKEND_URL=https://vision-3d-render.com/api" > .env
           docker compose -f docker-compose.prod.yml down
           docker compose -f docker-compose.prod.yml up -d --build
