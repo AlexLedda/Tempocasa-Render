@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     container_name: vision3d-backend
     restart: always
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     env_file:
       - .env
     environment:
@@ -22,14 +22,36 @@ services:
       dockerfile: Dockerfile
     container_name: vision3d-frontend
     restart: always
-    ports:
-      - "80:80"
+    expose:
+      - "80"
     environment:
-      - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-http://localhost:8000}
+      - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL:-https://vision-3d-render.com/api}
     depends_on:
       - backend
     networks:
       - vision3d-network
+
+  caddy:
+    image: caddy:alpine
+    container_name: vision3d-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - vision3d-network
+
+volumes:
+  caddy_data:
+  caddy_config:
+
 
 networks:
   vision3d-network:
