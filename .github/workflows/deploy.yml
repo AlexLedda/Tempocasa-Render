@@ -1,0 +1,42 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Create .env file for backend
+      run: |
+        echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> backend/.env
+        echo "DB_NAME=${{ secrets.DB_NAME }}" >> backend/.env
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> backend/.env
+        echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}" >> backend/.env
+        echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> backend/.env
+        echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> backend/.env
+        echo "EMERGENT_LLM_KEY=${{ secrets.EMERGENT_LLM_KEY }}" >> backend/.env
+
+    - name: Copy files to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "docker-compose.prod.yml,backend,frontend"
+        target: "~/app"
+
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ~/app
+          echo "REACT_APP_BACKEND_URL=http://${{ secrets.EC2_HOST }}:8000" > .env
+          docker-compose -f docker-compose.prod.yml down
+          docker-compose -f docker-compose.prod.yml up -d --build
