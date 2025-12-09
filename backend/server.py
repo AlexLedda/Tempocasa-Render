@@ -16,6 +16,10 @@ import json
 import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from openai import AsyncOpenAI
+from fastapi import BackgroundTasks
+import tempfile
+import shutil
+from services.drive_service import DriveService
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -30,7 +34,11 @@ cloudinary.config(
     cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
     api_key=os.environ['CLOUDINARY_API_KEY'],
     api_secret=os.environ['CLOUDINARY_API_SECRET']
+    api_secret=os.environ['CLOUDINARY_API_SECRET']
 )
+
+# Initialize Drive Service
+drive_service = DriveService()
 
 # Create the main app
 app = FastAPI()
@@ -197,15 +205,63 @@ async def delete_floorplan(floorplan_id: str):
         raise HTTPException(status_code=404, detail="Floor plan not found")
     return {"message": "Floor plan deleted successfully"}
 
+def upload_to_drive_background(file_path: str, folder_name: str, file_name: str):
+    """Background task to upload file to Google Drive"""
+    try:
+        logging.info(f"Starting background Drive upload for {file_name} in folder {folder_name}")
+        
+        # 1. Create or Find Project Folder
+        # Root folder "Tempocasa Projects"
+        root_folder_id = drive_service.find_folder("Tempocasa Projects")
+        if not root_folder_id:
+            root_folder_id = drive_service.create_folder("Tempocasa Projects")
+        
+        # Project Folder
+        project_folder_id = drive_service.find_folder(folder_name, parent_id=root_folder_id)
+        if not project_folder_id:
+            project_folder_id = drive_service.create_folder(folder_name, parent_id=root_folder_id)
+        
+        # 2. Upload File
+        drive_service.upload_file(file_path, folder_id=project_folder_id)
+        
+        # 3. Cleanup temp file
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            logging.info(f"Cleaned up temp file {file_path}")
+            
+    except Exception as e:
+        logging.error(f"Background Drive upload failed: {str(e)}")
+        # Try to cleanup even if failed
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
 @api_router.post("/floorplans/{floorplan_id}/upload")
-async def upload_floorplan_file(floorplan_id: str, file: UploadFile = File(...)):
+async def upload_floorplan_file(floorplan_id: str, background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     try:
         logging.info(f"Starting upload for floor plan {floorplan_id}, file: {file.filename}")
         
-        # Upload to Cloudinary
+        # Fetch floor plan to get name for Drive folder
+        floorplan = await db.floorplans.find_one({"id": floorplan_id})
+        folder_name = floorplan.get("name", f"Project_{floorplan_id}") if floorplan else f"Project_{floorplan_id}"
+
+        # Read file content
         contents = await file.read()
         logging.info(f"File read successfully, size: {len(contents)} bytes")
         
+        # Save to temp file for Drive Upload
+        try:
+            # Create a temp file that persists until background task deletes it
+            fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(file.filename)[1])
+            with os.fdopen(fd, 'wb') as tmp:
+                tmp.write(contents)
+            
+            # Add background task
+            background_tasks.add_task(upload_to_drive_background, temp_path, folder_name, file.filename)
+            logging.info(f"Added background Drive upload task for {temp_path}")
+        except Exception as e:
+            logging.error(f"Failed to prepare temp file for Drive: {e}")
+
+        # Upload to Cloudinary
         upload_result = await asyncio.to_thread(
             cloudinary.uploader.upload,
             contents,
