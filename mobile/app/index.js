@@ -1,13 +1,18 @@
 import { View, Text, TouchableOpacity, Animated } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'expo-router';
+import { authService } from '../services/auth';
 import '../global.css';
 
 export default function WelcomeScreen() {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(50)).current;
+    const router = useRouter();
 
     useEffect(() => {
+        checkUser();
+
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1,
@@ -21,6 +26,17 @@ export default function WelcomeScreen() {
             }),
         ]).start();
     }, []);
+
+    const checkUser = async () => {
+        try {
+            const user = await authService.getCurrentUser();
+            if (user) {
+                router.replace('/dashboard');
+            }
+        } catch (e) {
+            console.log('Auth check failed', e);
+        }
+    };
 
     return (
         <View className="flex-1 bg-gradient-to-br from-tempocasa-blue-600 to-tempocasa-green-600">
@@ -53,6 +69,7 @@ export default function WelcomeScreen() {
                     <TouchableOpacity
                         className="bg-white rounded-2xl px-8 py-4 shadow-lg active:scale-95"
                         activeOpacity={0.9}
+                        onPress={() => router.push('/auth/login')}
                     >
                         <Text className="text-tempocasa-blue-700 font-display font-semibold text-lg">
                             Inizia Ora
