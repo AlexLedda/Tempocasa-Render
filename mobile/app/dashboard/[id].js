@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { View, Text, Image, ScrollView, TouchableOpacity, Share, Alert } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, Share, Alert, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
 import { apiService } from '../../services/api';
@@ -13,6 +13,11 @@ export default function PlanDetailScreen() {
     const [plan, setPlan] = useState(null);
     const [loading, setLoading] = useState(true);
     const [is3DMode, setIs3DMode] = useState(false);
+
+    // AI Restyle State
+    const [restyleModalVisible, setRestyleModalVisible] = useState(false);
+    const [stylePrompt, setStylePrompt] = useState('');
+    const [isRestyling, setIsRestyling] = useState(false);
 
     useEffect(() => {
         loadPlanDetails();
@@ -39,6 +44,38 @@ export default function PlanDetailScreen() {
             });
         } catch (error) {
             console.error(error);
+        }
+    };
+
+    const handleRestyle = async () => {
+        if (!stylePrompt.trim()) return;
+
+        setIsRestyling(true);
+        try {
+            // Call API (simulated for now since apiService needs update or direct fetch)
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'https://vision-3d-render.com/api'}/floorplans/${id}/restyle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ style: stylePrompt })
+            });
+
+            if (!response.ok) throw new Error('Restyle failed');
+
+            const result = await response.json();
+
+            // Update plan with new data
+            setPlan(prev => ({
+                ...prev,
+                three_d_data: result.three_d_data
+            }));
+
+            setRestyleModalVisible(false);
+            setStylePrompt('');
+            Alert.alert('Successo', 'Il design è stato aggiornato!');
+        } catch (error) {
+            Alert.alert('Errore', 'Impossibile applicare lo stile: ' + error.message);
+        } finally {
+            setIsRestyling(false);
         }
     };
 
@@ -148,7 +185,66 @@ export default function PlanDetailScreen() {
                                 <Text className="text-white font-bold text-lg">Apri Modello 3D</Text>
                             </TouchableOpacity>
                         )}
+
+                        {is3DMode && (
+                            <TouchableOpacity
+                                onPress={() => setRestyleModalVisible(true)}
+                                className="w-full bg-purple-600 py-4 rounded-xl items-center shadow-lg active:opacity-90 flex-row justify-center space-x-2"
+                            >
+                                <Ionicons name="color-wand" size={24} color="white" />
+                                <Text className="text-white font-bold text-lg ml-2">AI Interior Design</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
+
+                    {/* AI Restyle Modal */}
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={restyleModalVisible}
+                        onRequestClose={() => setRestyleModalVisible(false)}
+                    >
+                        <View className="flex-1 justify-end">
+                            {/* Backdrop */}
+                            <TouchableOpacity
+                                className="absolute inset-0 bg-black/50"
+                                onPress={() => setRestyleModalVisible(false)}
+                            />
+
+                            <View className="bg-white rounded-t-3xl p-6 shadow-2xl">
+                                <View className="flex-row justify-between items-center mb-4">
+                                    <Text className="text-xl font-bold text-gray-900">AI Design Magic ✨</Text>
+                                    <TouchableOpacity onPress={() => setRestyleModalVisible(false)}>
+                                        <Ionicons name="close" size={24} color="#6b7280" />
+                                    </TouchableOpacity>
+                                </View>
+
+                                <Text className="text-gray-600 mb-4">
+                                    Descrivi lo stile che vuoi applicare (es. "Industrial", "Minimal beige", "Pavimento in marmo").
+                                </Text>
+
+                                <TextInput
+                                    className="bg-gray-100 p-4 rounded-xl text-lg mb-6 border border-gray-200"
+                                    placeholder="Es. Moderno con parquet..."
+                                    value={stylePrompt}
+                                    onChangeText={setStylePrompt}
+                                    autoFocus
+                                />
+
+                                <TouchableOpacity
+                                    className={`w-full py-4 rounded-xl items-center shadow-lg ${isRestyling ? 'bg-gray-400' : 'bg-purple-600'}`}
+                                    onPress={handleRestyle}
+                                    disabled={isRestyling}
+                                >
+                                    {isRestyling ? (
+                                        <ActivityIndicator color="white" />
+                                    ) : (
+                                        <Text className="text-white font-bold text-lg">Applica Stile</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
             </ScrollView>
         </View>

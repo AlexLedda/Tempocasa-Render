@@ -139,6 +139,9 @@ class ChatRequest(BaseModel):
     message: str
     model: str = "gpt-5"
 
+class RestyleRequest(BaseModel):
+    style: str
+
 # Routes
 @api_router.get("/")
 async def root():
@@ -390,6 +393,64 @@ async def convert_to_3d(floorplan_id: str):
     )
     
     return {"message": "Conversion completed", "three_d_data": three_d_data}
+
+async def restyle_floorplan_with_ai(three_d_data: dict, style: str) -> dict:
+    """Use AI to apply a style to the floor plan 3D data"""
+    try:
+        client = AsyncOpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        
+        system_prompt = """Sei un interior designer. Il tuo compito è modificare il JSON di una piantina 3D per applicare uno stile specifico.
+        Riceverai in input: { "style": "...", "data": ... }
+        Devi restituire SOLO il JSON modificato, aggiungendo o aggiornando le proprietà 'color' (hex) agli oggetti 'walls' e 'rooms'.
+        
+        Esempio modifiche:
+        - "Industrial": walls color #7d7d7d (cemento), floor color #4a4a4a (resina scura)
+        - "Scandinavian": walls color #f0f0f0 (bianco sporco), floor color #d2b48c (legno chiaro)
+        
+        Mantieni intatta la struttura geometria, cambia solo i colori.
+        Restituisci JSON puro."""
+
+        response = await client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": json.dumps({"style": style, "data": three_d_data})}
+            ],
+            response_format={"type": "json_object"}
+        )
+        
+        content = response.choices[0].message.content
+        return json.loads(content)
+    except Exception as e:
+        logging.error(f"AI restyle failed: {str(e)}")
+        # Fallback: simple deterministic color change
+        return three_d_data
+
+@api_router.post("/floorplans/{floorplan_id}/restyle")
+async def restyle_floorplan(floorplan_id: str, request: RestyleRequest):
+    floorplan = await db.floorplans.find_one({"id": floorplan_id})
+    if not floorplan:
+        raise HTTPException(status_code=404, detail="Floor plan not found")
+    
+    current_data = floorplan.get('three_d_data')
+    if isinstance(current_data, str):
+        current_data = json.loads(current_data)
+        
+    if not current_data:
+         raise HTTPException(status_code=400, detail="No 3D data to restyle")
+    
+    # Apply AI styling
+    new_data = await restyle_floorplan_with_ai(current_data, request.style)
+    
+    await db.floorplans.update_one(
+        {"id": floorplan_id},
+        {"$set": {
+            "three_d_data": json.dumps(new_data),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Restyle applied", "three_d_data": new_data}
 
 # Chat endpoints
 @api_router.post("/conversations", response_model=Conversation)

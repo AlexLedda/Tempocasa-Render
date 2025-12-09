@@ -4,25 +4,33 @@ import { OrbitControls, Grid } from '@react-three/drei/native';
 import * as THREE from 'three';
 import { View } from 'react-native';
 
-const Wall = ({ start, end, height = 2.8, thickness = 0.2 }) => {
+const Wall = ({ start, end, height = 2.8, thickness = 0.2, color = "#e5e7eb" }) => {
     const length = Math.sqrt(Math.pow(end[0] - start[0], 2) + Math.pow(end[1] - start[1], 2));
     const angle = Math.atan2(end[1] - start[1], end[0] - start[0]);
     const midX = (start[0] + end[0]) / 2;
-    const midZ = (start[1] + end[1]) / 2; // In 3D, Y is up, so 2D (x,y) -> 3D (x,z) usually, but consistency matters.
-
-    // Let's assume standard architecture: Y is up.
-    // Input coords (x, y) map to 3D (x, z).
+    const midZ = (start[1] + end[1]) / 2;
 
     return (
         <mesh
             position={[midX, height / 2, midZ]}
-            rotation={[0, -angle, 0]} // Negative angle because 3D rotation logic
+            rotation={[0, -angle, 0]}
         >
             <boxGeometry args={[length, height, thickness]} />
-            <meshStandardMaterial color="#e5e7eb" />
+            <meshStandardMaterial color={color} />
         </mesh>
     );
 };
+
+// Simple floor plane for a room
+const RoomFloor = ({ width, depth, position, color = "#e5e7eb" }) => {
+    // Assuming rooms are rectangles for simplicity in this version
+    return (
+        <mesh position={[position[0], 0.05, position[1]]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[width, depth]} />
+            <meshStandardMaterial color={color} />
+        </mesh>
+    );
+}
 
 export default function Scene3D({ data }) {
     if (!data) return null;
@@ -30,6 +38,7 @@ export default function Scene3D({ data }) {
     // Parse data if string
     const sceneData = typeof data === 'string' ? JSON.parse(data) : data;
     const walls = sceneData.walls || [];
+    const rooms = sceneData.rooms || [];
 
     return (
         <View style={{ flex: 1 }}>
@@ -41,16 +50,29 @@ export default function Scene3D({ data }) {
                 <group>
                     {walls.map((wall, index) => (
                         <Wall
-                            key={index}
+                            key={`wall-${index}`}
                             start={wall.start}
                             end={wall.end}
                             height={wall.height}
                             thickness={wall.thickness}
+                            color={wall.color}
                         />
                     ))}
 
-                    {/* Floor helper */}
-                    <Grid infiniteGrid fadeDistance={30} sectionColor={'#3b82f6'} cellColor={'#e5e7eb'} />
+                    {rooms.map((room, index) => (
+                        <RoomFloor
+                            key={`room-${index}`}
+                            width={room.width || 5}
+                            depth={room.depth || 5}
+                            position={[0, 0]} // Simplified: center at 0,0 for now, real app needs room position
+                            color={room.color || "#f3f4f6"}
+                        />
+                    ))}
+
+                    {/* Grid helper (only if no rooms defined) */}
+                    {rooms.length === 0 && (
+                        <Grid infiniteGrid fadeDistance={30} sectionColor={'#3b82f6'} cellColor={'#e5e7eb'} />
+                    )}
                 </group>
 
                 <OrbitControls makeDefault />
