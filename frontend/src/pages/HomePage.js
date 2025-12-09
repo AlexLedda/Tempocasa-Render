@@ -49,25 +49,25 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
-        
+
         <div className="max-w-5xl mx-auto text-center space-y-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
             <Sparkles className="w-3.5 h-3.5" />
             <span className="font-display">Nuovo Motore AI Disponibile</span>
           </div>
-          
+
           <h1 className="text-5xl sm:text-7xl font-bold font-display tracking-tight leading-[1.1]">
             Dai vita alle tue <br />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Idee Architettoniche
             </span>
           </h1>
-          
+
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-            La piattaforma all-in-one che trasforma schizzi e piantine 2D in 
+            La piattaforma all-in-one che trasforma schizzi e piantine 2D in
             modelli 3D fotorealistici grazie all'intelligenza artificiale.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
             <Button
               size="lg"
@@ -94,21 +94,21 @@ const HomePage = () => {
       <section className="py-24 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard 
+            <FeatureCard
               icon={<Upload />}
               title="Importazione Universale"
               description="Carica PDF, JPG o PNG. Il nostro sistema riconosce automaticamente muri, porte e finestre."
               color="text-blue-500"
               bg="bg-blue-500/10"
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Boxes />}
               title="Modellazione Instantanea"
               description="Guarda la tua piantina trasformarsi in un modello 3D navigabile in pochi secondi."
               color="text-purple-500"
               bg="bg-purple-500/10"
             />
-            <FeatureCard 
+            <FeatureCard
               icon={<Sparkles />}
               title="Rendering AI"
               description="Applica stili e materiali fotorealistici con un semplice prompt testuale."
@@ -124,14 +124,14 @@ const HomePage = () => {
         <div className="max-w-4xl mx-auto">
           <div className="relative rounded-3xl bg-primary px-6 py-16 md:px-12 text-center overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-            
+
             <h2 className="text-3xl sm:text-4xl font-bold font-display text-primary-foreground mb-6 relative z-10">
               Pronto a rivoluzionare il tuo workflow?
             </h2>
             <p className="text-lg text-primary-foreground/80 mb-10 max-w-2xl mx-auto relative z-10">
               Unisciti a migliaia di architetti e designer che usano Vision3D per risparmiare tempo.
             </p>
-            
+
             <Button
               size="lg"
               variant="secondary"

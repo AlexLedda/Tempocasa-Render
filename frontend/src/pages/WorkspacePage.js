@@ -2,17 +2,16 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Boxes, Upload, Pencil, Home, Loader2, Eye } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '../components/ui/select';
+import { Boxes, Upload, Pencil, Home, Loader2, Eye, Plus, Save, Trash2, RotateCw } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import * as THREE from 'three';
 import FloorPlanEditor2D from '../components/FloorPlanEditor2D_v2';
 import FloorPlanEditorKonva from '../components/FloorPlanEditorKonva';
 
@@ -21,24 +20,16 @@ extend({ OrbitControls });
 const CameraControls = () => {
   const { camera, gl } = useThree();
   const controlsRef = React.useRef();
-  
+
   React.useEffect(() => {
     const controls = new OrbitControls(camera, gl.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controlsRef.current = controls;
-    
-    return () => {
-      controls.dispose();
-    };
+    return () => controls.dispose();
   }, [camera, gl]);
-  
-  useFrame(() => {
-    if (controlsRef.current) {
-      controlsRef.current.update();
-    }
-  });
-  
+
+  useFrame(() => controlsRef.current?.update());
   return null;
 };
 
@@ -47,19 +38,20 @@ const Scene3D = ({ threeData }) => {
 
   try {
     const data = typeof threeData === 'string' ? JSON.parse(threeData) : threeData;
-    
+
     return (
       <>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <pointLight position={[-10, -10, -5]} intensity={0.5} />
-        
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[10, 20, 10]} intensity={1.2} castShadow />
+        <pointLight position={[-10, 5, -10]} intensity={0.5} />
+
         {/* Floor */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-          <planeGeometry args={[20, 20]} />
-          <meshStandardMaterial color="#e2e8f0" />
+          <planeGeometry args={[50, 50]} />
+          <meshStandardMaterial color="#f8fafc" roughness={0.8} />
+          <gridHelper args={[50, 50, 0xe2e8f0, 0xe2e8f0]} rotation={[-Math.PI / 2, 0, 0]} />
         </mesh>
-        
+
         {/* Walls */}
         {data.walls && data.walls.map((wall, idx) => {
           const start = wall.start;
@@ -68,32 +60,21 @@ const Scene3D = ({ threeData }) => {
           const angle = Math.atan2(end[1] - start[1], end[0] - start[0]);
           const centerX = (start[0] + end[0]) / 2;
           const centerZ = (start[1] + end[1]) / 2;
-          
+
           return (
             <mesh
               key={`wall-${idx}`}
               position={[centerX, wall.height / 2, centerZ]}
-              rotation={[0, angle, 0]}
+              rotation={[0, -angle, 0]}
               castShadow
+              receiveShadow
             >
               <boxGeometry args={[length, wall.height, wall.thickness]} />
-              <meshStandardMaterial color="#cbd5e1" />
+              <meshStandardMaterial color="#cbd5e1" roughness={0.5} />
             </mesh>
           );
         })}
-        
-        {/* Rooms visualization */}
-        {data.rooms && data.rooms.map((room, idx) => (
-          <mesh
-            key={`room-${idx}`}
-            position={[idx * 6 - 3, room.height / 2, 0]}
-            castShadow
-          >
-            <boxGeometry args={[room.width, room.height, room.depth]} />
-            <meshStandardMaterial color="#94a3b8" opacity={0.7} transparent />
-          </mesh>
-        ))}
-        
+
         <CameraControls />
       </>
     );
@@ -126,8 +107,9 @@ const WorkspacePage = () => {
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = '#000';
+      ctx.strokeStyle = '#0f172a';
       ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
       setCanvasContext(ctx);
     }
   }, [activeTab]);
@@ -145,34 +127,25 @@ const WorkspacePage = () => {
     const file = e.target.files[0];
     if (file) {
       setUploadFile(file);
-      if (!planName) {
-        setPlanName(file.name.split('.')[0]);
-      }
+      if (!planName) setPlanName(file.name.split('.')[0]);
     }
   };
 
   const handleUpload = async () => {
-    if (!uploadFile || !planName) {
-      toast.error('Seleziona un file e inserisci un nome');
-      return;
-    }
+    if (!uploadFile || !planName) return toast.error('Seleziona un file e inserisci un nome');
 
     setLoading(true);
     try {
-      // Create floor plan
       const createResponse = await axios.post(`${API}/floorplans`, {
         user_id: userId,
         name: planName,
         file_type: uploadFile.type.includes('pdf') ? 'pdf' : 'image'
       });
 
-      const planId = createResponse.data.id;
-
-      // Upload file
       const formData = new FormData();
       formData.append('file', uploadFile);
-      
-      await axios.post(`${API}/floorplans/${planId}/upload`, formData, {
+
+      await axios.post(`${API}/floorplans/${createResponse.data.id}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
@@ -189,15 +162,11 @@ const WorkspacePage = () => {
   };
 
   const handleSaveCanvas = async () => {
-    if (!canvasRef.current || !planName) {
-      toast.error('Disegna qualcosa e inserisci un nome');
-      return;
-    }
+    if (!canvasRef.current || !planName) return toast.error('Disegna qualcosa e inserisci un nome');
 
     setLoading(true);
     try {
       const canvasData = canvasRef.current.toDataURL();
-      
       const response = await axios.post(`${API}/floorplans`, {
         user_id: userId,
         name: planName,
@@ -205,16 +174,9 @@ const WorkspacePage = () => {
         canvas_data: canvasData
       });
 
-      toast.success('Disegno salvato con successo! Apro editor...');
-      
-      // Automatically open the editor with the newly created plan
+      toast.success('Disegno salvato! Apertura editor...');
       setSelectedPlan(response.data);
-      
       setPlanName('');
-      // Clear canvas
-      const ctx = canvasRef.current.getContext('2d');
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       loadFloorPlans();
     } catch (error) {
       console.error('Save error:', error);
@@ -224,40 +186,17 @@ const WorkspacePage = () => {
     }
   };
 
-  const handleConvert3D = async (planId) => {
-    setLoading(true);
-    try {
-      const response = await axios.post(`${API}/floorplans/${planId}/convert-3d`);
-      toast.success('Conversione 3D completata!');
-      loadFloorPlans();
-      
-      // Load the converted plan
-      const planResponse = await axios.get(`${API}/floorplans/${planId}`);
-      setSelectedPlan(planResponse.data);
-    } catch (error) {
-      console.error('Conversion error:', error);
-      toast.error('Errore durante la conversione');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleUpdate3D = async (updatedData) => {
     if (!selectedPlan) return;
-    
     setLoading(true);
     try {
-      await axios.patch(`${API}/floorplans/${selectedPlan.id}`, {
-        three_d_data: JSON.stringify(updatedData)
-      });
-      
-      // Reload the plan
+      await axios.patch(`${API}/floorplans/${selectedPlan.id}`, { three_d_data: JSON.stringify(updatedData) });
       const planResponse = await axios.get(`${API}/floorplans/${selectedPlan.id}`);
       setSelectedPlan(planResponse.data);
       toast.success('Modello 3D aggiornato!');
     } catch (error) {
       console.error('Update error:', error);
-      toast.error('Errore durante l\'aggiornamento');
+      toast.error('Errore aggiornamento');
     } finally {
       setLoading(false);
     }
@@ -278,245 +217,235 @@ const WorkspacePage = () => {
     canvasContext.stroke();
   };
 
-  const stopDrawing = () => {
-    setIsDrawing(false);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-background font-sans">
       {/* Navigation */}
-      <nav className="backdrop-blur-xl bg-white/80 border-b border-slate-200/50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Boxes className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                Vision3D
-              </span>
+      <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+              <Boxes className="w-5 h-5" />
             </div>
-            <Button
-              data-testid="home-button"
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="hover:bg-blue-50"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Button>
+            <span className="text-xl font-bold font-display tracking-tight">Vision3D</span>
           </div>
+          <Button variant="ghost" onClick={() => navigate('/')} className="text-muted-foreground hover:text-primary">
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Panel - Upload/Draw */}
-          <Card className="p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Crea Nuova Piantina</h2>
-            
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="upload" data-testid="upload-tab">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Carica File
-                </TabsTrigger>
-                <TabsTrigger value="draw" data-testid="draw-tab">
-                  <Pencil className="w-4 h-4 mr-2" />
-                  Disegna
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="upload" className="space-y-4">
-                <div>
-                  <Label htmlFor="planName">Nome Piantina</Label>
-                  <Input
-                    id="planName"
-                    data-testid="plan-name-input"
-                    value={planName}
-                    onChange={(e) => setPlanName(e.target.value)}
-                    placeholder="Es: Appartamento Milano"
-                    className="mt-2"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="fileUpload">Carica File (PDF, PNG, JPG)</Label>
-                  <Input
-                    id="fileUpload"
-                    data-testid="file-upload-input"
-                    type="file"
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    onChange={handleFileChange}
-                    className="mt-2"
-                  />
-                </div>
-                
-                {uploadFile && (
-                  <p className="text-sm text-slate-600">File selezionato: {uploadFile.name}</p>
-                )}
-                
-                <Button
-                  data-testid="upload-button"
-                  onClick={handleUpload}
-                  disabled={loading || !uploadFile || !planName}
-                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-                >
-                  {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-                  Carica Piantina
-                </Button>
-              </TabsContent>
-              
-              <TabsContent value="draw" className="space-y-4">
-                <div>
-                  <Label htmlFor="drawPlanName">Nome Piantina</Label>
-                  <Input
-                    id="drawPlanName"
-                    data-testid="draw-plan-name-input"
-                    value={planName}
-                    onChange={(e) => setPlanName(e.target.value)}
-                    placeholder="Es: Progetto Casa"
-                    className="mt-2"
-                  />
-                </div>
-                
-                <div className="border-2 border-slate-300 rounded-lg overflow-hidden">
-                  <canvas
-                    ref={canvasRef}
-                    data-testid="drawing-canvas"
-                    width={600}
-                    height={400}
-                    onMouseDown={startDrawing}
-                    onMouseMove={draw}
-                    onMouseUp={stopDrawing}
-                    onMouseLeave={stopDrawing}
-                    className="w-full cursor-crosshair bg-white"
-                  />
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button
-                    data-testid="clear-canvas-button"
-                    variant="outline"
-                    onClick={() => {
-                      if (canvasRef.current) {
+      <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto space-y-8">
+        {!selectedPlan ? (
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Creation Panel */}
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-2xl font-display">Nuovo Progetto</CardTitle>
+                <CardDescription>Carica una piantina esistente o disegnane una nuova</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsTrigger value="upload" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Upload className="w-4 h-4 mr-2" /> Carica
+                    </TabsTrigger>
+                    <TabsTrigger value="draw" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Pencil className="w-4 h-4 mr-2" /> Disegna
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upload" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="planName">Nome Progetto</Label>
+                      <Input
+                        id="planName"
+                        value={planName}
+                        onChange={(e) => setPlanName(e.target.value)}
+                        placeholder="Es. Ristrutturazione Bagno"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fileUpload">File (PDF, Immagine)</Label>
+                      <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-muted/50 transition-colors cursor-pointer relative">
+                        <Input
+                          id="fileUpload"
+                          type="file"
+                          accept=".pdf,.png,.jpg,.jpeg"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                          <Upload className="w-8 h-8 opacity-50" />
+                          <span className="text-sm font-medium">
+                            {uploadFile ? uploadFile.name : "Trascina o clicca per caricare"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleUpload}
+                      disabled={loading || !uploadFile || !planName}
+                      className="w-full h-11"
+                    >
+                      {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      Crea Progetto
+                    </Button>
+                  </TabsContent>
+
+                  <TabsContent value="draw" className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Nome Progetto</Label>
+                      <Input
+                        value={planName}
+                        onChange={(e) => setPlanName(e.target.value)}
+                        placeholder="Es. Schizzo Cucina"
+                      />
+                    </div>
+                    <div className="border border-border rounded-lg overflow-hidden shadow-inner bg-slate-50">
+                      <canvas
+                        ref={canvasRef}
+                        width={600}
+                        height={400}
+                        onMouseDown={startDrawing}
+                        onMouseMove={draw}
+                        onMouseUp={() => setIsDrawing(false)}
+                        onMouseLeave={() => setIsDrawing(false)}
+                        className="w-full h-auto cursor-crosshair touch-none"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => {
                         const ctx = canvasRef.current.getContext('2d');
                         ctx.fillStyle = 'white';
                         ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-                      }
-                    }}
-                    className="flex-1"
-                  >
-                    Cancella
-                  </Button>
-                  <Button
-                    data-testid="save-canvas-button"
-                    onClick={handleSaveCanvas}
-                    disabled={loading || !planName}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-                  >
-                    {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                    Salva Disegno
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </Card>
-
-          {/* Right Panel - Floor Plans List */}
-          <Card className="p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Le Tue Piantine</h2>
-            
-            <div className="space-y-3 max-h-[600px] overflow-y-auto">
-              {floorPlans.length === 0 ? (
-                <p className="text-slate-500 text-center py-8">Nessuna piantina ancora. Carica o disegna la prima!</p>
-              ) : (
-                floorPlans.map((plan) => (
-                  <Card key={plan.id} className="p-4 border hover:border-blue-400 transition-all">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{plan.name}</h3>
-                        <p className="text-sm text-slate-500">
-                          {plan.file_type} • {plan.status}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          data-testid={`edit-button-${plan.id}`}
-                          size="sm"
-                          onClick={() => setSelectedPlan(plan)}
-                          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white"
-                        >
-                          <Pencil className="w-4 h-4 mr-1" />
-                          Modifica 2D
-                        </Button>
-                        {plan.three_d_data && (
-                          <Button
-                            data-testid={`view-button-${plan.id}`}
-                            size="sm"
-                            onClick={() => setSelectedPlan(plan)}
-                            variant="outline"
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            Vista 3D
-                          </Button>
-                        )}
-                      </div>
+                      }} className="flex-1">
+                        <Trash2 className="w-4 h-4 mr-2" /> Pulisci
+                      </Button>
+                      <Button onClick={handleSaveCanvas} disabled={loading || !planName} className="flex-1">
+                        <Save className="w-4 h-4 mr-2" /> Salva
+                      </Button>
                     </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* Editor and Viewer */}
-        {selectedPlan && (
-          <>
-            <Card className="mt-8 p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-slate-900">Piantina: {selectedPlan.name}</h2>
-                <Button
-                  data-testid="close-editor-button"
-                  variant="outline"
-                  onClick={() => setSelectedPlan(null)}
-                >
-                  Chiudi
-                </Button>
-              </div>
-              
-              {selectedPlan.file_url && (
-                <div className="mb-4">
-                  <img 
-                    src={selectedPlan.file_url} 
-                    alt={selectedPlan.name}
-                    className="w-full max-h-64 object-contain rounded-lg border border-slate-200"
-                  />
-                </div>
-              )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
             </Card>
 
-            {/* 2D Editor */}
-            <FloorPlanEditorKonva
-              floorPlanImage={selectedPlan.file_url}
-              threeDData={selectedPlan.three_d_data}
-              onSave={handleUpdate3D}
-            />
+            {/* List Panel */}
+            <Card className="border-border/50 shadow-sm h-fit">
+              <CardHeader>
+                <CardTitle className="text-2xl font-display">I Tuoi Progetti</CardTitle>
+                <CardDescription>Gestisci e modifica le tue piantine</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                  {floorPlans.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground bg-muted/30 rounded-lg border border-dashed border-border">
+                      <Boxes className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                      <p>Nessun progetto trovato</p>
+                    </div>
+                  ) : (
+                    floorPlans.map((plan) => (
+                      <div key={plan.id} className="group p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold">{plan.name}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/10 text-secondary font-medium uppercase tracking-wider">
+                              {plan.file_type}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{plan.status}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button size="icon" variant="secondary" onClick={() => setSelectedPlan(plan)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          {plan.three_d_data && (
+                            <Button size="icon" variant="ghost" onClick={() => setSelectedPlan(plan)}>
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            {/* Editor Header */}
+            <div className="flex items-center justify-between bg-card p-4 rounded-xl border border-border shadow-sm">
+              <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" onClick={() => setSelectedPlan(null)}>
+                  <Home className="w-5 h-5 text-muted-foreground" />
+                </Button>
+                <div>
+                  <h2 className="text-xl font-bold font-display">{selectedPlan.name}</h2>
+                  <p className="text-sm text-muted-foreground">Editor Progetto</p>
+                </div>
+              </div>
+              <div className="flex bg-muted p-1 rounded-lg">
+                <div className="text-xs font-medium px-3 py-1 bg-background rounded-md shadow-sm">Modo Editor</div>
+              </div>
+            </div>
 
-            {/* 3D Viewer - Only show if 3D data exists */}
-            {selectedPlan.three_d_data && (
-              <Card className="mt-4 p-6 bg-white/90 backdrop-blur-sm border-2 border-slate-200">
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Render 3D</h3>
-                <div className="h-[500px] bg-slate-100 rounded-lg overflow-hidden" data-testid="3d-canvas">
-                  <Canvas camera={{ position: [10, 10, 10], fov: 50 }}>
-                    <Suspense fallback={null}>
-                      <Scene3D threeData={selectedPlan.three_d_data} />
-                    </Suspense>
-                  </Canvas>
+            <div className="grid lg:grid-cols-3 gap-6 h-[800px]">
+              {/* 2D Context Panel */}
+              <Card className="lg:col-span-1 border-border/50 shadow-sm flex flex-col overflow-hidden">
+                <CardHeader className="py-4 border-b border-border/50 bg-muted/30">
+                  <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Riferimento 2D</CardTitle>
+                </CardHeader>
+                <div className="flex-1 bg-slate-100 p-4 flex items-center justify-center overflow-auto">
+                  {selectedPlan.file_url ? (
+                    <img src={selectedPlan.file_url} alt="Reference" className="max-w-full max-h-full object-contain shadow-lg rounded" />
+                  ) : (
+                    <div className="text-muted-foreground text-sm">Nessuna immagine di riferimento</div>
+                  )}
                 </div>
               </Card>
-            )}
-          </>
+
+              {/* Main Editor Area */}
+              <Card className="lg:col-span-2 border-border/50 shadow-sm flex flex-col overflow-hidden">
+                <Tabs defaultValue="editor" className="flex flex-col h-full">
+                  <div className="px-4 py-2 border-b border-border/50 flex justify-between items-center bg-muted/30">
+                    <TabsList>
+                      <TabsTrigger value="editor"><Pencil className="w-3 h-3 mr-2" />Editor Strutturale</TabsTrigger>
+                      <TabsTrigger value="preview" disabled={!selectedPlan.three_d_data}><Eye className="w-3 h-3 mr-2" />Anteprima 3D</TabsTrigger>
+                    </TabsList>
+                  </div>
+
+                  <div className="flex-1 relative bg-slate-50 overflow-hidden">
+                    <TabsContent value="editor" className="h-full m-0 p-0 absolute inset-0">
+                      <FloorPlanEditorKonva
+                        floorPlanImage={selectedPlan.file_url}
+                        threeDData={selectedPlan.three_d_data}
+                        onSave={handleUpdate3D}
+                      />
+                    </TabsContent>
+
+                    <TabsContent value="preview" className="h-full m-0 p-0 absolute inset-0">
+                      {selectedPlan.three_d_data ? (
+                        <Canvas camera={{ position: [15, 20, 15], fov: 45 }}>
+                          <color attach="background" args={['#f8fafc']} />
+                          <fog attach="fog" args={['#f8fafc', 20, 60]} />
+                          <Suspense fallback={null}>
+                            <Scene3D threeData={selectedPlan.three_d_data} />
+                          </Suspense>
+                          <OrbitControls makeDefault minPolarAngle={0} maxPolarAngle={Math.PI / 2.2} />
+                        </Canvas>
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                          Nessun dato 3D disponibile
+                        </div>
+                      )}
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </Card>
+            </div>
+          </div>
         )}
       </div>
     </div>

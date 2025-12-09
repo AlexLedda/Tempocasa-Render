@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
+import { Card, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { ScrollArea } from '../components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Boxes, Home, Send, Sparkles, Loader2, Bot, User } from 'lucide-react';
+import { Boxes, Home, Send, Sparkles, Loader2, Bot, User, ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -89,107 +89,109 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-background font-sans flex flex-col">
       {/* Navigation */}
-      <nav className="backdrop-blur-xl bg-white/80 border-b border-slate-200/50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Boxes className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                Vision3D AI Chat
-              </span>
+      <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+              <Boxes className="w-5 h-5" />
             </div>
-            <Button
-              data-testid="home-button"
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="hover:bg-blue-50"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Button>
+            <span className="text-xl font-bold font-display tracking-tight">Vision3D AI</span>
           </div>
+          <Button variant="ghost" onClick={() => navigate('/')} className="text-muted-foreground hover:text-primary">
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <Card className="bg-white/90 backdrop-blur-sm border-2 border-slate-200 overflow-hidden">
+      <div className="flex-1 pt-24 pb-8 px-4 sm:px-6 max-w-4xl mx-auto w-full">
+        <Card className="h-[calc(100vh-8rem)] flex flex-col border-border/50 shadow-lg overflow-hidden bg-background/50 backdrop-blur-sm">
           {/* Header */}
-          <div className="p-4 border-b border-slate-200 bg-gradient-to-r from-blue-500 to-cyan-500">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Assistente AI</h2>
-                  <p className="text-sm text-blue-50">Esperto in architettura e design 3D</p>
+          <div className="p-4 border-b border-border/50 bg-muted/30 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                <Sparkles className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-display font-bold text-lg">Architect Assistant</h2>
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className="text-xs text-muted-foreground">Online • Ready to help</span>
                 </div>
               </div>
-              
-              <Select value={selectedModel} onValueChange={setSelectedModel}>
-                <SelectTrigger data-testid="model-selector" className="w-[200px] bg-white/20 backdrop-blur-sm border-white/30 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gpt-5">GPT-5 (OpenAI)</SelectItem>
-                  <SelectItem value="claude-4-sonnet-20250514">Claude Sonnet 4</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
+
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="w-[180px] bg-background border-border/50">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gpt-5">GPT-5 (OpenAI)</SelectItem>
+                <SelectItem value="claude-4-sonnet-20250514">Claude Sonnet 4</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Messages */}
-          <ScrollArea className="h-[500px] p-6">
+          <ScrollArea className="flex-1 p-6 bg-slate-50/50">
             {messages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
-                  <Bot className="w-8 h-8 text-white" />
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-0 animate-in fade-in zoom-in duration-500">
+                <div className="w-20 h-20 bg-gradient-to-tr from-primary to-accent rounded-3xl flex items-center justify-center mb-6 shadow-xl shadow-primary/20 rotate-3 transition-transform hover:rotate-6">
+                  <Bot className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Ciao! Come posso aiutarti?</h3>
-                <p className="text-slate-600">
-                  Sono un assistente AI esperto in architettura e design 3D. Posso aiutarti con:
+                <h3 className="text-2xl font-bold font-display mb-2">Come posso aiutarti oggi?</h3>
+                <p className="text-muted-foreground max-w-md mx-auto mb-8">
+                  Chiedimi di analizzare una piantina, suggerire materiali o ottimizzare gli spazi della tua casa.
                 </p>
-                <ul className="text-sm text-slate-600 mt-3 space-y-1">
-                  <li>• Conversione di piantine 2D in modelli 3D</li>
-                  <li>• Suggerimenti per il design e layout degli spazi</li>
-                  <li>• Consigli su rendering e materiali</li>
-                  <li>• Risposte a domande tecniche</li>
-                </ul>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+                  {['Come ottimizzo un soggiorno piccolo?', 'Quali colori per una camera moderna?', 'Spiegami come caricare una piantina', 'Analizza le tendenze 2025'].map((suggestion) => (
+                    <Button
+                      key={suggestion}
+                      variant="outline"
+                      className="h-auto py-3 px-4 text-left justify-start whitespace-normal text-muted-foreground hover:text-primary hover:border-primary/50"
+                      onClick={() => setInputMessage(suggestion)}
+                    >
+                      {suggestion}
+                    </Button>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
-                    data-testid={`message-${msg.role}-${idx}`}
-                    className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
                   >
                     {msg.role === 'assistant' && (
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md">
-                        <Bot className="w-5 h-5 text-white" />
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-1">
+                        <Bot className="w-4 h-4 text-primary" />
                       </div>
                     )}
-                    
+
                     <div
-                      className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                        msg.role === 'user'
-                          ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white'
-                          : 'bg-slate-100 text-slate-900'
-                      }`}
+                      className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-sm ${msg.role === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                          : 'bg-white border border-border rounded-tl-sm'
+                        }`}
                     >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                       {msg.model && (
-                        <p className="text-xs mt-2 opacity-70">Modello: {msg.model}</p>
+                        <div className="flex items-center gap-1 mt-2 pt-2 border-t border-border/10">
+                          <Sparkles className="w-3 h-3 opacity-70" />
+                          <span className="text-[10px] uppercase tracking-wider opacity-70 font-medium">{msg.model}</span>
+                        </div>
                       )}
                     </div>
-                    
+
                     {msg.role === 'user' && (
-                      <div className="w-8 h-8 bg-slate-300 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md">
-                        <User className="w-5 h-5 text-slate-700" />
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0 mt-1">
+                        <User className="w-4 h-4 text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -200,22 +202,22 @@ const ChatPage = () => {
           </ScrollArea>
 
           {/* Input */}
-          <div className="p-4 border-t border-slate-200 bg-white">
-            <div className="flex gap-2">
-              <Input
-                data-testid="chat-input"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Scrivi il tuo messaggio..."
-                disabled={loading}
-                className="flex-1"
-              />
+          <div className="p-4 bg-background border-t border-border/50">
+            <div className="flex gap-3 items-end">
+              <div className="flex-1 relative">
+                <Input
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Scrivi un messaggio all'AI..."
+                  disabled={loading}
+                  className="pr-4 py-6 shadow-sm border-muted-foreground/20 focus-visible:ring-primary"
+                />
+              </div>
               <Button
-                data-testid="send-button"
                 onClick={handleSendMessage}
                 disabled={loading || !inputMessage.trim()}
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6"
+                className="h-[50px] w-[50px] rounded-xl shadow-lg shadow-primary/25"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -223,6 +225,9 @@ const ChatPage = () => {
                   <Send className="w-5 h-5" />
                 )}
               </Button>
+            </div>
+            <div className="text-center mt-2">
+              <span className="text-[10px] text-muted-foreground">L'IA può commettere errori. Verifica le informazioni importanti.</span>
             </div>
           </div>
         </Card>
