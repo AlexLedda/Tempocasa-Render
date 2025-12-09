@@ -3,199 +3,177 @@ import { useNavigate } from 'react-router-dom';
 import { API } from '../App';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Boxes, MessageSquare, Sparkles, Zap, Upload, Pencil } from 'lucide-react';
+import { Boxes, MessageSquare, Sparkles, Zap, Upload, ArrowRight, LayoutTemplate } from 'lucide-react';
 import axios from 'axios';
-import { toast } from 'sonner';
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Test API connection
-    const testConnection = async () => {
-      try {
-        const response = await axios.get(`${API}/`);
-        console.log('API Connected:', response.data);
-      } catch (error) {
-        console.error('API Connection Error:', error);
-      }
-    };
-    testConnection();
+    // Health check
+    axios.get(`${API}/`).catch(console.error);
   }, []);
 
-  const handleGetStarted = () => {
-    navigate('/workspace');
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-background text-foreground font-sans">
       {/* Navigation */}
-      <nav className="backdrop-blur-xl bg-white/80 border-b border-slate-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Boxes className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                Vision3D
-              </span>
+      <nav className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+              <Boxes className="w-5 h-5" />
             </div>
-            <div className="flex items-center gap-4">
-              <Button
-                data-testid="chat-nav-button"
-                variant="ghost"
-                onClick={() => navigate('/chat')}
-                className="hover:bg-blue-50"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                AI Chat
-              </Button>
-              <Button
-                data-testid="workspace-nav-button"
-                onClick={handleGetStarted}
-                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/30"
-              >
-                Inizia
-              </Button>
-            </div>
+            <span className="text-xl font-bold font-display tracking-tight text-foreground">
+              Vision3D
+            </span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/chat')}
+              className="hidden sm:flex text-muted-foreground hover:text-primary"
+            >
+              <MessageSquare className="w-4 h-4 mr-2" />
+              AI Assistant
+            </Button>
+            <Button
+              onClick={() => navigate('/workspace')}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
+            >
+              Inizia Ora
+            </Button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full text-blue-700 text-sm font-medium">
-              <Sparkles className="w-4 h-4" />
-              Alimentato da AI GPT-5 & Claude Sonnet 4
-            </div>
-            
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold tracking-tight">
-              <span className="bg-gradient-to-r from-slate-900 via-blue-800 to-cyan-700 bg-clip-text text-transparent">
-                Trasforma Piantine 2D
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                in Modelli 3D
-              </span>
-            </h1>
-            
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Carica le tue piantine in PDF o immagini, disegnale direttamente nell'app, 
-              e guarda come la nostra AI le trasforma in rendering 3D professionali.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Button
-                data-testid="hero-get-started-button"
-                size="lg"
-                onClick={handleGetStarted}
-                className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-xl shadow-blue-500/30 rounded-2xl"
-              >
-                <Zap className="w-5 h-5 mr-2" />
-                Inizia Gratuitamente
-              </Button>
-              <Button
-                data-testid="hero-chat-button"
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/chat')}
-                className="text-lg px-8 py-6 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 rounded-2xl"
-              >
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Parla con l'AI
-              </Button>
-            </div>
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
+        
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span className="font-display">Nuovo Motore AI Disponibile</span>
+          </div>
+          
+          <h1 className="text-5xl sm:text-7xl font-bold font-display tracking-tight leading-[1.1]">
+            Dai vita alle tue <br />
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Idee Architettoniche
+            </span>
+          </h1>
+          
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+            La piattaforma all-in-one che trasforma schizzi e piantine 2D in 
+            modelli 3D fotorealistici grazie all'intelligenza artificiale.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
+            <Button
+              size="lg"
+              onClick={() => navigate('/workspace')}
+              className="h-12 px-8 text-base bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/25 rounded-full transition-all hover:scale-105"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              Crea Progetto
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => navigate('/chat')}
+              className="h-12 px-8 text-base border-border hover:bg-muted/50 rounded-full"
+            >
+              <LayoutTemplate className="w-5 h-5 mr-2" />
+              Esplora Demo
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-white/50 backdrop-blur-sm">
+      {/* Features Grid */}
+      <section className="py-24 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
-              Funzionalità Potenti
-            </h2>
-            <p className="text-lg text-slate-600">
-              Tutto ciò di cui hai bisogno per creare rendering 3D professionali
-            </p>
-          </div>
-          
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-2 border-slate-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300 bg-white">
-              <CardHeader>
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-500/20">
-                  <Upload className="w-7 h-7 text-white" />
-                </div>
-                <CardTitle className="text-2xl">Carica o Disegna</CardTitle>
-                <CardDescription className="text-base">
-                  Carica piantine in PDF o immagini (PNG/JPG), oppure disegnale direttamente nell'app con strumenti intuitivi.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card className="border-2 border-slate-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300 bg-white">
-              <CardHeader>
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-purple-500/20">
-                  <Boxes className="w-7 h-7 text-white" />
-                </div>
-                <CardTitle className="text-2xl">Conversione 3D Automatica</CardTitle>
-                <CardDescription className="text-base">
-                  La nostra AI analizza le piantine e le converte in modelli 3D completi con pareti, porte e finestre.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            
-            <Card className="border-2 border-slate-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300 bg-white">
-              <CardHeader>
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20">
-                  <Sparkles className="w-7 h-7 text-white" />
-                </div>
-                <CardTitle className="text-2xl">AI Auto-Apprendente</CardTitle>
-                <CardDescription className="text-base">
-                  L'assistente AI impara dalle tue preferenze e feedback, offrendo suggerimenti sempre più personalizzati.
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <FeatureCard 
+              icon={<Upload />}
+              title="Importazione Universale"
+              description="Carica PDF, JPG o PNG. Il nostro sistema riconosce automaticamente muri, porte e finestre."
+              color="text-blue-500"
+              bg="bg-blue-500/10"
+            />
+            <FeatureCard 
+              icon={<Boxes />}
+              title="Modellazione Instantanea"
+              description="Guarda la tua piantina trasformarsi in un modello 3D navigabile in pochi secondi."
+              color="text-purple-500"
+              bg="bg-purple-500/10"
+            />
+            <FeatureCard 
+              icon={<Sparkles />}
+              title="Rendering AI"
+              description="Applica stili e materiali fotorealistici con un semplice prompt testuale."
+              color="text-emerald-500"
+              bg="bg-emerald-500/10"
+            />
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-3xl p-12 shadow-2xl shadow-blue-500/30">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Pronto a Iniziare?
+      <section className="py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="relative rounded-3xl bg-primary px-6 py-16 md:px-12 text-center overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+            
+            <h2 className="text-3xl sm:text-4xl font-bold font-display text-primary-foreground mb-6 relative z-10">
+              Pronto a rivoluzionare il tuo workflow?
             </h2>
-            <p className="text-xl text-blue-50 mb-8">
-              Trasforma le tue piantine in rendering 3D professionali in pochi minuti.
+            <p className="text-lg text-primary-foreground/80 mb-10 max-w-2xl mx-auto relative z-10">
+              Unisciti a migliaia di architetti e designer che usano Vision3D per risparmiare tempo.
             </p>
+            
             <Button
-              data-testid="cta-get-started-button"
               size="lg"
-              onClick={handleGetStarted}
-              className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-blue-50 shadow-xl rounded-2xl"
+              variant="secondary"
+              onClick={() => navigate('/workspace')}
+              className="h-12 px-8 text-base bg-background text-primary hover:bg-background/90 shadow-lg border-0 rounded-full relative z-10"
             >
-              <Zap className="w-5 h-5 mr-2" />
-              Inizia Ora
+              Inizia Gratuitamente <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 bg-white/80 backdrop-blur-xl border-t border-slate-200/50">
-        <div className="max-w-7xl mx-auto text-center text-slate-600">
-          <p>© 2025 Vision3D. Alimentato da AI per architetti e designer.</p>
+      <footer className="py-12 px-6 border-t border-border bg-background">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 opacity-70 hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-2">
+            <Boxes className="w-5 h-5 text-primary" />
+            <span className="font-bold font-display">Vision3D</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            © 2025 Powered by Tempocasa Tech
+          </p>
         </div>
       </footer>
     </div>
   );
 };
 
+// Helper Component for consistency
+const FeatureCard = ({ icon, title, description, color, bg }) => (
+  <Card className="border border-border/50 bg-background/50 hover:bg-background hover:shadow-lg hover:border-primary/20 transition-all duration-300">
+    <CardHeader>
+      <div className={`w-12 h-12 rounded-xl ${bg} ${color} flex items-center justify-center mb-4`}>
+        {React.cloneElement(icon, { className: "w-6 h-6" })}
+      </div>
+      <CardTitle className="font-display text-xl">{title}</CardTitle>
+      <CardDescription className="text-base leading-relaxed">
+        {description}
+      </CardDescription>
+    </CardHeader>
+  </Card>
+);
+
+import React from 'react'; // Checking if React needs to be imported for cloneElement
 export default HomePage;
